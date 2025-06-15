@@ -1,4 +1,4 @@
-package com.github.kliushnichenko.jooby.mcp;
+package io.github.kliushnichenko.jooby.mcp;
 
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;

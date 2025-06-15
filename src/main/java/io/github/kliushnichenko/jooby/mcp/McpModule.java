@@ -1,4 +1,4 @@
-package com.github.kliushnichenko.jooby.mcp;
+package io.github.kliushnichenko.jooby.mcp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
