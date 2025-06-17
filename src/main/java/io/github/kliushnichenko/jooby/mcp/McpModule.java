@@ -124,6 +124,7 @@ public class McpModule implements Extension {
     private static final String VERSION_KEY = "version";
 
     private Config moduleConfig;
+    private ObjectMapper objectMapper = new ObjectMapper();
     private Set<Class<? extends McpSyncTool>> tools;
     private McpSyncServer mcpServer;
 
@@ -141,9 +142,8 @@ public class McpModule implements Extension {
     @Override
     public void install(@NonNull Jooby app) {
         this.moduleConfig = resolveModuleConfig(app.getConfig(), prefix);
-        ObjectMapper mapper = app.require(ObjectMapper.class);
 
-        JoobyTransportProvider transportProvider = new JoobyTransportProvider(mapper, app, moduleConfig);
+        JoobyTransportProvider transportProvider = new JoobyTransportProvider(objectMapper, app, moduleConfig);
         this.mcpServer = McpServer.sync(transportProvider)
                 .serverInfo(resolveRequiredParam(SERVER_NAME_KEY), resolveRequiredParam(VERSION_KEY))
                 .capabilities(McpSchema.ServerCapabilities.builder()
@@ -198,6 +198,11 @@ public class McpModule implements Extension {
 
     public McpModule tools(Set<Class<? extends McpSyncTool>> tools) {
         this.tools = tools;
+        return this;
+    }
+
+    public McpModule objectMapper(ObjectMapper mapper) {
+        this.objectMapper = mapper;
         return this;
     }
 
