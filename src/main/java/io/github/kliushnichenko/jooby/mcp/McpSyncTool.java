@@ -9,5 +9,5 @@ public interface McpSyncTool {
 
     McpSchema.Tool specification();
 
-    McpSchema.CallToolResult call(McpSyncServerExchange exchange, Map<String, Object> args);
+    McpSchema.CallToolResult handler(McpSyncServerExchange exchange, Map<String, Object> args);
 }

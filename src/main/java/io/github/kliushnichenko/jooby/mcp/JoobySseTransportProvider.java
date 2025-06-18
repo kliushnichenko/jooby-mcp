@@ -18,9 +18,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Provides SSE transport implementation for MCP server using Jooby framework.
  * Handles client connections, message routing, and session management.
  */
-public class JoobyTransportProvider implements McpServerTransportProvider {
+public class JoobySseTransportProvider implements McpServerTransportProvider {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JoobyTransportProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JoobySseTransportProvider.class);
 
     private static final String MESSAGE_EVENT_TYPE = "message";
     private static final String ENDPOINT_EVENT_TYPE = "endpoint";
@@ -44,7 +44,7 @@ public class JoobyTransportProvider implements McpServerTransportProvider {
      * @param app          The Jooby application instance to register endpoints with
      * @param moduleConfig Module configuration properties
      */
-    public JoobyTransportProvider(ObjectMapper objectMapper, Jooby app, Config moduleConfig) {
+    public JoobySseTransportProvider(ObjectMapper objectMapper, Jooby app, Config moduleConfig) {
         this.moduleConfig = moduleConfig;
         this.objectMapper = objectMapper;
         this.messageEndpoint = resolveConfigParam("messageEndpoint", DEFAULT_MESSAGE_ENDPOINT);

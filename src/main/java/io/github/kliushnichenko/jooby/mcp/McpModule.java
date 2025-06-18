@@ -14,6 +14,7 @@ import io.modelcontextprotocol.spec.McpSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
@@ -40,9 +41,8 @@ import java.util.Set;
  *
  * <pre>{@code
  * {
- *   install(new JacksonModule()); // is required due to JSON-RPC message format behind the scenes
  *   install(new McpModule()
- *     .tools(MyTool.class, AnotherTool.class)
+ *     .tools(Set.of(MyTool.class, AnotherTool.class))
  *   );
  * }
  * }</pre>
@@ -80,13 +80,12 @@ import java.util.Set;
  *
  * <pre>{@code
  * {
- *   install(new JacksonModule()); // is required due to JSON-RPC message format behind the scenes
  *
  *   install(new McpModule("mcp1")
- *     .tools(FirstTool.class)
+ *     .tools(Set.of(FirstTool.class))
  *   );
  *   install(new McpModule("mcp2")
- *     .tools(SecondTool.class)
+ *     .tools(Set.of(SecondTool.class))
  *   );
  * }
  * }</pre>
@@ -123,9 +122,11 @@ public class McpModule implements Extension {
     private static final String SERVER_NAME_KEY = "name";
     private static final String VERSION_KEY = "version";
 
+    private Jooby app;
     private Config moduleConfig;
     private ObjectMapper objectMapper = new ObjectMapper();
     private Set<Class<? extends McpSyncTool>> tools;
+    private Set<Class<? extends McpSyncPrompt>> prompts;
     private McpSyncServer mcpServer;
 
     private final String prefix;
@@ -141,23 +142,17 @@ public class McpModule implements Extension {
 
     @Override
     public void install(@NonNull Jooby app) {
+        this.app = app;
         this.moduleConfig = resolveModuleConfig(app.getConfig(), prefix);
 
-        JoobyTransportProvider transportProvider = new JoobyTransportProvider(objectMapper, app, moduleConfig);
+        JoobySseTransportProvider transportProvider = new JoobySseTransportProvider(objectMapper, app, moduleConfig);
         this.mcpServer = McpServer.sync(transportProvider)
                 .serverInfo(resolveRequiredParam(SERVER_NAME_KEY), resolveRequiredParam(VERSION_KEY))
-                .capabilities(McpSchema.ServerCapabilities.builder()
-                        .tools(true)
-                        .build())
+                .capabilities(computeCapabilities())
                 .build();
 
-        for (Class<? extends McpSyncTool> toolClass : tools) {
-            McpSyncTool toolInstance = app.require(toolClass);
-            this.mcpServer.addTool(new McpServerFeatures.SyncToolSpecification(
-                    toolInstance.specification(),
-                    toolInstance::call
-            ));
-        }
+        initTools();
+        initPrompts();
 
         if (DEFAULT_CONFIG_PREFIX.equals(prefix)) {
             app.getServices().put(McpSyncServer.class, this.mcpServer);
@@ -167,6 +162,48 @@ public class McpModule implements Extension {
 
         app.onStop(() -> this.mcpServer.close());
         logMcpStart();
+    }
+
+    private void initTools() {
+        if (isEmpty(tools)) {
+            return;
+        }
+
+        for (Class<? extends McpSyncTool> toolClass : tools) {
+            McpSyncTool tool = app.require(toolClass);
+            this.mcpServer.addTool(new McpServerFeatures.SyncToolSpecification(
+                    tool.specification(),
+                    tool::handler
+            ));
+        }
+    }
+
+    private void initPrompts() {
+        if (isEmpty(prompts)) {
+            return;
+        }
+
+        for (Class<? extends McpSyncPrompt> promptClass : prompts) {
+            McpSyncPrompt prompt = app.require(promptClass);
+            this.mcpServer.addPrompt(new McpServerFeatures.SyncPromptSpecification(
+                    prompt.specification(),
+                    prompt::handler
+            ));
+        }
+    }
+
+    private McpSchema.ServerCapabilities computeCapabilities() {
+        var builder = McpSchema.ServerCapabilities.builder();
+
+        if (!isEmpty(tools)) {
+            builder.tools(true);
+        }
+
+        if (!isEmpty(prompts)) {
+            builder.prompts(true);
+        }
+
+        return builder.build();
     }
 
     private Config resolveModuleConfig(Config config, String prefix) {
@@ -180,9 +217,9 @@ public class McpModule implements Extension {
         log.info("""
                                                 
                         MCP server started with:
-                         name: {}
-                         version: {}
-                         capabilities: {}
+                          name: {}
+                          version: {}
+                          capabilities: {}
                         """,
                 mcpServer.getServerInfo().name(),
                 mcpServer.getServerInfo().version(),
@@ -201,6 +238,11 @@ public class McpModule implements Extension {
         return this;
     }
 
+    public McpModule prompts(Set<Class<? extends McpSyncPrompt>> prompts) {
+        this.prompts = prompts;
+        return this;
+    }
+
     public McpModule objectMapper(ObjectMapper mapper) {
         this.objectMapper = mapper;
         return this;
@@ -213,5 +255,9 @@ public class McpModule implements Extension {
     @Override
     public boolean lateinit() {
         return true;
+    }
+
+    private boolean isEmpty(Collection collection) {
+        return collection == null || collection.isEmpty();
     }
 }
