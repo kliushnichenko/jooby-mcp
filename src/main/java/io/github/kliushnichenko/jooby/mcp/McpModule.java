@@ -127,6 +127,7 @@ public class McpModule implements Extension {
     private ObjectMapper objectMapper = new ObjectMapper();
     private Set<Class<? extends McpSyncTool>> tools;
     private Set<Class<? extends McpSyncPrompt>> prompts;
+    private Set<Class<? extends McpSyncResource>> resources;
     private McpSyncServer mcpServer;
 
     private final String prefix;
@@ -153,6 +154,7 @@ public class McpModule implements Extension {
 
         initTools();
         initPrompts();
+        initResources();
 
         if (DEFAULT_CONFIG_PREFIX.equals(prefix)) {
             app.getServices().put(McpSyncServer.class, this.mcpServer);
@@ -192,6 +194,20 @@ public class McpModule implements Extension {
         }
     }
 
+    private void initResources() {
+        if (isEmpty(resources)) {
+            return;
+        }
+
+        for (Class<? extends McpSyncResource> resourceClass : resources) {
+            McpSyncResource resource = app.require(resourceClass);
+            this.mcpServer.addResource(new McpServerFeatures.SyncResourceSpecification(
+                    resource.specification(),
+                    resource::handler
+            ));
+        }
+    }
+
     private McpSchema.ServerCapabilities computeCapabilities() {
         var builder = McpSchema.ServerCapabilities.builder();
 
@@ -201,6 +217,10 @@ public class McpModule implements Extension {
 
         if (!isEmpty(prompts)) {
             builder.prompts(true);
+        }
+
+        if (!isEmpty(resources)) {
+            builder.resources(false, true);
         }
 
         return builder.build();
@@ -240,6 +260,11 @@ public class McpModule implements Extension {
 
     public McpModule prompts(Set<Class<? extends McpSyncPrompt>> prompts) {
         this.prompts = prompts;
+        return this;
+    }
+
+    public McpModule resources(Set<Class<? extends McpSyncResource>> resources) {
+        this.resources = resources;
         return this;
     }
 
