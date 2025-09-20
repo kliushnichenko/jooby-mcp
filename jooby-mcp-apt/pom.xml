@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.kliushnichenko</groupId>
+        <artifactId>jooby-mcp-project</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>jooby-mcp-apt</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Jooby MCP Annotation Processor</name>
+    <description>Annotation processor for generating Jooby MCP Server</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.jooby</groupId>
+            <artifactId>jooby</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.kliushnichenko</groupId>
+            <artifactId>jooby-mcp</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.palantir.javapoet</groupId>
+            <artifactId>javapoet</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.kliushnichenko</groupId>
+            <artifactId>jsonschema-generator-apt</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+        </dependency>
+    </dependencies>
+
+</project> 

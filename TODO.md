@@ -1,0 +1,5 @@
+-+ add ability to customize default target pacakge
+-+ add ability to customize `default` server name`
+- support List as result type
+- update readme
+- refactor example module

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.kliushnichenko</groupId>
+        <artifactId>jooby-mcp-project</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>jooby-mcp</artifactId>
+    <packaging>jar</packaging>
+
+    <name>jooby-mcp</name>
+    <description>Jooby module that lets you run a Model Context Protocol (MCP) server</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jooby</groupId>
+            <artifactId>jooby</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project> 
