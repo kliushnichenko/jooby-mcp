@@ -135,9 +135,8 @@ As a result, additional `WeatherMcpServer` class will be generated. Register it 
 
    ```java
    {
-        ...
-        install(new McpModule(new DefaultMcpServer().server(new WeatherMcpServer())));
-        }
+     install(new McpModule(new DefaultMcpServer(), new WeatherMcpServer()));
+   }
    ```
 
 The weather MCP server should have its own configuration section in `application.conf`:

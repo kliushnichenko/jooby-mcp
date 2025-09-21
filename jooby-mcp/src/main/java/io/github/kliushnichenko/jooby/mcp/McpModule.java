@@ -11,6 +11,7 @@ import io.jooby.exception.StartupException;
 import io.modelcontextprotocol.server.McpSyncServer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -76,7 +77,7 @@ import java.util.List;
  * {
  *
  *   install(new JacksonModule());
- *   install(new McpModule(new DefaultMcpServer()).server(new CalculatorMcpServer());
+ *   install(new McpModule(new DefaultMcpServer(), new CalculatorMcpServer()));
  * }
  * }</pre>
  *
@@ -114,13 +115,11 @@ public class McpModule implements Extension {
     private ObjectMapper objectMapper = new ObjectMapper();
     private final List<JoobyMcpServer> mcpServers = new ArrayList<>();
 
-    public McpModule(JoobyMcpServer joobyMcpServer) {
+    public McpModule(JoobyMcpServer joobyMcpServer, JoobyMcpServer ...moreMcpServers) {
         mcpServers.add(joobyMcpServer);
-    }
-
-    public McpModule server(@NonNull JoobyMcpServer joobyMcpServer) {
-        mcpServers.add(joobyMcpServer);
-        return this;
+        if (moreMcpServers != null) {
+            Collections.addAll(mcpServers, moreMcpServers);
+        }
     }
 
     @Override

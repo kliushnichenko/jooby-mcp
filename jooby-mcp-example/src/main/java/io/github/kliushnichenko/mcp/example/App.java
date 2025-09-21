@@ -15,8 +15,7 @@ public class App extends Jooby {
         getServices().put(CalculatorService.class, new CalculatorService());
         getServices().put(WeatherService.class, new WeatherService());
 
-        install(new McpModule(new CalculatorMcpServer())
-                .server(new WeatherMcpServer()));
+        install(new McpModule(new CalculatorMcpServer(), new WeatherMcpServer()));
     }
 
     public static void main(String[] args) {
