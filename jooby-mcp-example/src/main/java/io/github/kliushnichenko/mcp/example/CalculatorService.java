@@ -5,12 +5,6 @@ import io.github.kliushnichenko.jooby.mcp.annotation.PromptArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
 import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.modelcontextprotocol.spec.McpSchema;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Example service demonstrating MCP tool annotations.
@@ -20,16 +14,10 @@ import java.util.UUID;
  * </p>
  */
 public class CalculatorService {
-    private static final Logger log = LoggerFactory.getLogger(CalculatorService.class);
 
-    private static final String PI_NUMBER_IMAGE = "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";
+    private static final String PI_SIGN_IMAGE = "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";
 
     public record ArithmeticResult(String operation, double result, String expression) {
-
-        @Override
-        public String toString() {
-            return expression;
-        }
     }
 
     @Tool(name = "add", description = "Adds two numbers together")
@@ -37,73 +25,19 @@ public class CalculatorService {
             @ToolArg(name = "first", description = "First number to add") int a,
             @ToolArg(name = "second", description = "Second number to add") int b
     ) {
-        double result = a + b;
+        int result = a + b;
         return new ArithmeticResult("addition", result, a + " + " + b + " = " + result);
     }
 
-    @Tool(name = "subtract")
+    @Tool
     public String subtract(int a, int b) {
         int result = a - b;
         return String.valueOf(result);
     }
 
-    @Tool(name = "pi_number_image", description = "Returns an image of the number Pi")
+    @Tool(name = "pi_sign_image", description = "Returns an image of the number Pi")
     public McpSchema.ImageContent getPiNumberImage() {
-        return new McpSchema.ImageContent(null, null, PI_NUMBER_IMAGE, "image/png");
-    }
-
-    @Tool(name = "no_params", description = "Method with no parameters")
-    public McpSchema.Content noParams() {
-        return new McpSchema.TextContent("42");
-    }
-
-    @Tool(
-            name = "runTask",
-            description = "Runs a task with UUID and name - demonstrates UUID handling"
-    )
-    public ArithmeticResult runTask(
-            @ToolArg(name = "orderId", description = "Order identifier") UUID orderId,
-            @ToolArg(name = "taskName", description = "Name of the task") String taskName
-    ) {
-        return new ArithmeticResult("task", 1.0, "Task " + taskName + " for order " + orderId + " completed");
-    }
-
-    @Tool(name = "add_pet")
-    public String addPet(@ToolArg Pet pet) {
-        log.info("Adding pet: {}", pet);
-        return "Pet " + pet.getName() + " has been added";
-    }
-
-    @Tool(name = "add_pets")
-    public String addPets(@ToolArg List<Pet> pets) {
-        log.info("Adding pet: {}", pets);
-        return pets.size() + " pets were added";
-    }
-
-    @Tool(name = "add_pets_array")
-    public String addPetsArray(Pet[] pets) {
-        return pets.length + " pets were added";
-    }
-
-    @Tool(name = "add_array_of_primitives")
-    public String addVector(int[] vector) {
-        return vector.length + " pets were added";
-    }
-
-    @Tool(name = "add_map_of_pets")
-    public String addMap(Map<UUID, Pet> pets) {
-        return pets.size() + " pets were added";
-    }
-
-    @Tool(
-            name = "petZooAssignment",
-            description = "Assigns pet to zoo - demonstrates multiple complex parameters"
-    )
-    public ArithmeticResult petZooAssignment(
-            @ToolArg(name = "pet", description = "Pet to assign") Pet pet,
-            @ToolArg(name = "zooId", description = "Zoo identifier") UUID zooId
-    ) {
-        return new ArithmeticResult("assignment", 1.0, "Pet " + pet.getName() + " assigned to zoo " + zooId);
+        return new McpSchema.ImageContent(null, null, PI_SIGN_IMAGE, "image/png");
     }
 
     @Prompt(name = "summarizeText", description = "Summarizes the provided text into a specified number of sentences")
@@ -113,5 +47,4 @@ public class CalculatorService {
                 %s
                 """, maxSentences, text);
     }
-
 } 

@@ -9,13 +9,12 @@ import io.jooby.jackson.JacksonModule;
 public class App extends Jooby {
 
     {
-        // Install Jackson for JSON processing
         install(new JacksonModule());
 
+        // Simple, for the sake of example, DI less services registration, but DI is supported as well
         getServices().put(CalculatorService.class, new CalculatorService());
         getServices().put(WeatherService.class, new WeatherService());
 
-        // Create the generated ToolRegistry to demonstrate the annotation processor
         install(new McpModule(new CalculatorMcpServer())
                 .server(new WeatherMcpServer()));
     }
