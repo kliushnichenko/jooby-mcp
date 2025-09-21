@@ -14,7 +14,7 @@
     <artifactId>jooby-mcp-apt</artifactId>
     <packaging>jar</packaging>
 
-    <name>Jooby MCP Annotation Processor</name>
+    <name>jooby-mcp-apt</name>
     <description>Annotation processor for generating Jooby MCP Server</description>
 
     <dependencies>
