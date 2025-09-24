@@ -7,6 +7,8 @@ import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Singleton;
 
+import java.util.UUID;
+
 /**
  * Example service demonstrating MCP tool annotations.
  * <p>
@@ -35,6 +37,11 @@ public class CalculatorService {
     public String subtract(int a, int b) {
         int result = a - b;
         return String.valueOf(result);
+    }
+
+    @Tool
+    public String getOrder(UUID orderId) {
+        return "success";
     }
 
     @Tool(name = "pi_sign_image", description = "Returns an image of the number Pi")

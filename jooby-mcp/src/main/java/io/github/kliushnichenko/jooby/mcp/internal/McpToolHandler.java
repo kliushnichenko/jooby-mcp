@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Map;
 
 public class McpToolHandler {
 
@@ -19,13 +18,14 @@ public class McpToolHandler {
         this.objectMapper = objectMapper;
     }
 
-    public McpSchema.CallToolResult handle(String toolName, JoobyMcpServer server, Map<String, Object> args) {
+    public McpSchema.CallToolResult handle(McpSchema.CallToolRequest request, JoobyMcpServer server) {
+        String toolName = request.name();
         try {
             if (!server.getTools().containsKey(toolName)) {
                 throw new IllegalArgumentException("Tool '" + toolName + "' is not registered.");
             }
 
-            Object result = server.invokeTool(toolName, args);
+            Object result = server.invokeTool(toolName, request.arguments());
 
             if (result == null) {
                 return new McpSchema.CallToolResult("null", false);
