@@ -13,7 +13,7 @@ import static io.modelcontextprotocol.spec.McpSchema.Role.USER;
 
 public class McpPromptHandler {
 
-    private final Logger log = LoggerFactory.getLogger(McpPromptHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(McpPromptHandler.class);
 
     public McpSchema.GetPromptResult handle(JoobyMcpServer server, McpSchema.GetPromptRequest request) {
         try {
@@ -41,7 +41,7 @@ public class McpPromptHandler {
                 return new McpSchema.GetPromptResult(null, List.of(promptMessage));
             }
         } catch (Exception ex) {
-            log.error("Unexpected error while handling prompt request", ex);
+            LOG.error("Error invoking prompt '{}': {}", request.name(), ex.getMessage(), ex);
             throw new McpError(new McpSchema.JSONRPCResponse.JSONRPCError(
                     INTERNAL_ERROR,
                     ex.getMessage(),
