@@ -18,9 +18,9 @@ import static io.github.kliushnichenko.jooby.mcp.apt.generator.McpServerGenerato
 class FieldsGenerator {
 
     public static void generateFields(TypeSpec.Builder builder) {
-        FieldSpec joobyServices = FieldSpec.builder(
-                        ClassName.get("io.jooby", "ServiceRegistry"),
-                        "services",
+        FieldSpec joobyApp = FieldSpec.builder(
+                        ClassName.get("io.jooby", "Jooby"),
+                        "app",
                         Modifier.PRIVATE)
                 .build();
 
@@ -71,7 +71,7 @@ class FieldsGenerator {
                 .addJavadoc("Map of prompt names to method invokers.")
                 .build();
 
-        builder.addField(joobyServices);
+        builder.addField(joobyApp);
         builder.addField(objectMapper);
         builder.addField(toolsField);
         builder.addField(promptsField);

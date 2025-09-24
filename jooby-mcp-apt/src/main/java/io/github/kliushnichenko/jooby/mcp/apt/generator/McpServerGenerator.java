@@ -112,7 +112,7 @@ public class McpServerGenerator {
                 .addJavadoc("@param app the Jooby application instance")
                 .addJavadoc("@param objectMapper json serializer instance");
 
-        initMethodBuilder.addStatement("this.services = app.getServices()");
+        initMethodBuilder.addStatement("this.app = app");
         initMethodBuilder.addStatement("this.objectMapper = objectMapper");
         initMethodBuilder.addCode("\n");
 
@@ -197,7 +197,7 @@ public class McpServerGenerator {
 
         ClassName serviceClassName = ClassName.get(serviceClass);
         CodeBlock.Builder methodCall = CodeBlock.builder();
-        methodCall.add("(args) -> (services.get($T.class)).$L(", serviceClassName, method.getSimpleName());
+        methodCall.add("(args) -> (app.require($T.class)).$L(", serviceClassName, method.getSimpleName());
 
         for (int i = 0; i < parameters.size(); i++) {
             if (i > 0) {

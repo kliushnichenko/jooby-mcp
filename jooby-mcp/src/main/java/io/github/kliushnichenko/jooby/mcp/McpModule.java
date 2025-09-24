@@ -115,7 +115,7 @@ public class McpModule implements Extension {
     private ObjectMapper objectMapper = new ObjectMapper();
     private final List<JoobyMcpServer> mcpServers = new ArrayList<>();
 
-    public McpModule(JoobyMcpServer joobyMcpServer, JoobyMcpServer ...moreMcpServers) {
+    public McpModule(JoobyMcpServer joobyMcpServer, JoobyMcpServer... moreMcpServers) {
         mcpServers.add(joobyMcpServer);
         if (moreMcpServers != null) {
             Collections.addAll(mcpServers, moreMcpServers);
@@ -175,10 +175,5 @@ public class McpModule implements Extension {
     public McpModule objectMapper(ObjectMapper mapper) {
         this.objectMapper = mapper;
         return this;
-    }
-
-    @Override
-    public boolean lateinit() {
-        return true;
     }
 }

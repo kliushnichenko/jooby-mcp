@@ -3,11 +3,15 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.modelcontextprotocol.spec.McpSchema;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 public class McpToolHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(McpToolHandler.class);
 
     private final ObjectMapper objectMapper;
 
@@ -36,6 +40,7 @@ public class McpToolHandler {
                 return new McpSchema.CallToolResult(resultStr, false);
             }
         } catch (Exception ex) {
+            LOG.error("Error invoking tool '{}': {}", toolName, ex.getMessage(), ex);
             return new McpSchema.CallToolResult(ex.getMessage(), true);
         }
     }
