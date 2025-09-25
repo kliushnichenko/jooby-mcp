@@ -51,14 +51,12 @@ public class McpServerRunner {
 
     private void initTools(McpSyncServer mcpServer) {
         for (Map.Entry<String, McpSchema.Tool> entry : joobyMcpServer.getTools().entrySet()) {
-            String toolName = entry.getKey();
+            var toolSpec = new McpServerFeatures.SyncToolSpecification.Builder()
+                    .tool(entry.getValue())
+                    .callHandler((exchange, callToolRequest) -> toolHandler.handle(callToolRequest, joobyMcpServer))
+                    .build();
 
-            mcpServer.addTool(
-                    new McpServerFeatures.SyncToolSpecification(
-                            entry.getValue(),
-                            (mcpSyncServerExchange, args) -> toolHandler.handle(toolName, joobyMcpServer, args)
-                    )
-            );
+            mcpServer.addTool(toolSpec);
         }
     }
 

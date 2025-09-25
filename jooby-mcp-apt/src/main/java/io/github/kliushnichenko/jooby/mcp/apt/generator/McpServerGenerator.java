@@ -11,6 +11,7 @@ import io.github.kliushnichenko.jooby.mcp.apt.tools.ToolEntry;
 import io.github.kliushnichenko.jsonschema.generator.JsonSchemaGenerator;
 import io.github.kliushnichenko.jsonschema.model.JsonSchemaAnnotationMapper;
 import io.github.kliushnichenko.jsonschema.model.JsonSchemaProps;
+import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import javax.annotation.processing.Filer;
@@ -114,6 +115,7 @@ public class McpServerGenerator {
 
         initMethodBuilder.addStatement("this.app = app");
         initMethodBuilder.addStatement("this.objectMapper = objectMapper");
+        initMethodBuilder.addStatement("this.mcpJsonMapper = new $T(objectMapper)", ClassName.get(JacksonMcpJsonMapper.class));
         initMethodBuilder.addCode("\n");
 
         fillToolsMap(initMethodBuilder, descriptor.tools());
@@ -132,10 +134,11 @@ public class McpServerGenerator {
         for (ToolEntry tool : tools) {
             String jsonSchema = schemaGenerator.generate(tool.method());
             methodBuilder.addStatement(
-                    "tools.put($S, new $T($S, $S, $S))",
+                    "tools.put($S, $T.builder().name($S).title($S).description($S).inputSchema(mcpJsonMapper, $S).build())",
                     tool.toolName(),
                     ClassName.get(McpSchema.Tool.class),
                     tool.toolName(),
+                    tool.toolName(), // todo: add title support in annotations
                     tool.toolDescription(),
                     jsonSchema);
         }
