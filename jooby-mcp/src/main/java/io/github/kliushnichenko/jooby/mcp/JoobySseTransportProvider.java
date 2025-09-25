@@ -1,9 +1,10 @@
 package io.github.kliushnichenko.jooby.mcp;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import io.jooby.*;
+import io.modelcontextprotocol.json.TypeRef;
+import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.spec.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
 
     private final Config moduleConfig;
     private final String messageEndpoint;
-    private final ObjectMapper objectMapper;
+    private final JacksonMcpJsonMapper mcpJsonMapper;
     private final ConcurrentHashMap<String, McpServerSession> sessions = new ConcurrentHashMap<>();
 
     private McpServerSession.Factory sessionFactory;
@@ -46,7 +47,7 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
      */
     public JoobySseTransportProvider(ObjectMapper objectMapper, Jooby app, Config moduleConfig) {
         this.moduleConfig = moduleConfig;
-        this.objectMapper = objectMapper;
+        this.mcpJsonMapper = new JacksonMcpJsonMapper(objectMapper);
         this.messageEndpoint = resolveConfigParam("messageEndpoint", DEFAULT_MESSAGE_ENDPOINT);
         String sseEndpoint = resolveConfigParam("sseEndpoint", DEFAULT_SSE_ENDPOINT);
 
@@ -124,12 +125,16 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
     private Object handleMessage(Context ctx) {
         if (isClosing.get()) {
             ctx.setResponseCode(StatusCode.SERVICE_UNAVAILABLE);
-            return new McpError("Server is shutting down");
+            return McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR)
+                    .message("Server is shutting down")
+                    .build();
         }
 
         if (ctx.query(SESSION_ID_KEY).isMissing()) {
             ctx.setResponseCode(StatusCode.BAD_REQUEST);
-            return new McpError("Session ID missing in message endpoint");
+            return McpError.builder(McpSchema.ErrorCodes.INVALID_REQUEST)
+                    .message("Session ID missing in message endpoint")
+                    .build();
         }
 
         String sessionId = ctx.query(SESSION_ID_KEY).value();
@@ -137,12 +142,14 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
 
         if (session == null) {
             ctx.setResponseCode(StatusCode.NOT_FOUND);
-            return new McpError("Session not found: " + sessionId);
+            return McpError.builder(McpSchema.ErrorCodes.RESOURCE_NOT_FOUND)
+                    .message("Session not found: " + sessionId)
+                    .build();
         }
 
         try {
             var body = ctx.body().value();
-            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(this.objectMapper, body);
+            McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(this.mcpJsonMapper, body);
 
             return session.handle(message).then(Mono.just((Object) StatusCode.OK))
                     .onErrorResume(error -> {
@@ -152,7 +159,9 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
                     .block();
         } catch (IOException | IllegalArgumentException e) {
             LOG.error("Failed to deserialize message: {}", e.getMessage());
-            return new McpError("Invalid message format");
+            return McpError.builder(McpSchema.ErrorCodes.PARSE_ERROR)
+                    .message("Invalid message format")
+                    .build();
         }
     }
 
@@ -173,7 +182,7 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
         public Mono<Void> sendMessage(McpSchema.JSONRPCMessage message) {
             return Mono.fromRunnable(() -> {
                 try {
-                    String jsonText = objectMapper.writeValueAsString(message);
+                    String jsonText = mcpJsonMapper.writeValueAsString(message);
                     sse.send(new ServerSentMessage(jsonText).setEvent(MESSAGE_EVENT_TYPE));
                     LOG.debug("Message sent to session {}: {}", sessionId, message);
                 } catch (Exception e) {
@@ -184,8 +193,8 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
         }
 
         @Override
-        public <T> T unmarshalFrom(Object data, TypeReference<T> typeRef) {
-            return objectMapper.convertValue(data, typeRef);
+        public <T> T unmarshalFrom(Object data, TypeRef<T> typeRef) {
+            return mcpJsonMapper.convertValue(data, typeRef);
         }
 
         @Override

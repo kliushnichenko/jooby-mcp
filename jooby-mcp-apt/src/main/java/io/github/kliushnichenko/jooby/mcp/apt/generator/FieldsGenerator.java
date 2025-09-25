@@ -6,6 +6,7 @@ import com.palantir.javapoet.FieldSpec;
 import com.palantir.javapoet.ParameterizedTypeName;
 import com.palantir.javapoet.TypeSpec;
 import io.github.kliushnichenko.jooby.mcp.internal.MethodInvoker;
+import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import javax.lang.model.element.Modifier;
@@ -27,6 +28,12 @@ class FieldsGenerator {
         FieldSpec objectMapper = FieldSpec.builder(
                         ClassName.get(ObjectMapper.class),
                         "objectMapper",
+                        Modifier.PRIVATE)
+                .build();
+
+        FieldSpec mcpJsonMapper = FieldSpec.builder(
+                        ClassName.get(JacksonMcpJsonMapper.class),
+                        "mcpJsonMapper",
                         Modifier.PRIVATE)
                 .build();
 
@@ -73,6 +80,7 @@ class FieldsGenerator {
 
         builder.addField(joobyApp);
         builder.addField(objectMapper);
+        builder.addField(mcpJsonMapper);
         builder.addField(toolsField);
         builder.addField(promptsField);
         builder.addField(toolInvokersField);
