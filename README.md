@@ -44,7 +44,7 @@ Table of Contents:
            <annotationProcessorPaths>
                <path>
                    <groupId>io.github.kliushnichenko</groupId>
-                   <artifactId>jooby-mcp-processor</artifactId>
+                   <artifactId>jooby-mcp-apt</artifactId>
                    <version>${jooby.mcp.version}</version>
                </path>
            </annotationProcessorPaths>
@@ -82,7 +82,7 @@ Table of Contents:
    import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
    
    @Singleton
-   public class Service {
+   public class CalculatorService {
    
        @Tool(name = "add", description = "Adds two numbers together")
        public String add(
@@ -164,7 +164,7 @@ to `com.acme.corp.mcp`, you can add the following configuration to your `pom.xml
            <annotationProcessorPaths>
                <path>
                    <groupId>io.github.kliushnichenko</groupId>
-                   <artifactId>jooby-mcp-processor</artifactId>
+                   <artifactId>jooby-mcp-apt</artifactId>
                    <version>${version}</version>
                </path>
            </annotationProcessorPaths>
