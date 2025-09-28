@@ -39,7 +39,7 @@ public class CalculatorService {
 
     @Tool(name = "pi_sign_image", description = "Returns an image of the number Pi")
     public McpSchema.ImageContent getPiNumberImage() {
-        return new McpSchema.ImageContent(null, null, PI_SIGN_IMAGE, "image/png");
+        return new McpSchema.ImageContent(null, PI_SIGN_IMAGE, "image/png");
     }
 
     @Prompt(name = "summarizeText", description = "Summarizes the provided text into a specified number of sentences")

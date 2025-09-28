@@ -2,6 +2,8 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
+import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
@@ -22,6 +24,7 @@ public class McpServerRunner {
     private final String serverVersion;
     private final McpToolHandler toolHandler;
     private final McpPromptHandler promptHandler;
+    private final McpJsonMapper mcpJsonMapper;
 
     public McpServerRunner(JoobyMcpServer joobyMcpServer,
                            McpServerTransportProvider transportProvider,
@@ -34,6 +37,7 @@ public class McpServerRunner {
         this.serverVersion = serverVersion;
         this.toolHandler = new McpToolHandler(objectMapper);
         this.promptHandler = new McpPromptHandler();
+        this.mcpJsonMapper = new JacksonMcpJsonMapper(objectMapper);
     }
 
     public McpSyncServer run() {
@@ -50,13 +54,21 @@ public class McpServerRunner {
     }
 
     private void initTools(McpSyncServer mcpServer) {
-        for (Map.Entry<String, McpSchema.Tool> entry : joobyMcpServer.getTools().entrySet()) {
-            var toolSpec = new McpServerFeatures.SyncToolSpecification.Builder()
-                    .tool(entry.getValue())
+        for (Map.Entry<String, ToolSpec> entry : joobyMcpServer.getTools().entrySet()) {
+            ToolSpec toolSpec = entry.getValue();
+            McpSchema.Tool tool = McpSchema.Tool.builder()
+                    .name(toolSpec.getName())
+                    .title(toolSpec.getTitle())
+                    .description(toolSpec.getDescription())
+                    .inputSchema(mcpJsonMapper, toolSpec.getInputSchema())
+                    .build();
+
+            var syncToolSpec = new McpServerFeatures.SyncToolSpecification.Builder()
+                    .tool(tool)
                     .callHandler((exchange, callToolRequest) -> toolHandler.handle(callToolRequest, joobyMcpServer))
                     .build();
 
-            mcpServer.addTool(toolSpec);
+            mcpServer.addTool(syncToolSpec);
         }
     }
 
@@ -89,9 +101,9 @@ public class McpServerRunner {
         log.info("""
                                                 
                         MCP server started with:
-                          name: {}
-                          version: {}
-                          capabilities: {}
+                            name: {}
+                            version: {}
+                            capabilities: {}
                         """,
                 mcpServer.getServerInfo().name(),
                 mcpServer.getServerInfo().version(),
