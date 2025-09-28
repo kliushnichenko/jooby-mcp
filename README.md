@@ -1,3 +1,5 @@
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg)](https://search.maven.org/artifact/io.github.kliushnichenko/jooby-mcp)
+
 # jooby-mcp
 
 This module provides a lightweight wrapper over the official Java MCP [SDK](https://github.com/modelcontextprotocol/java-sdk), adapted for use with Jooby’s routing, server
@@ -16,6 +18,7 @@ Features:
 - [ ] Resources
 - [ ] Completions
 - [ ] HTTP Streamable transport
+- [X] Tool required arguments validation
 
 Table of Contents:
 - [Quick Start](#quick-start)
