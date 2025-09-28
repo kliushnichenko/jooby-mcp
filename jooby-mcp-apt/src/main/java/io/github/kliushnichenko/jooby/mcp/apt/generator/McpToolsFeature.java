@@ -6,12 +6,13 @@ import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.github.kliushnichenko.jooby.mcp.apt.McpServerDescriptor;
 import io.github.kliushnichenko.jooby.mcp.apt.tools.ToolEntry;
 import io.github.kliushnichenko.jooby.mcp.internal.MethodInvoker;
+import io.github.kliushnichenko.jooby.mcp.internal.ToolSpec;
 import io.github.kliushnichenko.jsonschema.generator.JsonSchemaGenerator;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
-import io.modelcontextprotocol.spec.McpSchema;
+import io.github.kliushnichenko.jsonschema.model.JsonSchemaObj;
 
 import javax.lang.model.element.Modifier;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.github.kliushnichenko.jooby.mcp.apt.generator.AnnotationMappers.MAPPERS;
@@ -29,14 +30,8 @@ class McpToolsFeature extends McpFeature {
                         Modifier.PRIVATE)
                 .build();
 
-        FieldSpec mcpJsonMapper = FieldSpec.builder(
-                        ClassName.get(JacksonMcpJsonMapper.class),
-                        "mcpJsonMapper",
-                        Modifier.PRIVATE)
-                .build();
-
         FieldSpec toolsField = FieldSpec.builder(
-                        ParameterizedTypeName.get(Map.class, String.class, McpSchema.Tool.class),
+                        ParameterizedTypeName.get(Map.class, String.class, ToolSpec.class),
                         "tools",
                         Modifier.PRIVATE, Modifier.FINAL)
                 .initializer("new $T<>()", HashMap.class)
@@ -56,7 +51,6 @@ class McpToolsFeature extends McpFeature {
                 .build();
 
         builder.addField(objectMapper);
-        builder.addField(mcpJsonMapper);
         builder.addField(toolsField);
         builder.addField(toolInvokersField);
     }
@@ -64,20 +58,23 @@ class McpToolsFeature extends McpFeature {
     @Override
     public void generateInitializers(MethodSpec.Builder builder, McpServerDescriptor descriptor) {
         builder.addStatement("this.objectMapper = objectMapper");
-        builder.addStatement("this.mcpJsonMapper = new $T(objectMapper)", ClassName.get(JacksonMcpJsonMapper.class));
         builder.addCode("\n");
 
         // fill tools map
         for (ToolEntry tool : descriptor.tools()) {
-            String jsonSchema = schemaGenerator.generate(tool.method());
+            JsonSchemaObj jsonSchemaObj = schemaGenerator.generateAsObject(tool.method());
+            String jsonSchema = JsonSchemaGenerator.serializeSchemaObj(jsonSchemaObj);
+            CodeBlock requiredArgs = buildRequiredArguments(jsonSchemaObj.getRequired());
+
             builder.addStatement(
-                    "tools.put($S, $T.builder().name($S).title($S).description($S).inputSchema(mcpJsonMapper, $S).build())",
+                    "tools.put($S, $T.builder().name($S).title($S).description($S).inputSchema($S).requiredArguments($L).build())",
                     tool.toolName(),
-                    ClassName.get(McpSchema.Tool.class),
+                    ClassName.get(ToolSpec.class),
                     tool.toolName(),
                     tool.toolName(), // todo: add title support in annotations
                     tool.toolDescription(),
-                    jsonSchema);
+                    jsonSchema,
+                    requiredArgs);
         }
         builder.addCode("\n");
 
@@ -88,6 +85,19 @@ class McpToolsFeature extends McpFeature {
             builder.addCode(CodeBlock.of("toolInvokers.put($L);\n", mapEntry));
         }
         builder.addCode("\n");
+    }
+
+    private CodeBlock buildRequiredArguments(List<String> requiredArgs) {
+        CodeBlock.Builder codeBlock = CodeBlock.builder();
+        codeBlock.add("$T.of(", List.class);
+        for (int i = 0; i < requiredArgs.size(); i++) {
+            if (i > 0) {
+                codeBlock.add(", ");
+            }
+            codeBlock.add("$S", requiredArgs.get(i));
+        }
+        codeBlock.add(")");
+        return codeBlock.build();
     }
 
     @Override
@@ -113,7 +123,7 @@ class McpToolsFeature extends McpFeature {
     public void generateGetter(TypeSpec.Builder builder) {
         MethodSpec getSchemasMethod = MethodSpec.methodBuilder("getTools")
                 .addModifiers(Modifier.PUBLIC)
-                .returns(ParameterizedTypeName.get(Map.class, String.class, McpSchema.Tool.class))
+                .returns(ParameterizedTypeName.get(Map.class, String.class, ToolSpec.class))
                 .addStatement("return tools")
                 .build();
 
