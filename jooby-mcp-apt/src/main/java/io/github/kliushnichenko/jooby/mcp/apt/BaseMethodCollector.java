@@ -3,23 +3,20 @@ package io.github.kliushnichenko.jooby.mcp.apt;
 import io.github.kliushnichenko.jooby.mcp.annotation.McpServer;
 
 import javax.annotation.processing.Messager;
-import javax.lang.model.element.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
 public class BaseMethodCollector {
 
     protected String defaultServerKey;
     protected final Messager messager;
-    protected Class<?> methodAnnotation;
-    protected String annotationName;
 
-    public BaseMethodCollector(Messager messager,
-                               Class<?> methodAnnotation,
-                               String defaultServerKey) {
+    public BaseMethodCollector(Messager messager, String defaultServerKey) {
         this.messager = messager;
-        this.methodAnnotation = methodAnnotation;
         this.defaultServerKey = defaultServerKey;
-        this.annotationName = "@" + methodAnnotation.getSimpleName();
     }
 
     protected String extractServerKey(ExecutableElement method, TypeElement serviceClass) {
@@ -42,10 +39,9 @@ public class BaseMethodCollector {
         }
     }
 
-    protected boolean isValidMethod(Element element) {
-        ExecutableElement method = (ExecutableElement) element;
+    protected boolean isPublicMethod(ExecutableElement method) {
         if (!method.getModifiers().contains(Modifier.PUBLIC)) {
-            reportError(annotationName + " annotated methods must be public", element);
+            reportError(method.getSimpleName().toString() + " method must be public", method);
             return false;
         }
 

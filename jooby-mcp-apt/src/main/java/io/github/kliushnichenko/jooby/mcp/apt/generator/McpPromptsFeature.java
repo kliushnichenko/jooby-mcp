@@ -14,8 +14,6 @@ import java.util.Map;
 
 public class McpPromptsFeature extends McpFeature {
 
-    private static final String PROMPT_INVOKERS_FIELD_NAME = "promptInvokers";
-
     @Override
     public void generateFields(TypeSpec.Builder builder) {
         FieldSpec promptsField = FieldSpec.builder(
@@ -32,7 +30,7 @@ public class McpPromptsFeature extends McpFeature {
                                 ClassName.get(String.class),
                                 ClassName.get(MethodInvoker.class)
                         ),
-                        PROMPT_INVOKERS_FIELD_NAME,
+                        "promptInvokers",
                         Modifier.PRIVATE, Modifier.FINAL)
                 .initializer("new $T<>()", HashMap.class)
                 .addJavadoc("Map of prompt names to method invokers.")
@@ -78,9 +76,7 @@ public class McpPromptsFeature extends McpFeature {
                 .addJavadoc("@param promptName the name of the prompt to invoke\n")
                 .addJavadoc("@param args the arguments to pass to the prompt\n")
                 .addJavadoc("@return the result of the prompt invocation\n")
-                .addJavadoc("@throws IllegalArgumentException if the tool is not found")
-                .addStatement("$T invoker = $L.get(promptName)",
-                        ClassName.get(MethodInvoker.class), PROMPT_INVOKERS_FIELD_NAME)
+                .addStatement("$T invoker = promptInvokers.get(promptName)", ClassName.get(MethodInvoker.class))
                 .addStatement("return invoker.invoke(args)")
                 .build();
 
@@ -89,13 +85,13 @@ public class McpPromptsFeature extends McpFeature {
 
     @Override
     public void generateGetter(TypeSpec.Builder builder) {
-        MethodSpec getSchemasMethod = MethodSpec.methodBuilder("getPrompts")
+        MethodSpec getter = MethodSpec.methodBuilder("getPrompts")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ParameterizedTypeName.get(Map.class, String.class, McpSchema.Prompt.class))
                 .addStatement("return prompts")
                 .build();
 
-        builder.addMethod(getSchemasMethod);
+        builder.addMethod(getter);
     }
 
     private CodeBlock buildPromptArgs(List<PromptEntry.Arg> promptArgs) {

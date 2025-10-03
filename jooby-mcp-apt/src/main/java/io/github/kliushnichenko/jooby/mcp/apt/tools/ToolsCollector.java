@@ -17,7 +17,7 @@ import java.util.*;
 public class ToolsCollector extends BaseMethodCollector {
 
     public ToolsCollector(Messager messager, String defaultServerKey) {
-        super(messager, Tool.class, defaultServerKey);
+        super(messager, defaultServerKey);
     }
 
     public List<ToolEntry> collectTools(RoundEnvironment roundEnv) {
@@ -40,6 +40,11 @@ public class ToolsCollector extends BaseMethodCollector {
         }
 
         return toolEntries;
+    }
+
+    private boolean isValidMethod(Element element) {
+        ExecutableElement method = (ExecutableElement) element;
+        return isPublicMethod(method);
     }
 
     private String extractToolName(ExecutableElement method, Tool annotation) {

@@ -19,7 +19,6 @@ import static io.github.kliushnichenko.jooby.mcp.apt.generator.AnnotationMappers
 
 class McpToolsFeature extends McpFeature {
 
-    private static final String TOOL_INVOKERS_FIELD_NAME = "toolInvokers";
     private final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(MAPPERS); // todo: looks like only TOOL_ARG_MAPPER is used
 
     @Override
@@ -44,7 +43,7 @@ class McpToolsFeature extends McpFeature {
                                 ClassName.get(String.class),
                                 ClassName.get(MethodInvoker.class)
                         ),
-                        TOOL_INVOKERS_FIELD_NAME,
+                        "toolInvokers",
                         Modifier.PRIVATE, Modifier.FINAL)
                 .initializer("new $T<>()", HashMap.class)
                 .addJavadoc("Map of tool names to method invokers.")
@@ -111,8 +110,7 @@ class McpToolsFeature extends McpFeature {
                 .addJavadoc("@param toolName the name of the tool to invoke\n")
                 .addJavadoc("@param args the arguments to pass to the tool\n")
                 .addJavadoc("@return the result of the tool invocation\n")
-                .addStatement("$T invoker = $L.get(toolName)",
-                        ClassName.get(MethodInvoker.class), TOOL_INVOKERS_FIELD_NAME)
+                .addStatement("$T invoker = toolInvokers.get(toolName)", ClassName.get(MethodInvoker.class))
                 .addStatement("return invoker.invoke(args)")
                 .build();
 
@@ -121,12 +119,12 @@ class McpToolsFeature extends McpFeature {
 
     @Override
     public void generateGetter(TypeSpec.Builder builder) {
-        MethodSpec getSchemasMethod = MethodSpec.methodBuilder("getTools")
+        MethodSpec getter = MethodSpec.methodBuilder("getTools")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(ParameterizedTypeName.get(Map.class, String.class, ToolSpec.class))
                 .addStatement("return tools")
                 .build();
 
-        builder.addMethod(getSchemasMethod);
+        builder.addMethod(getter);
     }
 }
