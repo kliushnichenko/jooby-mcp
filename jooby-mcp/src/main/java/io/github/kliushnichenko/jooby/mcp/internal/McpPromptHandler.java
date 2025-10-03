@@ -11,11 +11,11 @@ import java.util.List;
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
 import static io.modelcontextprotocol.spec.McpSchema.Role.USER;
 
-public class McpPromptHandler {
+class McpPromptHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(McpPromptHandler.class);
 
-    public McpSchema.GetPromptResult handle(JoobyMcpServer server, McpSchema.GetPromptRequest request) {
+    public static McpSchema.GetPromptResult handle(JoobyMcpServer server, McpSchema.GetPromptRequest request) {
         try {
             var promptName = request.name();
             if (!server.getPrompts().containsKey(promptName)) {

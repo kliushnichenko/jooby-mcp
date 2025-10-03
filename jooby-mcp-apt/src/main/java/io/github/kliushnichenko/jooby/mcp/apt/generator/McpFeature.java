@@ -33,7 +33,7 @@ abstract class McpFeature {
 
         ClassName serviceClassName = ClassName.get(serviceClass);
         CodeBlock.Builder methodCall = CodeBlock.builder();
-        methodCall.add("(args) -> (app.require($T.class)).$L(", serviceClassName, method.getSimpleName());
+        methodCall.add("(args) -> app.require($T.class).$L(", serviceClassName, method.getSimpleName());
 
         for (int i = 0; i < parameters.size(); i++) {
             if (i > 0) {

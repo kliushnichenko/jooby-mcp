@@ -12,6 +12,8 @@ import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class McpServerRunner {
@@ -23,7 +25,6 @@ public class McpServerRunner {
     private final String serverName;
     private final String serverVersion;
     private final McpToolHandler toolHandler;
-    private final McpPromptHandler promptHandler;
     private final McpJsonMapper mcpJsonMapper;
 
     public McpServerRunner(JoobyMcpServer joobyMcpServer,
@@ -35,15 +36,16 @@ public class McpServerRunner {
         this.transportProvider = transportProvider;
         this.serverName = serverName;
         this.serverVersion = serverVersion;
-        this.toolHandler = new McpToolHandler(objectMapper);
-        this.promptHandler = new McpPromptHandler();
         this.mcpJsonMapper = new JacksonMcpJsonMapper(objectMapper);
+        this.toolHandler = new McpToolHandler(objectMapper);
     }
 
     public McpSyncServer run() {
+        List<McpServerFeatures.SyncCompletionSpecification> completions = initCompletions();
         McpSyncServer mcpServer = McpServer.sync(transportProvider)
                 .serverInfo(serverName, serverVersion)
                 .capabilities(computeCapabilities())
+                .completions(completions)
                 .build();
 
         initTools(mcpServer);
@@ -51,6 +53,18 @@ public class McpServerRunner {
 
         logMcpStart(mcpServer);
         return mcpServer;
+    }
+
+    private List<McpServerFeatures.SyncCompletionSpecification> initCompletions() {
+        List<McpServerFeatures.SyncCompletionSpecification> completions = new ArrayList<>();
+        for (McpSchema.CompleteReference ref : joobyMcpServer.getCompletions()) {
+            var completion = new McpServerFeatures.SyncCompletionSpecification(
+                    ref,
+                    (exchange, request) -> McpCompletionHandler.handle(joobyMcpServer, request)
+            );
+            completions.add(completion);
+        }
+        return completions;
     }
 
     private void initTools(McpSyncServer mcpServer) {
@@ -77,7 +91,7 @@ public class McpServerRunner {
             mcpServer.addPrompt(
                     new McpServerFeatures.SyncPromptSpecification(
                             entry.getValue(),
-                            (mcpSyncServerExchange, request) -> promptHandler.handle(joobyMcpServer, request)
+                            (mcpSyncServerExchange, request) -> McpPromptHandler.handle(joobyMcpServer, request)
                     )
             );
         }
@@ -92,6 +106,10 @@ public class McpServerRunner {
 
         if (!joobyMcpServer.getPrompts().isEmpty()) {
             builder.prompts(true);
+        }
+
+        if (!joobyMcpServer.getCompletions().isEmpty()) {
+            builder.completions();
         }
 
         return builder.build();

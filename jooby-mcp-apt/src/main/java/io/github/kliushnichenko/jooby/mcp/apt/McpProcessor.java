@@ -4,6 +4,8 @@ import com.google.auto.service.AutoService;
 import io.github.kliushnichenko.jooby.mcp.annotation.McpServer;
 import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
 import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
+import io.github.kliushnichenko.jooby.mcp.apt.completions.CompletionEntry;
+import io.github.kliushnichenko.jooby.mcp.apt.completions.CompletionsCollector;
 import io.github.kliushnichenko.jooby.mcp.apt.generator.McpServerGenerator;
 import io.github.kliushnichenko.jooby.mcp.apt.prompts.PromptEntry;
 import io.github.kliushnichenko.jooby.mcp.apt.prompts.PromptsCollector;
@@ -47,11 +49,13 @@ public class McpProcessor extends AbstractProcessor {
 
     private ToolsCollector toolsCollector;
     private PromptsCollector promptsCollector;
+    private CompletionsCollector completionsCollector;
     private McpServerGenerator mcpServerGenerator;
 
     private Set<String> serverKeys;
     private List<ToolEntry> tools = new ArrayList<>();
     private List<PromptEntry> prompts = new ArrayList<>();
+    private List<CompletionEntry> completions = new ArrayList<>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -72,6 +76,7 @@ public class McpProcessor extends AbstractProcessor {
         this.serverKeys = new HashSet<>(List.of(defaultServerKey));
         this.toolsCollector = new ToolsCollector(messager, defaultServerKey);
         this.promptsCollector = new PromptsCollector(messager, defaultServerKey);
+        this.completionsCollector = new CompletionsCollector(messager, defaultServerKey);
         this.mcpServerGenerator = new McpServerGenerator(processingEnv.getFiler());
     }
 
@@ -106,6 +111,9 @@ public class McpProcessor extends AbstractProcessor {
 
             tools = toolsCollector.collectTools(roundEnv);
             prompts = promptsCollector.collectPrompts(roundEnv);
+
+            List<String> promptRefs = prompts.stream().map(PromptEntry::promptName).toList();
+            completions = completionsCollector.collectCompletions(roundEnv, promptRefs);
 
             List<McpServerDescriptor> descriptors = buildServerDescriptors(defaultTargetPackage);
             mcpServerGenerator.generateMcpServers(descriptors);
@@ -145,8 +153,9 @@ public class McpProcessor extends AbstractProcessor {
             descriptors.add(new McpServerDescriptor(
                     serverKey,
                     defaultTargetPackage,
-                    tools.stream().filter(tool -> tool.serverKey().equals(serverKey)).toList(),
-                    prompts.stream().filter(prompt -> prompt.serverKey().equals(serverKey)).toList()
+                    tools.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
+                    prompts.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
+                    completions.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList()
             ));
         }
         return descriptors;

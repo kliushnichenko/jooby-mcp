@@ -15,7 +15,7 @@ import java.util.*;
 public class PromptsCollector extends BaseMethodCollector {
 
     public PromptsCollector(Messager messager, String defaultServerKey) {
-        super(messager, Prompt.class, defaultServerKey);
+        super(messager, defaultServerKey);
     }
 
     public List<PromptEntry> collectPrompts(RoundEnvironment roundEnv) {
@@ -30,6 +30,14 @@ public class PromptsCollector extends BaseMethodCollector {
         }
 
         return prompts;
+    }
+
+    private boolean isValidMethod(Element element) {
+        ExecutableElement method = (ExecutableElement) element;
+        if (!isPublicMethod(method)) {
+            return false;
+        }
+        return true;
     }
 
     private PromptEntry buildPromptEntry(ExecutableElement method) {

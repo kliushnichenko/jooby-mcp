@@ -14,8 +14,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public @interface CompletePrompt {
 
     /**
-     * The name reference to a prompt. If not such {@link Prompt} exists then the build fails.
+     * The name reference to a prompt. If no such {@link Prompt} exists then the build fails.
      */
     String value();
-
 }
