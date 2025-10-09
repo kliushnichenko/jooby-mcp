@@ -72,10 +72,12 @@ public class McpPromptsFeature extends McpFeature {
                 .addParameter(String.class, "promptName", Modifier.FINAL)
                 .addParameter(ParameterizedTypeName.get(Map.class, String.class, Object.class), "args", Modifier.FINAL)
                 .returns(Object.class)
-                .addJavadoc("Invokes a prompt by name with the provided arguments.\n")
-                .addJavadoc("@param promptName the name of the prompt to invoke\n")
-                .addJavadoc("@param args the arguments to pass to the prompt\n")
-                .addJavadoc("@return the result of the prompt invocation\n")
+                .addJavadoc("""
+                         Invokes a prompt by name with the provided arguments.
+                         @param promptName the name of the prompt to invoke
+                         @param args the arguments to pass to the prompt
+                         @return the result of the prompt invocation
+                        """)
                 .addStatement("$T invoker = promptInvokers.get(promptName)", ClassName.get(MethodInvoker.class))
                 .addStatement("return invoker.invoke(args)")
                 .build();

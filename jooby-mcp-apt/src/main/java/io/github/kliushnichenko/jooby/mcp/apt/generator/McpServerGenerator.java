@@ -18,7 +18,8 @@ public class McpServerGenerator {
     private static final List<McpFeature> FEATURES = List.of(
             new McpToolsFeature(),
             new McpPromptsFeature(),
-            new McpCompletionsFeature()
+            new McpCompletionsFeature(),
+            new McpResourcesFeature()
     );
 
     public McpServerGenerator(Filer filer) {

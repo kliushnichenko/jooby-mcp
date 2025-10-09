@@ -49,4 +49,16 @@ abstract class McpFeature {
         methodCall.add(")");
         return methodCall.build();
     }
+
+    protected void addIfNotNull(Object value, CodeBlock.Builder codeBuilder, String format) {
+        if (value != null) {
+            codeBuilder.add(format, value);
+        }
+    }
+
+    protected void addIfPositive(Number value, CodeBlock.Builder codeBuilder, String format) {
+        if (value != null && value.doubleValue() >= 0) {
+            codeBuilder.add(format, value);
+        }
+    }
 }

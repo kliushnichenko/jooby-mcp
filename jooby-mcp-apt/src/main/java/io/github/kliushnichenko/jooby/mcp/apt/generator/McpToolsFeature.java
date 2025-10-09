@@ -106,10 +106,12 @@ class McpToolsFeature extends McpFeature {
                 .addParameter(String.class, "toolName", Modifier.FINAL)
                 .addParameter(ParameterizedTypeName.get(Map.class, String.class, Object.class), "args", Modifier.FINAL)
                 .returns(Object.class)
-                .addJavadoc("Invokes a tool by name with the provided arguments.\n")
-                .addJavadoc("@param toolName the name of the tool to invoke\n")
-                .addJavadoc("@param args the arguments to pass to the tool\n")
-                .addJavadoc("@return the result of the tool invocation\n")
+                .addJavadoc("""
+                        Invokes a tool by name with the provided arguments.
+                        @param toolName the name of the tool to invoke
+                        @param args the arguments to pass to the tool
+                        @return the result of the tool invocation
+                        """)
                 .addStatement("$T invoker = toolInvokers.get(toolName)", ClassName.get(MethodInvoker.class))
                 .addStatement("return invoker.invoke(args)")
                 .build();

@@ -3,3 +3,4 @@
 - support List as result type
 - refactor example module
 - build-time verification of the return type for each handler (tool, prompt, completion..)
+- add detailed annotation processor result logging

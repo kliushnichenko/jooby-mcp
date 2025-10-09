@@ -48,6 +48,10 @@ public class BaseMethodCollector {
         return true;
     }
 
+    protected String toNullIfEmpty(String str) {
+        return str.isEmpty() ? null : str;
+    }
+
     protected void reportError(String message, Element element) {
         messager.printMessage(Diagnostic.Kind.ERROR, message, element);
     }

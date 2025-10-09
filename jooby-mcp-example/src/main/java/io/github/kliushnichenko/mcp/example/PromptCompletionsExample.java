@@ -3,7 +3,6 @@ package io.github.kliushnichenko.mcp.example;
 import io.github.kliushnichenko.jooby.mcp.annotation.CompleteArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt;
 import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
-import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Singleton;
 
 import java.util.List;
@@ -31,12 +30,10 @@ public class PromptCompletionsExample {
     }
 
     @CompletePrompt("code_review")
-    public McpSchema.CompleteResult completeCodeReviewLang(@CompleteArg(name = "language") String partialInput) {
-        var values = SUPPORTED_LANGUAGES.stream()
+    public List<String> completeCodeReviewLang(@CompleteArg(name = "language") String partialInput) {
+        return SUPPORTED_LANGUAGES.stream()
                 .filter(lang -> lang.toLowerCase().contains(partialInput.toLowerCase()))
                 .toList();
-        var completion = new McpSchema.CompleteResult.CompleteCompletion(values, values.size(), false);
-        return new McpSchema.CompleteResult(completion);
     }
 
     @CompletePrompt("code_review")
