@@ -16,8 +16,6 @@ import java.util.function.Function;
 
 public class McpCompletionsFeature extends McpFeature {
 
-    private static final String COMPLETIONS_INVOKERS_FIELD_NAME = "completionInvokers";
-
     @Override
     void generateFields(TypeSpec.Builder builder) {
         FieldSpec completionsField = FieldSpec.builder(
@@ -37,7 +35,7 @@ public class McpCompletionsFeature extends McpFeature {
                                         ClassName.get(String.class),
                                         ClassName.get(Object.class))
                         ),
-                        COMPLETIONS_INVOKERS_FIELD_NAME,
+                        "completionInvokers",
                         Modifier.PRIVATE, Modifier.FINAL)
                 .initializer("new $T<>()", HashMap.class)
                 .addJavadoc("Map of completion key(a composition of <identifier>_<argumentName>) to method invoker.")

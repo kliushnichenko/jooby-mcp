@@ -20,9 +20,12 @@ public interface JoobyMcpServer {
 
     Object invokeCompletion(String identifier, String argumentName, String input);
 
+    Object readResource(String uri);
     Map<String, ToolSpec> getTools();
 
     Map<String, McpSchema.Prompt> getPrompts();
+
+    List<McpSchema.Resource> getResources();
 
     List<McpSchema.CompleteReference> getCompletions();
 }

@@ -24,22 +24,7 @@ class McpPromptHandler {
 
             Object result = server.invokePrompt(promptName, request.arguments());
 
-            if (result == null) {
-                return new McpSchema.GetPromptResult(null, List.of());
-            } else if (result instanceof McpSchema.GetPromptResult promptResult) {
-                return promptResult;
-            } else if (result instanceof McpSchema.PromptMessage promptMessage) {
-                return new McpSchema.GetPromptResult(null, List.of(promptMessage));
-            } else if (result instanceof McpSchema.Content content) {
-                var promptMessage = new McpSchema.PromptMessage(USER, content);
-                return new McpSchema.GetPromptResult(null, List.of(promptMessage));
-            } else if (result instanceof String str) {
-                var promptMessage = new McpSchema.PromptMessage(USER, new McpSchema.TextContent(str));
-                return new McpSchema.GetPromptResult(null, List.of(promptMessage));
-            } else {
-                var promptMessage = new McpSchema.PromptMessage(USER, new McpSchema.TextContent(result.toString()));
-                return new McpSchema.GetPromptResult(null, List.of(promptMessage));
-            }
+            return toPromptResult(result);
         } catch (Exception ex) {
             LOG.error("Error invoking prompt '{}': {}", request.name(), ex.getMessage(), ex);
             throw new McpError(new McpSchema.JSONRPCResponse.JSONRPCError(
@@ -47,6 +32,25 @@ class McpPromptHandler {
                     ex.getMessage(),
                     null
             ));
+        }
+    }
+
+    private static McpSchema.GetPromptResult toPromptResult(Object result) {
+        if (result == null) {
+            return new McpSchema.GetPromptResult(null, List.of());
+        } else if (result instanceof McpSchema.GetPromptResult promptResult) {
+            return promptResult;
+        } else if (result instanceof McpSchema.PromptMessage promptMessage) {
+            return new McpSchema.GetPromptResult(null, List.of(promptMessage));
+        } else if (result instanceof McpSchema.Content content) {
+            var promptMessage = new McpSchema.PromptMessage(USER, content);
+            return new McpSchema.GetPromptResult(null, List.of(promptMessage));
+        } else if (result instanceof String str) {
+            var promptMessage = new McpSchema.PromptMessage(USER, new McpSchema.TextContent(str));
+            return new McpSchema.GetPromptResult(null, List.of(promptMessage));
+        } else {
+            var promptMessage = new McpSchema.PromptMessage(USER, new McpSchema.TextContent(result.toString()));
+            return new McpSchema.GetPromptResult(null, List.of(promptMessage));
         }
     }
 }

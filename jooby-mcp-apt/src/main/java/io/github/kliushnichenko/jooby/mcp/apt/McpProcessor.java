@@ -9,6 +9,8 @@ import io.github.kliushnichenko.jooby.mcp.apt.completions.CompletionsCollector;
 import io.github.kliushnichenko.jooby.mcp.apt.generator.McpServerGenerator;
 import io.github.kliushnichenko.jooby.mcp.apt.prompts.PromptEntry;
 import io.github.kliushnichenko.jooby.mcp.apt.prompts.PromptsCollector;
+import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourceEntry;
+import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourcesCollector;
 import io.github.kliushnichenko.jooby.mcp.apt.tools.ToolEntry;
 import io.github.kliushnichenko.jooby.mcp.apt.tools.ToolsCollector;
 
@@ -50,12 +52,14 @@ public class McpProcessor extends AbstractProcessor {
     private ToolsCollector toolsCollector;
     private PromptsCollector promptsCollector;
     private CompletionsCollector completionsCollector;
+    private ResourcesCollector resourcesCollector;
     private McpServerGenerator mcpServerGenerator;
 
     private Set<String> serverKeys;
     private List<ToolEntry> tools = new ArrayList<>();
     private List<PromptEntry> prompts = new ArrayList<>();
     private List<CompletionEntry> completions = new ArrayList<>();
+    private List<ResourceEntry> resources = new ArrayList<>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -77,6 +81,7 @@ public class McpProcessor extends AbstractProcessor {
         this.toolsCollector = new ToolsCollector(messager, defaultServerKey);
         this.promptsCollector = new PromptsCollector(messager, defaultServerKey);
         this.completionsCollector = new CompletionsCollector(messager, defaultServerKey);
+        this.resourcesCollector = new ResourcesCollector(messager, defaultServerKey);
         this.mcpServerGenerator = new McpServerGenerator(processingEnv.getFiler());
     }
 
@@ -114,6 +119,7 @@ public class McpProcessor extends AbstractProcessor {
 
             List<String> promptRefs = prompts.stream().map(PromptEntry::promptName).toList();
             completions = completionsCollector.collectCompletions(roundEnv, promptRefs);
+            resources = resourcesCollector.collectResources(roundEnv);
 
             List<McpServerDescriptor> descriptors = buildServerDescriptors(defaultTargetPackage);
             mcpServerGenerator.generateMcpServers(descriptors);
@@ -155,7 +161,8 @@ public class McpProcessor extends AbstractProcessor {
                     defaultTargetPackage,
                     tools.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
                     prompts.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
-                    completions.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList()
+                    completions.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
+                    resources.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList()
             ));
         }
         return descriptors;

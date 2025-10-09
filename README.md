@@ -15,8 +15,10 @@ Features:
 - [X] Multiple servers support
 - [X] Tools
 - [X] Prompts
-- [ ] Resources
-- [ ] Completions
+- [X] Resources
+- [ ] Resource Templates
+- [X] Prompt Completions
+- [ ] Resource Template Completions
 - [ ] HTTP Streamable transport
 - [X] Tool required arguments validation
 
@@ -77,7 +79,7 @@ Table of Contents:
    }
    ```
 
-### Example Tools & Prompts
+### Tools & Prompts Example
 
    ```java
    import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
@@ -110,6 +112,68 @@ Table of Contents:
                    """, maxSentences, text);
        }
    } 
+   ```
+
+### Resource Example
+
+   ```java
+   import io.github.kliushnichenko.jooby.mcp.annotation.Resource;
+
+   @Singleton
+   public class ResourceExamples {
+   
+       @Resource(uri = "file:///project/README.md", name = "README.md", title = "README", mimeType = "text/markdown")
+       public McpSchema.TextResourceContents textResource() {
+           String content = """
+                   # Project Title
+   
+                   This is an example README file for the project.
+   
+                   ## Features
+   
+                   - Feature 1
+                   - Feature 2
+                   - Feature 3
+   
+                   """;
+           return new McpSchema.TextResourceContents("file:///project/README.md", "text/markdown", content);
+       }
+   }
+   ```
+
+### Prompt Completion Example
+
+   ```java
+    import io.github.kliushnichenko.jooby.mcp.annotation.CompleteArg;
+    import io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt;
+    import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
+
+   @Singleton
+   public class PromptCompletionsExample {
+   
+       private static final List<String> SUPPORTED_LANGUAGES = List.of("Java", "Python", "JavaScript", "Go", "TypeScript");
+   
+       @Prompt(name = "code_review", description = "Code Review Prompt")
+       public String codeReviewPrompt(String codeSnippet, String language) {
+           return """
+                   You are a senior software engineer tasked with reviewing the following %s code snippet:
+                      
+                   %s
+                      
+                   Please provide feedback on:
+                   1. Code readability and maintainability.
+                   2. Potential bugs or issues.
+                   3. Suggestions for improvement.
+                    """.formatted(language, codeSnippet);
+       }
+   
+       @CompletePrompt("code_review")
+       public List<String> completeCodeReviewLang(@CompleteArg(name = "language") String partialInput) {
+           return SUPPORTED_LANGUAGES.stream()
+                   .filter(lang -> lang.toLowerCase().contains(partialInput.toLowerCase()))
+                   .toList();
+       }
+   }
    ```
 
 ### Multiple Servers Support

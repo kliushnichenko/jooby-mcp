@@ -25,6 +25,7 @@ public class McpServerRunner {
     private final String serverName;
     private final String serverVersion;
     private final McpToolHandler toolHandler;
+    private final McpResourceHandler resourceHandler;
     private final McpJsonMapper mcpJsonMapper;
 
     public McpServerRunner(JoobyMcpServer joobyMcpServer,
@@ -38,6 +39,7 @@ public class McpServerRunner {
         this.serverVersion = serverVersion;
         this.mcpJsonMapper = new JacksonMcpJsonMapper(objectMapper);
         this.toolHandler = new McpToolHandler(objectMapper);
+        this.resourceHandler = new McpResourceHandler(objectMapper);
     }
 
     public McpSyncServer run() {
@@ -50,6 +52,7 @@ public class McpServerRunner {
 
         initTools(mcpServer);
         initPrompts(mcpServer);
+        initResources(mcpServer);
 
         logMcpStart(mcpServer);
         return mcpServer;
@@ -91,7 +94,18 @@ public class McpServerRunner {
             mcpServer.addPrompt(
                     new McpServerFeatures.SyncPromptSpecification(
                             entry.getValue(),
-                            (mcpSyncServerExchange, request) -> McpPromptHandler.handle(joobyMcpServer, request)
+                            (exchange, request) -> McpPromptHandler.handle(joobyMcpServer, request)
+                    )
+            );
+        }
+    }
+
+    private void initResources(McpSyncServer mcpServer) {
+        for (McpSchema.Resource resource : joobyMcpServer.getResources()) {
+            mcpServer.addResource(
+                    new McpServerFeatures.SyncResourceSpecification(
+                            resource,
+                            (exchange, request) -> resourceHandler.handle(joobyMcpServer, request)
                     )
             );
         }
@@ -110,6 +124,10 @@ public class McpServerRunner {
 
         if (!joobyMcpServer.getCompletions().isEmpty()) {
             builder.completions();
+        }
+
+        if (!joobyMcpServer.getResources().isEmpty()) {
+            builder.resources(true, true);
         }
 
         return builder.build();
