@@ -2,8 +2,7 @@
 
 # jooby-mcp
 
-This module provides a lightweight wrapper over the official Java MCP [SDK](https://github.com/modelcontextprotocol/java-sdk), adapted for use with Jooby’s routing, server
-capabilities and DI.
+This module provides a lightweight wrapper over the official Java MCP [SDK](https://github.com/modelcontextprotocol/java-sdk), adapted for use with Jooby’s routing, server capabilities and DI.
 
 The module provides declarative(annotation-based) registration of tools, prompts and resources.
 Annotations discovery is done at build-time using APT, so no reflection is used at runtime.
@@ -24,7 +23,9 @@ Features:
 
 Table of Contents:
 - [Quick Start](#quick-start)
-- [Example Tools & Prompts](#example-tools--prompts)
+- [Tools & Prompts Example](#tools--prompts-example)
+- [Resource Example](#resource-example)
+- [Prompt Completion Example](#prompt-completion-example)
 - [Multiple Servers Support](#multiple-servers-support)
 - [Customizing Default Server Name and Package](#customizing-default-server-name-and-package)
 - [Supported return types in Tools](#supported-return-types-in-tools)
@@ -269,3 +270,19 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 - `McpSchema.Content`
 - `String`
 - POJO (`toString()` method will be invoked to get the string representation)
+
+#### Supported return types in Resources
+
+- `McpSchema.ReadResourceResult`
+- `McpSchema.ResourceContents`
+- `List<McpSchema.ResourceContents>`
+- `McpSchema.TextResourceContents`
+- `McpSchema.BlobResourceContents`
+- POJO (will be serialized to JSON)
+
+#### Supported return types in Prompt Completions
+
+- `McpSchema.CompleteResult`
+- `McpSchema.CompleteResult.CompleteCompletion`
+- `List<String>`
+- `String`
