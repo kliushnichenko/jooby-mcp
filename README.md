@@ -67,7 +67,7 @@ Table of Contents:
    }
    ```
 
-4. Implement your tool, prompt or resource, see examples below
+4. Implement your features (tools, prompts, resources, etc.), see examples below and in the [example-project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example)
 
 5. Install the module. After compilation, you can observe generated `DefaultMcpServer` class. Now register its instance
    in the module:
@@ -81,100 +81,101 @@ Table of Contents:
 
 ### Tools & Prompts Example
 
-   ```java
-   import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
-   import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
-   import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
-   
-   @Singleton
-   public class CalculatorService {
-   
-       @Tool(name = "add", description = "Adds two numbers together")
-       public String add(
-               @ToolArg(name = "first", description = "First number to add") int a,
-               @ToolArg(name = "second", description = "Second number to add") int b
-       ) {
-           int result = a + b;
-           return String.valueOf(result);
-       }
-   
-       @Tool
-       public String subtract(int a, int b) {
-           int result = a - b;
-           return String.valueOf(result);
-       }
-   
-       @Prompt(name = "summarizeText", description = "Summarizes the provided text into a specified number of sentences")
-       public String summarizeText(@PromptArg(name = "text") String text, String maxSentences) {
-           return String.format("""
-                   Please provide a clear and concise summary of the following text in no more than %s sentences:
-                   %s
-                   """, maxSentences, text);
-       }
-   } 
-   ```
+```java
+import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
+import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
+import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
+
+@Singleton
+public class CalculatorService {
+
+   @Tool(name = "add", description = "Adds two numbers together")
+   public String add(
+           @ToolArg(name = "first", description = "First number to add") int a,
+           @ToolArg(name = "second", description = "Second number to add") int b
+   ) {
+       int result = a + b;
+       return String.valueOf(result);
+   }
+
+   @Tool
+   public String subtract(int a, int b) {
+       int result = a - b;
+       return String.valueOf(result);
+   }
+
+   @Prompt(name = "summarizeText", description = "Summarizes the provided text into a specified number of sentences")
+   public String summarizeText(@PromptArg(name = "text") String text, String maxSentences) {
+       return String.format("""
+               Please provide a clear and concise summary of the following text in no more than %s sentences:
+               %s
+               """, maxSentences, text);
+   }
+} 
+```
 
 ### Resource Example
 
-   ```java
-   import io.github.kliushnichenko.jooby.mcp.annotation.Resource;
+```java
+import io.github.kliushnichenko.jooby.mcp.annotation.Resource;
 
-   @Singleton
-   public class ResourceExamples {
-   
-       @Resource(uri = "file:///project/README.md", name = "README.md", title = "README", mimeType = "text/markdown")
-       public McpSchema.TextResourceContents textResource() {
-           String content = """
-                   # Project Title
-   
-                   This is an example README file for the project.
-   
-                   ## Features
-   
-                   - Feature 1
-                   - Feature 2
-                   - Feature 3
-   
-                   """;
-           return new McpSchema.TextResourceContents("file:///project/README.md", "text/markdown", content);
-       }
+@Singleton
+public class ResourceExamples {
+
+   @Resource(uri = "file:///project/README.md", name = "README.md", title = "README", mimeType = "text/markdown")
+   public McpSchema.TextResourceContents textResource() {
+       String content = """
+               # Project Title
+
+               This is an example README file for the project.
+
+               ## Features
+
+               - Feature 1
+               - Feature 2
+               - Feature 3
+
+               """;
+       return new McpSchema.TextResourceContents("file:///project/README.md", "text/markdown", content);
    }
-   ```
+}
+```
+Find more examples in the [project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example/ResourceExamples.java)
 
 ### Prompt Completion Example
 
-   ```java
-    import io.github.kliushnichenko.jooby.mcp.annotation.CompleteArg;
-    import io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt;
-    import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
+```java
+import io.github.kliushnichenko.jooby.mcp.annotation.CompleteArg;
+import io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt;
+import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
 
-   @Singleton
-   public class PromptCompletionsExample {
-   
-       private static final List<String> SUPPORTED_LANGUAGES = List.of("Java", "Python", "JavaScript", "Go", "TypeScript");
-   
-       @Prompt(name = "code_review", description = "Code Review Prompt")
-       public String codeReviewPrompt(String codeSnippet, String language) {
-           return """
-                   You are a senior software engineer tasked with reviewing the following %s code snippet:
-                      
-                   %s
-                      
-                   Please provide feedback on:
-                   1. Code readability and maintainability.
-                   2. Potential bugs or issues.
-                   3. Suggestions for improvement.
-                    """.formatted(language, codeSnippet);
-       }
-   
-       @CompletePrompt("code_review")
-       public List<String> completeCodeReviewLang(@CompleteArg(name = "language") String partialInput) {
-           return SUPPORTED_LANGUAGES.stream()
-                   .filter(lang -> lang.toLowerCase().contains(partialInput.toLowerCase()))
-                   .toList();
-       }
+@Singleton
+public class PromptCompletionsExample {
+
+   private static final List<String> SUPPORTED_LANGUAGES = List.of("Java", "Python", "JavaScript", "Go", "TypeScript");
+
+   @Prompt(name = "code_review", description = "Code Review Prompt")
+   public String codeReviewPrompt(String codeSnippet, String language) {
+       return """
+               You are a senior software engineer tasked with reviewing the following %s code snippet:
+                  
+               %s
+                  
+               Please provide feedback on:
+               1. Code readability and maintainability.
+               2. Potential bugs or issues.
+               3. Suggestions for improvement.
+                """.formatted(language, codeSnippet);
    }
-   ```
+
+   @CompletePrompt("code_review")
+   public List<String> completeCodeReviewLang(@CompleteArg(name = "language") String partialInput) {
+       return SUPPORTED_LANGUAGES.stream()
+               .filter(lang -> lang.toLowerCase().contains(partialInput.toLowerCase()))
+               .toList();
+   }
+}
+```
 
 ### Multiple Servers Support
 
