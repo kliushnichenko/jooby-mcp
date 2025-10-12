@@ -1,10 +1,9 @@
 package io.github.kliushnichenko.jooby.mcp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import io.jooby.*;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.TypeRef;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.spec.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
 
     private final Config moduleConfig;
     private final String messageEndpoint;
-    private final JacksonMcpJsonMapper mcpJsonMapper;
+    private final McpJsonMapper mcpJsonMapper;
     private final ConcurrentHashMap<String, McpServerSession> sessions = new ConcurrentHashMap<>();
 
     private McpServerSession.Factory sessionFactory;
@@ -41,13 +40,13 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
     /**
      * Constructs a new Jooby Reactive SSE transport provider instance.
      *
-     * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization of MCP messages
-     * @param app          The Jooby application instance to register endpoints with
-     * @param moduleConfig Module configuration properties
+     * @param mcpJsonMapper The MCP JSON mapper for message serialization/deserialization
+     * @param app           The Jooby application instance to register endpoints with
+     * @param moduleConfig  Module configuration properties
      */
-    public JoobySseTransportProvider(ObjectMapper objectMapper, Jooby app, Config moduleConfig) {
+    public JoobySseTransportProvider(McpJsonMapper mcpJsonMapper, Jooby app, Config moduleConfig) {
         this.moduleConfig = moduleConfig;
-        this.mcpJsonMapper = new JacksonMcpJsonMapper(objectMapper);
+        this.mcpJsonMapper = mcpJsonMapper;
         this.messageEndpoint = resolveConfigParam("messageEndpoint", DEFAULT_MESSAGE_ENDPOINT);
         String sseEndpoint = resolveConfigParam("sseEndpoint", DEFAULT_SSE_ENDPOINT);
 

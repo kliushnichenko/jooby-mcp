@@ -8,6 +8,8 @@ import io.jooby.Extension;
 import io.jooby.Jooby;
 import io.jooby.ServiceKey;
 import io.jooby.exception.StartupException;
+import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpSyncServer;
 
 import java.util.ArrayList;
@@ -112,7 +114,7 @@ public class McpModule implements Extension {
     private static final String SERVER_NAME_KEY = "name";
     private static final String VERSION_KEY = "version";
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private McpJsonMapper mcpJsonMapper = new JacksonMcpJsonMapper(new ObjectMapper());
     private final List<JoobyMcpServer> mcpServers = new ArrayList<>();
 
     public McpModule(JoobyMcpServer joobyMcpServer, JoobyMcpServer... moreMcpServers) {
@@ -131,15 +133,23 @@ public class McpModule implements Extension {
 
         for (JoobyMcpServer joobyMcpServer : mcpServers) {
             Config serverConfig = resolveServerConfig(config, joobyMcpServer.getServerKey());
-            joobyMcpServer.init(app, this.objectMapper);
-            JoobySseTransportProvider transportProvider = new JoobySseTransportProvider(objectMapper, app, serverConfig);
+            joobyMcpServer.init(app, mcpJsonMapper);
+            JoobySseTransportProvider transportProvider = new JoobySseTransportProvider(mcpJsonMapper, app, serverConfig);
+//            JoobyStreamableServerTransportProvider transportProvider = new JoobyStreamableServerTransportProvider(
+//                    app,
+//                    mcpJsonMapper,
+//                    "/mcp",
+//                    false,
+//                    request -> McpTransportContext.EMPTY,
+//                    Duration.of(30, ChronoUnit.SECONDS)
+//            );
 
             var runner = new McpServerRunner(
                     joobyMcpServer,
                     transportProvider,
                     resolveRequiredParam(serverConfig, SERVER_NAME_KEY),
                     resolveRequiredParam(serverConfig, VERSION_KEY),
-                    objectMapper
+                    mcpJsonMapper
             );
 
             McpSyncServer mcpServer = runner.run();
@@ -172,8 +182,14 @@ public class McpModule implements Extension {
         return config.getString(configPath);
     }
 
+    @Deprecated(since = "1.4.0", forRemoval = true)
     public McpModule objectMapper(ObjectMapper mapper) {
-        this.objectMapper = mapper;
+        this.mcpJsonMapper = new JacksonMcpJsonMapper(mapper);
+        return this;
+    }
+
+    public McpModule mcpJsonMapper(McpJsonMapper mcpJsonMapper) {
+        this.mcpJsonMapper = mcpJsonMapper;
         return this;
     }
 }

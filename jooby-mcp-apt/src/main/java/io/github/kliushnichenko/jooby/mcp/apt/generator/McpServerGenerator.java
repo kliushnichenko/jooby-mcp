@@ -1,9 +1,9 @@
 package io.github.kliushnichenko.jooby.mcp.apt.generator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palantir.javapoet.*;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.github.kliushnichenko.jooby.mcp.apt.McpServerDescriptor;
+import io.modelcontextprotocol.json.McpJsonMapper;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Modifier;
@@ -67,10 +67,10 @@ public class McpServerGenerator {
         MethodSpec.Builder initMethodBuilder = MethodSpec.methodBuilder("init")
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(ClassName.get("io.jooby", "Jooby"), "app", Modifier.FINAL)
-                .addParameter(ClassName.get(ObjectMapper.class), "objectMapper", Modifier.FINAL)
+                .addParameter(ClassName.get(McpJsonMapper.class), "mcpJsonMapper", Modifier.FINAL)
                 .addJavadoc("Initialize a new server.")
                 .addJavadoc("@param app the Jooby application instance")
-                .addJavadoc("@param objectMapper json serializer instance");
+                .addJavadoc("@param mcpJsonMapper json serializer instance");
 
         initMethodBuilder.addStatement("this.app = app");
 

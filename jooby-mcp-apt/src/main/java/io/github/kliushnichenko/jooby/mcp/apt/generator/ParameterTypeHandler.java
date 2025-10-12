@@ -57,7 +57,7 @@ class ParameterTypeHandler {
             case "java.lang.Double" -> CodeBlock.of("(Double) args.get($S)", parameterName);
             case "java.lang.Float" -> CodeBlock.of("(Float) args.get($S)", parameterName);
             case "java.lang.Boolean" -> CodeBlock.of("(Boolean) args.get($S)", parameterName);
-            default -> CodeBlock.of("($L) objectMapper.convertValue(args.get($S), $L.class)",
+            default -> CodeBlock.of("($L) mcpJsonMapper.convertValue(args.get($S), $L.class)",
                     paramType,
                     parameterName,
                     paramType);
@@ -65,7 +65,7 @@ class ParameterTypeHandler {
     }
 
     private static CodeBlock handleMapTypes(String parameterName, String paramType) {
-        return CodeBlock.of("($L) objectMapper.convertValue(args.get($S), new $T<$L>() {})",
+        return CodeBlock.of("($L) mcpJsonMapper.convertValue(args.get($S), new $T<$L>() {})",
                 paramType,
                 parameterName,
                 TypeReference.class,
@@ -75,13 +75,13 @@ class ParameterTypeHandler {
     private static CodeBlock handleIterableTypes(String parameterName, TypeMirror typeMirror, String paramType) {
         TypeMirror componentType = TypeUtils.getCollectionComponentType(typeMirror);
         if (TypeKind.ARRAY == typeMirror.getKind()) {
-            return CodeBlock.of("($L) objectMapper.convertValue(args.get($S), $L[].class)",
+            return CodeBlock.of("($L) mcpJsonMapper.convertValue(args.get($S), $L[].class)",
                     paramType,
                     parameterName,
                     componentType.toString());
         } else {
             // handle collection
-            return CodeBlock.of("($L) objectMapper.convertValue(args.get($S), new $T<$L>() {})",
+            return CodeBlock.of("($L) mcpJsonMapper.convertValue(args.get($S), new $T<$L>() {})",
                     paramType,
                     parameterName,
                     TypeReference.class,

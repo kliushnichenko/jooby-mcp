@@ -1,9 +1,7 @@
 package io.github.kliushnichenko.jooby.mcp.internal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.modelcontextprotocol.json.McpJsonMapper;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
@@ -32,14 +30,14 @@ public class McpServerRunner {
                            McpServerTransportProvider transportProvider,
                            String serverName,
                            String serverVersion,
-                           ObjectMapper objectMapper) {
+                           McpJsonMapper mcpJsonMapper) {
         this.joobyMcpServer = joobyMcpServer;
         this.transportProvider = transportProvider;
         this.serverName = serverName;
         this.serverVersion = serverVersion;
-        this.mcpJsonMapper = new JacksonMcpJsonMapper(objectMapper);
-        this.toolHandler = new McpToolHandler(objectMapper);
-        this.resourceHandler = new McpResourceHandler(objectMapper);
+        this.mcpJsonMapper = mcpJsonMapper;
+        this.toolHandler = new McpToolHandler(mcpJsonMapper);
+        this.resourceHandler = new McpResourceHandler(mcpJsonMapper);
     }
 
     public McpSyncServer run() {

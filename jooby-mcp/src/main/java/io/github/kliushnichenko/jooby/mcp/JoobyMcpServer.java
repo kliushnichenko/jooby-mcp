@@ -1,8 +1,8 @@
 package io.github.kliushnichenko.jooby.mcp;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.internal.ToolSpec;
 import io.jooby.Jooby;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public interface JoobyMcpServer {
 
     String getServerKey();
 
-    void init(Jooby app, ObjectMapper objectMapper);
+    void init(Jooby app, McpJsonMapper mcpJsonMapper);
 
     Object invokeTool(String toolName, Map<String, Object> args);
 
@@ -21,6 +21,7 @@ public interface JoobyMcpServer {
     Object invokeCompletion(String identifier, String argumentName, String input);
 
     Object readResource(String uri);
+
     Map<String, ToolSpec> getTools();
 
     Map<String, McpSchema.Prompt> getPrompts();
