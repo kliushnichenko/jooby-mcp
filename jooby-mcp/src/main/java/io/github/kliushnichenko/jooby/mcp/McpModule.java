@@ -3,6 +3,7 @@ package io.github.kliushnichenko.jooby.mcp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
 import io.github.kliushnichenko.jooby.mcp.internal.McpServerRunner;
 import io.jooby.Extension;
 import io.jooby.Jooby;
@@ -111,8 +112,6 @@ import java.util.List;
 public class McpModule implements Extension {
 
     private static final String MODULE_CONFIG_PREFIX = "mcp";
-    private static final String SERVER_NAME_KEY = "name";
-    private static final String VERSION_KEY = "version";
 
     private McpJsonMapper mcpJsonMapper = new JacksonMcpJsonMapper(new ObjectMapper());
     private final List<JoobyMcpServer> mcpServers = new ArrayList<>();
@@ -132,23 +131,13 @@ public class McpModule implements Extension {
         }
 
         for (JoobyMcpServer joobyMcpServer : mcpServers) {
-            Config serverConfig = resolveServerConfig(config, joobyMcpServer.getServerKey());
+            McpServerConfig serverConfig = resolveServerConfig(config, joobyMcpServer.getServerKey());
             joobyMcpServer.init(app, mcpJsonMapper);
-            JoobySseTransportProvider transportProvider = new JoobySseTransportProvider(mcpJsonMapper, app, serverConfig);
-//            JoobyStreamableServerTransportProvider transportProvider = new JoobyStreamableServerTransportProvider(
-//                    app,
-//                    mcpJsonMapper,
-//                    "/mcp",
-//                    false,
-//                    request -> McpTransportContext.EMPTY,
-//                    Duration.of(30, ChronoUnit.SECONDS)
-//            );
 
             var runner = new McpServerRunner(
+                    app,
                     joobyMcpServer,
-                    transportProvider,
-                    resolveRequiredParam(serverConfig, SERVER_NAME_KEY),
-                    resolveRequiredParam(serverConfig, VERSION_KEY),
+                    serverConfig,
                     mcpJsonMapper
             );
 
@@ -167,21 +156,22 @@ public class McpModule implements Extension {
         }
     }
 
-    private Config resolveServerConfig(Config config, String serverKey) {
+    private McpServerConfig resolveServerConfig(Config config, String serverKey) {
         String path = MODULE_CONFIG_PREFIX + "." + serverKey;
         if (!config.hasPath(path)) {
             throw new StartupException(String.format("Missing required config path: %s", path));
         }
-        return config.getConfig(path);
+        return McpServerConfig.fromConfig(config.getConfig(path));
     }
 
-    private String resolveRequiredParam(Config config, String configPath) {
-        if (!config.hasPath(configPath)) {
-            throw new StartupException("Missing required config path: " + configPath);
-        }
-        return config.getString(configPath);
-    }
-
+    /**
+     * Use a custom Jackson ObjectMapper for JSON serialization/deserialization.
+     * <p>
+     * Deprecated since 1.4.0, use {@link #mcpJsonMapper(McpJsonMapper)} instead.
+     *
+     * @param mapper the custom ObjectMapper
+     * @return the current McpModule instance
+     */
     @Deprecated(since = "1.4.0", forRemoval = true)
     public McpModule objectMapper(ObjectMapper mapper) {
         this.mcpJsonMapper = new JacksonMcpJsonMapper(mapper);

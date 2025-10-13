@@ -1,5 +1,6 @@
 package io.github.kliushnichenko.jooby.mcp;
 
+import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
 import io.jooby.*;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,12 +31,6 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
      * Event type for JSON-RPC messages sent through the SSE connection.
      */
     public static final String MESSAGE_EVENT_TYPE = "message";
-    public static final String DEFAULT_MCP_ENDPOINT = "/mcp";
-
-    /**
-     * The endpoint URI where clients should send their JSON-RPC messages. Default value is "/mcp".
-     */
-    private final String mcpEndpoint;
 
     /**
      * Flag indicating whether DELETE requests are disallowed on the endpoint.
@@ -57,29 +53,24 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
     private KeepAliveScheduler keepAliveScheduler;
 
     public JoobyStreamableServerTransportProvider(Jooby app,
-                                                   McpJsonMapper jsonMapper,
-                                                   String mcpEndpoint,
-                                                   boolean disallowDelete,
-                                                   McpTransportContextExtractor<Context> contextExtractor,
-                                                   Duration keepAliveInterval) {
-        Objects.requireNonNull(jsonMapper, "McpJsonMapper must not be null");
-        Objects.requireNonNull(mcpEndpoint, "MCP endpoint must not be null");
+                                                  McpJsonMapper jsonMapper,
+                                                  McpServerConfig serverConfig,
+                                                  McpTransportContextExtractor<Context> contextExtractor) {
         Objects.requireNonNull(contextExtractor, "McpTransportContextExtractor must not be null");
 
         this.mcpJsonMapper = jsonMapper;
-        this.mcpEndpoint = mcpEndpoint;
-        this.disallowDelete = disallowDelete;
+        this.disallowDelete = serverConfig.isDisallowDelete();
         this.contextExtractor = contextExtractor;
 
-        app.head(this.mcpEndpoint, ctx -> {
-            ctx.setResponseHeader("Content-Type", "text/event-stream");
-            return StatusCode.OK;
-        });
-        app.sse(this.mcpEndpoint, this::handleGet);
-        app.post(this.mcpEndpoint, this::handlePost);
-        app.delete(this.mcpEndpoint, this::handleDelete);
+        var mcpEndpoint = serverConfig.getMcpEndpoint();
 
-        if (keepAliveInterval != null) {
+        app.head(mcpEndpoint, ctx -> StatusCode.OK).produces(TEXT_EVENT_STREAM);
+        app.sse(mcpEndpoint, this::handleGet);
+        app.post(mcpEndpoint, this::handlePost);
+        app.delete(mcpEndpoint, this::handleDelete);
+
+        if (serverConfig.getKeepAliveInterval() != null) {
+            var keepAliveInterval = Duration.ofSeconds(serverConfig.getKeepAliveInterval());
             this.keepAliveScheduler = KeepAliveScheduler
                     .builder(() -> (isClosing) ? Flux.empty() : Flux.fromIterable(this.sessions.values()))
                     .initialDelay(keepAliveInterval)
@@ -102,7 +93,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
             return;
         }
 
-        if (!ctx.accept(MediaType.valueOf("text/event-stream"))) {
+        if (!ctx.accept(TEXT_EVENT_STREAM)) {
             ctx.setResponseCode(StatusCode.BAD_REQUEST)
                     .send("Invalid Accept header. Expected 'text/event-stream'");
             return;
@@ -250,9 +241,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                         .block();
                 return StatusCode.ACCEPTED;
             } else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
-                ctx.setResponseHeader("Connection", "Close");
-                ctx.setResponseType("text/event-stream; charset=utf-8");
-                ctx.setResponseCode(StatusCode.OK);
+                ctx.setResponseType(TEXT_EVENT_STREAM, StandardCharsets.UTF_8);
 
                 ctx.upgrade(sse -> {
                     sse.onClose(() -> {

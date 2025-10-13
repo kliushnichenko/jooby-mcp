@@ -1,6 +1,6 @@
 package io.github.kliushnichenko.jooby.mcp;
 
-import com.typesafe.config.Config;
+import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
 import io.jooby.*;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.TypeRef;
@@ -26,10 +26,6 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
     private static final String ENDPOINT_EVENT_TYPE = "endpoint";
     private static final String SESSION_ID_KEY = "sessionId";
 
-    private static final String DEFAULT_SSE_ENDPOINT = "/mcp/sse";
-    private static final String DEFAULT_MESSAGE_ENDPOINT = "/mcp/message";
-
-    private final Config moduleConfig;
     private final String messageEndpoint;
     private final McpJsonMapper mcpJsonMapper;
     private final ConcurrentHashMap<String, McpServerSession> sessions = new ConcurrentHashMap<>();
@@ -40,15 +36,14 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
     /**
      * Constructs a new Jooby Reactive SSE transport provider instance.
      *
-     * @param mcpJsonMapper The MCP JSON mapper for message serialization/deserialization
      * @param app           The Jooby application instance to register endpoints with
-     * @param moduleConfig  Module configuration properties
+     * @param serverConfig  The MCP server configuration containing endpoint settings
+     * @param mcpJsonMapper The MCP JSON mapper for message serialization/deserialization
      */
-    public JoobySseTransportProvider(McpJsonMapper mcpJsonMapper, Jooby app, Config moduleConfig) {
-        this.moduleConfig = moduleConfig;
+    public JoobySseTransportProvider(Jooby app, McpServerConfig serverConfig, McpJsonMapper mcpJsonMapper) {
         this.mcpJsonMapper = mcpJsonMapper;
-        this.messageEndpoint = resolveConfigParam("messageEndpoint", DEFAULT_MESSAGE_ENDPOINT);
-        String sseEndpoint = resolveConfigParam("sseEndpoint", DEFAULT_SSE_ENDPOINT);
+        this.messageEndpoint = serverConfig.getMessageEndpoint();
+        String sseEndpoint = serverConfig.getSseEndpoint();
 
         app.head(sseEndpoint, ctx -> {
             ctx.setResponseHeader("Content-Type", "text/event-stream");
@@ -56,10 +51,6 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
         });
         app.sse(sseEndpoint, this::handleSseConnection);
         app.post(this.messageEndpoint, this::handleMessage);
-    }
-
-    private String resolveConfigParam(String configPath, String defaultValue) {
-        return moduleConfig.hasPath(configPath) ? moduleConfig.getString(configPath) : defaultValue;
     }
 
     @Override
