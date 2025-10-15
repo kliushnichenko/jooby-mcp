@@ -1,8 +1,8 @@
 package io.github.kliushnichenko.jooby.mcp.internal;
 
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
-import io.github.kliushnichenko.jooby.mcp.JoobySseTransportProvider;
-import io.github.kliushnichenko.jooby.mcp.JoobyStreamableServerTransportProvider;
+import io.github.kliushnichenko.jooby.mcp.transport.JoobySseTransportProvider;
+import io.github.kliushnichenko.jooby.mcp.transport.JoobyStreamableServerTransportProvider;
 import io.jooby.Jooby;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;

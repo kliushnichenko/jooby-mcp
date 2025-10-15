@@ -1,4 +1,4 @@
-package io.github.kliushnichenko.jooby.mcp;
+package io.github.kliushnichenko.jooby.mcp.transport;
 
 import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
 import io.jooby.*;

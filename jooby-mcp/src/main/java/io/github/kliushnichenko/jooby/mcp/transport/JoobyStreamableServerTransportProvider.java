@@ -1,4 +1,4 @@
-package io.github.kliushnichenko.jooby.mcp;
+package io.github.kliushnichenko.jooby.mcp.transport;
 
 import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
 import io.jooby.*;
@@ -65,7 +65,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
         var mcpEndpoint = serverConfig.getMcpEndpoint();
 
         app.head(mcpEndpoint, ctx -> StatusCode.OK).produces(TEXT_EVENT_STREAM);
-        app.sse(mcpEndpoint, this::handleGet);
+        app.get(mcpEndpoint, this::handleGet);
         app.post(mcpEndpoint, this::handlePost);
         app.delete(mcpEndpoint, this::handleDelete);
 
@@ -84,77 +84,80 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
     /**
      * Setups the listening SSE connections and message replay.
      *
-     * @param sse ServerSentEmitter provided by Jooby for SSE communication
+     * @param ctx The Jooby context for the incoming request
      */
-    private void handleGet(ServerSentEmitter sse) {
-        Context ctx = sse.getContext();
+    private Context handleGet(Context ctx) {
         if (this.isClosing) {
-            ctx.setResponseCode(StatusCode.SERVICE_UNAVAILABLE).send("Server is shutting down");
-            return;
+            return ctx.setResponseCode(StatusCode.SERVICE_UNAVAILABLE)
+                    .send("Server is shutting down");
         }
 
         if (!ctx.accept(TEXT_EVENT_STREAM)) {
-            ctx.setResponseCode(StatusCode.BAD_REQUEST)
+            return ctx.setResponseCode(StatusCode.BAD_REQUEST)
                     .send("Invalid Accept header. Expected 'text/event-stream'");
-            return;
         }
 
-        McpTransportContext transportContext = this.contextExtractor.extract(sse.getContext());
+        McpTransportContext transportContext = this.contextExtractor.extract(ctx);
 
         if (ctx.header(HttpHeaders.MCP_SESSION_ID).isMissing()) {
-            ctx.setResponseCode(StatusCode.BAD_REQUEST).send("Session ID required in mcp-session-id header");
-            return;
+            return ctx.setResponseCode(StatusCode.BAD_REQUEST)
+                    .send("Session ID required in mcp-session-id header");
         }
 
         String sessionId = ctx.header(HttpHeaders.MCP_SESSION_ID).value();
         McpStreamableServerSession session = this.sessions.get(sessionId);
 
         if (session == null) {
-            ctx.setResponseCode(StatusCode.NOT_FOUND).send("Session not found: " + sessionId);
-            return;
+            return ctx.setResponseCode(StatusCode.NOT_FOUND)
+                    .send("Session not found: " + sessionId);
         }
 
         log.debug("Handling GET request for session: {}", sessionId);
 
         try {
-            var sessionTransport = new JoobyStreamableMcpSessionTransport(sessionId, sse);
+            ctx.upgrade(sse -> {
+                sse.onClose(() -> log.debug("SSE connection closed by client for session: {}", sessionId));
 
-            // Check if this is a replay request
-            if (ctx.header(HttpHeaders.LAST_EVENT_ID).isPresent()) {
-                String lastId = ctx.header(HttpHeaders.LAST_EVENT_ID).value();
+                var sessionTransport = new JoobyStreamableMcpSessionTransport(sessionId, sse);
 
-                try {
-                    session.replay(lastId)
-                            .contextWrite(reactorCtx -> reactorCtx.put(McpTransportContext.KEY, transportContext))
-                            .toIterable()
-                            .forEach(message -> {
-                                try {
-                                    sessionTransport.sendMessage(message)
-                                            .contextWrite(reactorCtx -> reactorCtx.put(McpTransportContext.KEY, transportContext))
-                                            .block();
-                                } catch (Exception e) {
-                                    log.error("Failed to replay message: {}", e.getMessage());
-                                    sse.send("Error", e.getMessage());
-                                }
-                            });
-                } catch (Exception e) {
-                    log.error("Failed to replay messages: {}", e.getMessage());
-                    sse.send("Error", e.getMessage());
+                // Check if this is a replay request
+                if (ctx.header(HttpHeaders.LAST_EVENT_ID).isPresent()) {
+                    String lastId = ctx.header(HttpHeaders.LAST_EVENT_ID).value();
+
+                    try {
+                        session.replay(lastId)
+                                .contextWrite(reactorCtx -> reactorCtx.put(McpTransportContext.KEY, transportContext))
+                                .toIterable()
+                                .forEach(message -> {
+                                    try {
+                                        sessionTransport.sendMessage(message)
+                                                .contextWrite(reactorCtx -> reactorCtx.put(McpTransportContext.KEY, transportContext))
+                                                .block();
+                                    } catch (Exception e) {
+                                        log.error("Failed to replay message: {}", e.getMessage());
+                                        sse.send("Error", e.getMessage());
+                                    }
+                                });
+                    } catch (Exception e) {
+                        log.error("Failed to replay messages: {}", e.getMessage());
+                        sse.send("Error", e.getMessage());
+                    }
+                } else {
+                    // Establish new listening stream
+                    McpStreamableServerSession.McpStreamableServerSessionStream listeningStream = session
+                            .listeningStream(sessionTransport);
+
+                    sse.onClose(() -> {
+                        log.debug("SSE connection has been closed for session: {}", sessionId);
+                        listeningStream.close();
+                    });
                 }
-            } else {
-                // Establish new listening stream
-                McpStreamableServerSession.McpStreamableServerSessionStream listeningStream = session
-                        .listeningStream(sessionTransport);
-
-                sse.onClose(() -> {
-                    log.debug("SSE connection has been closed for session: {}", sessionId);
-                    listeningStream.close();
-                });
-            }
+            });
         } catch (Exception e) {
             log.error("Failed to handle GET request for session {}: {}", sessionId, e.getMessage());
             ctx.setResponseCode(StatusCode.SERVER_ERROR);
         }
+        return ctx.setResponseCode(StatusCode.OK);
     }
 
     /**
@@ -243,7 +246,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
             } else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
                 ctx.setResponseType(TEXT_EVENT_STREAM, StandardCharsets.UTF_8);
 
-                ctx.upgrade(sse -> {
+                return ctx.upgrade(sse -> {
                     sse.onClose(() -> {
                         log.debug("Request response stream completed for session: {}", sessionId);
                     });
@@ -260,7 +263,6 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                         sse.send("Error", e.getMessage());
                     }
                 });
-                return StatusCode.OK; // Response is handled in the upgrade block
             } else {
                 return McpError.builder(McpSchema.ErrorCodes.INTERNAL_ERROR)
                         .message("Unknown message type")
@@ -383,9 +385,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
     private class JoobyStreamableMcpSessionTransport implements McpStreamableServerTransport {
 
         private final String sessionId;
-
         private final ServerSentEmitter sse;
-
         private volatile boolean closed = false;
 
         JoobyStreamableMcpSessionTransport(String sessionId, ServerSentEmitter sse) {
