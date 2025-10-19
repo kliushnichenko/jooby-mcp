@@ -1,10 +1,9 @@
-package io.github.kliushnichenko.jooby.mcp;
+package io.github.kliushnichenko.jooby.mcp.transport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.typesafe.config.Config;
+import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
 import io.jooby.*;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.TypeRef;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.spec.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +26,8 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
     private static final String ENDPOINT_EVENT_TYPE = "endpoint";
     private static final String SESSION_ID_KEY = "sessionId";
 
-    private static final String DEFAULT_SSE_ENDPOINT = "/mcp/sse";
-    private static final String DEFAULT_MESSAGE_ENDPOINT = "/mcp/message";
-
-    private final Config moduleConfig;
     private final String messageEndpoint;
-    private final JacksonMcpJsonMapper mcpJsonMapper;
+    private final McpJsonMapper mcpJsonMapper;
     private final ConcurrentHashMap<String, McpServerSession> sessions = new ConcurrentHashMap<>();
 
     private McpServerSession.Factory sessionFactory;
@@ -41,15 +36,14 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
     /**
      * Constructs a new Jooby Reactive SSE transport provider instance.
      *
-     * @param objectMapper The ObjectMapper to use for JSON serialization/deserialization of MCP messages
-     * @param app          The Jooby application instance to register endpoints with
-     * @param moduleConfig Module configuration properties
+     * @param app           The Jooby application instance to register endpoints with
+     * @param serverConfig  The MCP server configuration containing endpoint settings
+     * @param mcpJsonMapper The MCP JSON mapper for message serialization/deserialization
      */
-    public JoobySseTransportProvider(ObjectMapper objectMapper, Jooby app, Config moduleConfig) {
-        this.moduleConfig = moduleConfig;
-        this.mcpJsonMapper = new JacksonMcpJsonMapper(objectMapper);
-        this.messageEndpoint = resolveConfigParam("messageEndpoint", DEFAULT_MESSAGE_ENDPOINT);
-        String sseEndpoint = resolveConfigParam("sseEndpoint", DEFAULT_SSE_ENDPOINT);
+    public JoobySseTransportProvider(Jooby app, McpServerConfig serverConfig, McpJsonMapper mcpJsonMapper) {
+        this.mcpJsonMapper = mcpJsonMapper;
+        this.messageEndpoint = serverConfig.getMessageEndpoint();
+        String sseEndpoint = serverConfig.getSseEndpoint();
 
         app.head(sseEndpoint, ctx -> {
             ctx.setResponseHeader("Content-Type", "text/event-stream");
@@ -57,10 +51,6 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
         });
         app.sse(sseEndpoint, this::handleSseConnection);
         app.post(this.messageEndpoint, this::handleMessage);
-    }
-
-    private String resolveConfigParam(String configPath, String defaultValue) {
-        return moduleConfig.hasPath(configPath) ? moduleConfig.getString(configPath) : defaultValue;
     }
 
     @Override

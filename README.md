@@ -18,8 +18,8 @@ Features:
 - [ ] Resource Templates
 - [X] Prompt Completions
 - [ ] Resource Template Completions
-- [ ] HTTP Streamable transport
-- [X] Tool required arguments validation
+- [X] HTTP Streamable transport
+- [X] Required arguments validation in tools
 
 Table of Contents:
 - [Quick Start](#quick-start)
@@ -30,6 +30,8 @@ Table of Contents:
 - [Customizing Default Server Name and Package](#customizing-default-server-name-and-package)
 - [Supported return types in Tools](#supported-return-types-in-tools)
 - [Supported return types in Prompts](#supported-return-types-in-prompts)
+- [Supported return types in Resources](#supported-return-types-in-resources)
+- [Supported return types in Prompt Completions](#supported-return-types-in-prompt-completions)
 
 ## Quick Start
 
@@ -58,15 +60,31 @@ Table of Contents:
    </plugin>
    ```
 
-3. Add configuration to `application.conf`
+3. Add configuration to `application.conf`   
+   ⚠️ Since version `1.4.0` default transport was changed from `SSE` to `Streamable HTTP`
    ```
    mcp.default {                       # `default` is the server key, can be customized over compiler arguments
      name: "my-awesome-mcp-server"     # Required
      version: "0.1.0"                  # Required
-     sseEndpoint: "/mcp/sse"           # Optional (default: /mcp/sse)
-     messageEndpoint: "/mcp/message"   # Optional (default: /mcp/message)
+     transport: "sse"                  # Optional (default: streamable-http)
+     sseEndpoint: "/mcp/sse"           # Optional (default: /mcp/sse), applicable only to SSE transport
+     messageEndpoint: "/mcp/message"   # Optional (default: /mcp/message), applicable only to SSE transport
    }
    ```
+      
+   Full config for `Streamable HTTP` transport:
+   ```
+    mcp.default {
+      name: "my-awesome-mcp-server"    # Required
+      version: "0.1.0"                 # Required
+      transport: "streamable-http"     # Optional (default: streamable-http)
+      mcpEndpoint: "/mcp/streamable"   # Optional (default: /mcp), applicable only to Streamable HTTP transport
+      disallowDelete: true,            # Optional (default: false)
+      keepAliveInterval: 45            # Optional (default: N/A), in seconds
+    }
+    ```
+   `keepAliveInterval` - enables sending periodic keep-alive messages to the client.  
+    Disabled by default to avoid excessive network overhead. Set to a positive integer value (in seconds) to enable.
 
 4. Implement your features (tools, prompts, resources, etc.), see examples below and in the [example-project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example)
 

@@ -1,13 +1,13 @@
 package io.github.kliushnichenko.jooby.mcp.internal;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
@@ -16,10 +16,10 @@ class McpResourceHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(McpResourceHandler.class);
 
-    private final ObjectMapper objectMapper;
+    private final McpJsonMapper mcpJsonMapper;
 
-    public McpResourceHandler(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public McpResourceHandler(McpJsonMapper mcpJsonMapper) {
+        this.mcpJsonMapper = mcpJsonMapper;
     }
 
     public McpSchema.ReadResourceResult handle(JoobyMcpServer server, McpSchema.ReadResourceRequest request) {
@@ -38,7 +38,7 @@ class McpResourceHandler {
         }
     }
 
-    private McpSchema.ReadResourceResult toResourceResult(Object result, String uri) throws RuntimeException, JsonProcessingException {
+    private McpSchema.ReadResourceResult toResourceResult(Object result, String uri) throws RuntimeException, IOException {
         if (result == null) {
             return new McpSchema.ReadResourceResult(List.of());
         } else if (result instanceof McpSchema.ReadResourceResult resourceResult) {
@@ -62,8 +62,8 @@ class McpResourceHandler {
         }
     }
 
-    private McpSchema.ReadResourceResult toJsonResult(Object result, String uri) throws JsonProcessingException {
-        var resultStr = objectMapper.writeValueAsString(result);
+    private McpSchema.ReadResourceResult toJsonResult(Object result, String uri) throws IOException {
+        var resultStr = mcpJsonMapper.writeValueAsString(result);
         var content = new McpSchema.TextResourceContents(uri, "application/json", resultStr);
         return new McpSchema.ReadResourceResult(List.of(content));
     }

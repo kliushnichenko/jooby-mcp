@@ -1,6 +1,5 @@
 package io.github.kliushnichenko.jooby.mcp.apt.generator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palantir.javapoet.*;
 import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.github.kliushnichenko.jooby.mcp.apt.McpServerDescriptor;
@@ -9,6 +8,7 @@ import io.github.kliushnichenko.jooby.mcp.internal.MethodInvoker;
 import io.github.kliushnichenko.jooby.mcp.internal.ToolSpec;
 import io.github.kliushnichenko.jsonschema.generator.JsonSchemaGenerator;
 import io.github.kliushnichenko.jsonschema.model.JsonSchemaObj;
+import io.modelcontextprotocol.json.McpJsonMapper;
 
 import javax.lang.model.element.Modifier;
 import java.util.HashMap;
@@ -24,8 +24,8 @@ class McpToolsFeature extends McpFeature {
     @Override
     public void generateFields(TypeSpec.Builder builder) {
         FieldSpec objectMapper = FieldSpec.builder(
-                        ClassName.get(ObjectMapper.class),
-                        "objectMapper",
+                        ClassName.get(McpJsonMapper.class),
+                        "mcpJsonMapper",
                         Modifier.PRIVATE)
                 .build();
 
@@ -56,7 +56,7 @@ class McpToolsFeature extends McpFeature {
 
     @Override
     public void generateInitializers(MethodSpec.Builder builder, McpServerDescriptor descriptor) {
-        builder.addStatement("this.objectMapper = objectMapper");
+        builder.addStatement("this.mcpJsonMapper = mcpJsonMapper");
         builder.addCode("\n");
 
         // fill tools map

@@ -1,7 +1,7 @@
 package io.github.kliushnichenko.jooby.mcp.internal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
+import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +13,10 @@ public class McpToolHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(McpToolHandler.class);
 
-    private final ObjectMapper objectMapper;
+    private final McpJsonMapper mcpJsonMapper;
 
-    public McpToolHandler(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public McpToolHandler(McpJsonMapper mcpJsonMapper) {
+        this.mcpJsonMapper = mcpJsonMapper;
     }
 
     public McpSchema.CallToolResult handle(McpSchema.CallToolRequest request, JoobyMcpServer server) {
@@ -41,7 +41,7 @@ public class McpToolHandler {
             } else if (result instanceof McpSchema.Content content) {
                 return McpSchema.CallToolResult.builder().content(List.of(content)).isError(false).build();
             } else {
-                var resultStr = objectMapper.writeValueAsString(result);
+                var resultStr = mcpJsonMapper.writeValueAsString(result);
                 return new McpSchema.CallToolResult(resultStr, false);
             }
         } catch (Exception ex) {

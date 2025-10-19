@@ -1,14 +1,15 @@
 package io.github.kliushnichenko.jooby.mcp.internal;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
+import io.github.kliushnichenko.jooby.mcp.transport.JoobySseTransportProvider;
+import io.github.kliushnichenko.jooby.mcp.transport.JoobyStreamableServerTransportProvider;
+import io.jooby.Jooby;
+import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.spec.McpSchema;
-import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,35 +21,27 @@ public class McpServerRunner {
 
     private final static Logger log = LoggerFactory.getLogger(McpServerRunner.class);
 
+    private final Jooby app;
     private final JoobyMcpServer joobyMcpServer;
-    private final McpServerTransportProvider transportProvider;
-    private final String serverName;
-    private final String serverVersion;
+    private final McpServerConfig serverConfig;
     private final McpToolHandler toolHandler;
     private final McpResourceHandler resourceHandler;
     private final McpJsonMapper mcpJsonMapper;
 
-    public McpServerRunner(JoobyMcpServer joobyMcpServer,
-                           McpServerTransportProvider transportProvider,
-                           String serverName,
-                           String serverVersion,
-                           ObjectMapper objectMapper) {
+    public McpServerRunner(Jooby app,
+                           JoobyMcpServer joobyMcpServer,
+                           McpServerConfig serverConfig,
+                           McpJsonMapper mcpJsonMapper) {
+        this.app = app;
         this.joobyMcpServer = joobyMcpServer;
-        this.transportProvider = transportProvider;
-        this.serverName = serverName;
-        this.serverVersion = serverVersion;
-        this.mcpJsonMapper = new JacksonMcpJsonMapper(objectMapper);
-        this.toolHandler = new McpToolHandler(objectMapper);
-        this.resourceHandler = new McpResourceHandler(objectMapper);
+        this.serverConfig = serverConfig;
+        this.mcpJsonMapper = mcpJsonMapper;
+        this.toolHandler = new McpToolHandler(mcpJsonMapper);
+        this.resourceHandler = new McpResourceHandler(mcpJsonMapper);
     }
 
     public McpSyncServer run() {
-        List<McpServerFeatures.SyncCompletionSpecification> completions = initCompletions();
-        McpSyncServer mcpServer = McpServer.sync(transportProvider)
-                .serverInfo(serverName, serverVersion)
-                .capabilities(computeCapabilities())
-                .completions(completions)
-                .build();
+        McpSyncServer mcpServer = initMcpServer();
 
         initTools(mcpServer);
         initPrompts(mcpServer);
@@ -56,6 +49,34 @@ public class McpServerRunner {
 
         logMcpStart(mcpServer);
         return mcpServer;
+    }
+
+    private McpSyncServer initMcpServer() {
+        List<McpServerFeatures.SyncCompletionSpecification> completions = initCompletions();
+
+        if (McpServerConfig.Transport.SSE == serverConfig.getTransport()) {
+            var transportProvider = new JoobySseTransportProvider(app, serverConfig, mcpJsonMapper);
+            return McpServer.sync(transportProvider)
+                    .serverInfo(serverConfig.getName(), serverConfig.getVersion())
+                    .capabilities(computeCapabilities())
+                    .completions(completions)
+                    .build();
+        } else if (McpServerConfig.Transport.STREAMABLE_HTTP == serverConfig.getTransport()) {
+            var transportProvider = new JoobyStreamableServerTransportProvider(
+                    app,
+                    mcpJsonMapper,
+                    serverConfig,
+                    request -> McpTransportContext.EMPTY
+            );
+
+            return McpServer.sync(transportProvider)
+                    .serverInfo(serverConfig.getName(), serverConfig.getVersion())
+                    .capabilities(computeCapabilities())
+                    .completions(completions)
+                    .build();
+        } else {
+            throw new IllegalStateException("Unsupported transport: " + serverConfig.getTransport());
+        }
     }
 
     private List<McpServerFeatures.SyncCompletionSpecification> initCompletions() {
@@ -139,10 +160,12 @@ public class McpServerRunner {
                         MCP server started with:
                             name: {}
                             version: {}
+                            transport: {}
                             capabilities: {}
                         """,
                 mcpServer.getServerInfo().name(),
                 mcpServer.getServerInfo().version(),
+                serverConfig.getTransport().getValue(),
                 mcpServer.getServerCapabilities());
     }
 }
