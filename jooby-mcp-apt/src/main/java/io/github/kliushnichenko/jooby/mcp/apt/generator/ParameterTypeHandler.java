@@ -1,8 +1,8 @@
 package io.github.kliushnichenko.jooby.mcp.apt.generator;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.palantir.javapoet.CodeBlock;
 import io.github.kliushnichenko.jsonschema.generator.TypeUtils;
+import io.modelcontextprotocol.json.TypeRef;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
@@ -68,7 +68,7 @@ class ParameterTypeHandler {
         return CodeBlock.of("($L) mcpJsonMapper.convertValue(args.get($S), new $T<$L>() {})",
                 paramType,
                 parameterName,
-                TypeReference.class,
+                TypeRef.class,
                 paramType);
     }
 
@@ -84,7 +84,7 @@ class ParameterTypeHandler {
             return CodeBlock.of("($L) mcpJsonMapper.convertValue(args.get($S), new $T<$L>() {})",
                     paramType,
                     parameterName,
-                    TypeReference.class,
+                    TypeRef.class,
                     paramType);
         }
     }
