@@ -7,6 +7,8 @@ import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Singleton;
 
+import java.util.Map;
+
 /**
  * Example service demonstrating MCP tool annotations.
  * <p>
@@ -48,5 +50,10 @@ public class CalculatorService {
                 Please provide a clear and concise summary of the following text in no more than %s sentences:
                 %s
                 """, maxSentences, text);
+    }
+
+    @Tool(name = "patch_data", description = "Patch data")
+    public String patch(String entityId, Map<String, Object> data) {
+        return "OK";
     }
 } 
