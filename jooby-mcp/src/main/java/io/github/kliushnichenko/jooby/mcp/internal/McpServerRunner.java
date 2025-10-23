@@ -132,6 +132,17 @@ public class McpServerRunner {
         }
     }
 
+//    private void initResourceTemplates(McpSyncServer mcpServer) {
+//        for (McpSchema.ResourceTemplate template : joobyMcpServer.getResourceTemplates()) {
+//            var syncTemplateSpec = new McpServerFeatures.SyncResourceTemplateSpecification(
+//                    template,
+//                    (exchange, request) -> McpResourceTemplateHandler.handle(joobyMcpServer, request)
+//            );
+//                    mcpServer.addResourceTemplate(syncTemplateSpec);
+//
+//        }
+//    }
+
     private McpSchema.ServerCapabilities computeCapabilities() {
         var builder = McpSchema.ServerCapabilities.builder();
 

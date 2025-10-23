@@ -28,5 +28,7 @@ public interface JoobyMcpServer {
 
     List<McpSchema.Resource> getResources();
 
+    List<McpSchema.ResourceTemplate> getResourceTemplates();
+
     List<McpSchema.CompleteReference> getCompletions();
 }
