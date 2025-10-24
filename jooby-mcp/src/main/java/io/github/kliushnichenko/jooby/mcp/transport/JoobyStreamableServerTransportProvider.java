@@ -22,6 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_REQUEST;
 
+/**
+ * Jooby implementation of Streamable HTTP transport. Inspired by <a href="https://github.com/modelcontextprotocol/java-sdk/blob/main/mcp-spring/mcp-spring-webmvc/src/main/java/io/modelcontextprotocol/server/transport/WebMvcStreamableServerTransportProvider.java">WebMvcStreamableServerTransportProvider</a>
+ */
 public class JoobyStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
 
     private static final Logger log = LoggerFactory.getLogger(JoobyStreamableServerTransportProvider.class);
@@ -70,26 +73,26 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
      *
      * @param ctx The Jooby context for the incoming request
      */
-    private Object handleGet(Context ctx) {
+    private Context handleGet(Context ctx) {
         if (this.isClosing) {
-            return Error.serverIsShuttingDown(ctx);
+            return SendError.serverIsShuttingDown(ctx);
         }
 
         if (!ctx.accept(TEXT_EVENT_STREAM)) {
-            return Error.invalidAcceptHeader(ctx, List.of(TEXT_EVENT_STREAM));
+            return SendError.invalidAcceptHeader(ctx, List.of(TEXT_EVENT_STREAM));
         }
 
         McpTransportContext transportContext = this.contextExtractor.extract(ctx);
 
         if (ctx.header(HttpHeaders.MCP_SESSION_ID).isMissing()) {
-            return Error.missingSessionId(ctx);
+            return SendError.missingSessionId(ctx);
         }
 
         String sessionId = ctx.header(HttpHeaders.MCP_SESSION_ID).value();
         McpStreamableServerSession session = this.sessions.get(sessionId);
 
         if (session == null) {
-            return Error.sessionNotFound(ctx, sessionId);
+            return SendError.sessionNotFound(ctx, sessionId);
         }
 
         log.debug("Handling GET request for session: {}", sessionId);
@@ -136,7 +139,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
             });
         } catch (Exception e) {
             log.error("Failed to handle GET request for session {}: {}", sessionId, e.getMessage());
-            return Error.internalError(ctx, sessionId);
+            return SendError.internalError(ctx, sessionId);
         }
     }
 
@@ -147,11 +150,11 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
      */
     private Object handlePost(Context ctx) {
         if (this.isClosing) {
-            return Error.serverIsShuttingDown(ctx);
+            return SendError.serverIsShuttingDown(ctx);
         }
 
         if (!ctx.accept(TEXT_EVENT_STREAM) || !ctx.accept(MediaType.json)) {
-            return Error.invalidAcceptHeader(ctx, List.of(TEXT_EVENT_STREAM, MediaType.json));
+            return SendError.invalidAcceptHeader(ctx, List.of(TEXT_EVENT_STREAM, MediaType.json));
         }
 
         McpTransportContext transportContext = this.contextExtractor.extract(ctx);
@@ -160,7 +163,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
         try {
             var body = ctx.body().valueOrNull();
             if (body == null) {
-                return Error.error(ctx, StatusCode.BAD_REQUEST, INVALID_REQUEST, "Request body is missing");
+                return SendError.error(ctx, StatusCode.BAD_REQUEST, INVALID_REQUEST, "Request body is missing");
             }
             McpSchema.JSONRPCMessage message = McpSchema.deserializeJsonRpcMessage(mcpJsonMapper, body);
 
@@ -189,20 +192,20 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                     );
                 } catch (Exception e) {
                     log.error("Failed to initialize session: {}", e.getMessage());
-                    return Error.internalError(ctx, sessionId);
+                    return SendError.internalError(ctx, sessionId);
                 }
             }
 
             // Handle other messages that require a session
             if (ctx.header(HttpHeaders.MCP_SESSION_ID).isMissing()) {
-                return Error.missingSessionId(ctx);
+                return SendError.missingSessionId(ctx);
             }
 
             sessionId = ctx.header(HttpHeaders.MCP_SESSION_ID).value();
             McpStreamableServerSession session = this.sessions.get(sessionId);
 
             if (session == null) {
-                return Error.sessionNotFound(ctx, sessionId);
+                return SendError.sessionNotFound(ctx, sessionId);
             }
 
             if (message instanceof McpSchema.JSONRPCResponse jsonrpcResponse) {
@@ -235,14 +238,14 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                     }
                 });
             } else {
-                return Error.unknownMsgType(ctx, sessionId);
+                return SendError.unknownMsgType(ctx, sessionId);
             }
         } catch (IllegalArgumentException | IOException e) {
             log.error("Failed to deserialize message: {}", e.getMessage());
-            return Error.msgParseError(ctx, sessionId);
+            return SendError.msgParseError(ctx, sessionId);
         } catch (Exception e) {
             log.error("Unexpected error occurred while handling message: {}", e.getMessage());
-            return Error.internalError(ctx, sessionId);
+            return SendError.internalError(ctx, sessionId);
         }
     }
 
@@ -254,24 +257,24 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
      */
     private Object handleDelete(Context ctx) {
         if (this.isClosing) {
-            return Error.serverIsShuttingDown(ctx);
+            return SendError.serverIsShuttingDown(ctx);
         }
 
         if (this.disallowDelete) {
-            return Error.deletionNotAllowed(ctx);
+            return SendError.deletionNotAllowed(ctx);
         }
 
         McpTransportContext transportContext = this.contextExtractor.extract(ctx);
 
         if (ctx.header(HttpHeaders.MCP_SESSION_ID).isMissing()) {
-            return Error.missingSessionId(ctx);
+            return SendError.missingSessionId(ctx);
         }
 
         String sessionId = ctx.header(HttpHeaders.MCP_SESSION_ID).value();
         McpStreamableServerSession session = this.sessions.get(sessionId);
 
         if (session == null) {
-            return Error.sessionNotFound(ctx, sessionId);
+            return SendError.sessionNotFound(ctx, sessionId);
         }
 
         try {
@@ -282,7 +285,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
             return StatusCode.NO_CONTENT;
         } catch (Exception e) {
             log.error("Failed to delete session {}: {}", sessionId, e.getMessage());
-            return Error.internalError(ctx, sessionId);
+            return SendError.internalError(ctx, sessionId);
         }
     }
 

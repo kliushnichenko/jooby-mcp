@@ -13,7 +13,7 @@ public class McpServerConfig {
     private Transport transport;
     private String sseEndpoint;
     private String messageEndpoint;
-    private String mcpEndpoint;
+    private String mcpEndpoint = DEFAULT_MCP_ENDPOINT;
     private boolean disallowDelete;
     private Integer keepAliveInterval;
 
