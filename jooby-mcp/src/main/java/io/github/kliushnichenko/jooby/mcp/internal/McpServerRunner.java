@@ -161,11 +161,15 @@ public class McpServerRunner {
                             name: {}
                             version: {}
                             transport: {}
+                            keepAliveInterval: {}
+                            disallowDelete: {}
                             capabilities: {}
                         """,
                 mcpServer.getServerInfo().name(),
                 mcpServer.getServerInfo().version(),
                 serverConfig.getTransport().getValue(),
+                serverConfig.getKeepAliveInterval() == null ? "N/A" : serverConfig.getKeepAliveInterval() + " s",
+                serverConfig.isDisallowDelete(),
                 mcpServer.getServerCapabilities());
     }
 }
