@@ -22,11 +22,15 @@ public interface JoobyMcpServer {
 
     Object readResource(String uri);
 
+    Object readResourceByTemplate(String uri, Map<String, Object> templateArgs);
+
     Map<String, ToolSpec> getTools();
 
     Map<String, McpSchema.Prompt> getPrompts();
 
     List<McpSchema.Resource> getResources();
+
+    List<McpSchema.ResourceTemplate> getResourceTemplates();
 
     List<McpSchema.CompleteReference> getCompletions();
 }

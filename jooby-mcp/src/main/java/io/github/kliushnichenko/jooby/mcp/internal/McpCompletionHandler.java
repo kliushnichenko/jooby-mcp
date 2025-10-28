@@ -25,7 +25,7 @@ class McpCompletionHandler {
 
             return toCompleteResult(result);
         } catch (Exception ex) {
-            LOG.error("Error invoking prompt completion '{}': {}", request.ref().identifier(), ex.getMessage(), ex);
+            LOG.error("Error invoking prompt completion '{}':", request.ref().identifier(), ex);
             throw new McpError(new McpSchema.JSONRPCResponse.JSONRPCError(
                     INTERNAL_ERROR,
                     ex.getMessage(),

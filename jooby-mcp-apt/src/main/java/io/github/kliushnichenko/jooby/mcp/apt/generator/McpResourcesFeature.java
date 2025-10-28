@@ -75,28 +75,6 @@ public class McpResourcesFeature extends McpFeature {
         methodBuilder.addCode("\n");
     }
 
-    private static CodeBlock buildResourceAnnotations(ResourceEntry.Annotations annotations) {
-        if (annotations != null) {
-            CodeBlock.Builder audienceList = CodeBlock.builder().add("List.of(");
-            var roles = annotations.audience();
-            for (int i = 0; i < roles.length; i++) {
-                if (i > 0) {
-                    audienceList.add(", ");
-                }
-                audienceList.add("$T.$L", McpSchema.Role.class, roles[i].name());
-            }
-            audienceList.add(")");
-
-            return CodeBlock.of("new $T($L, $L, $S)",
-                    ClassName.get(McpSchema.Annotations.class),
-                    audienceList.build(),
-                    annotations.priority(),
-                    annotations.lastModified()
-            );
-        }
-        return null;
-    }
-
     protected CodeBlock buildMethodInvocation(ExecutableElement method, TypeElement serviceClass) {
         return CodeBlock.of("() -> app.require($T.class).$L()", ClassName.get(serviceClass), method.getSimpleName());
     }

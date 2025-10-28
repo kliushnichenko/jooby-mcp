@@ -19,7 +19,8 @@ public class McpServerGenerator {
             new McpToolsFeature(),
             new McpPromptsFeature(),
             new McpCompletionsFeature(),
-            new McpResourcesFeature()
+            new McpResourcesFeature(),
+            new McpResourceTemplatesFeature()
     );
 
     public McpServerGenerator(Filer filer) {

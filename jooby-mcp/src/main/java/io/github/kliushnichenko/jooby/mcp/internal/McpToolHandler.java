@@ -45,7 +45,7 @@ public class McpToolHandler {
                 return new McpSchema.CallToolResult(resultStr, false);
             }
         } catch (Exception ex) {
-            LOG.error("Error invoking tool '{}': {}", toolName, ex.getMessage(), ex);
+            LOG.error("Error invoking tool '{}':", toolName, ex);
             return new McpSchema.CallToolResult(ex.getMessage(), true);
         }
     }

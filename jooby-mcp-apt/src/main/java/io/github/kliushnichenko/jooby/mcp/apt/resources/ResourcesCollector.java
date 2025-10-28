@@ -21,9 +21,9 @@ public class ResourcesCollector extends BaseMethodCollector {
 
     public List<ResourceEntry> collectResources(RoundEnvironment roundEnv) {
         List<ResourceEntry> resources = new ArrayList<>();
-        Set<? extends Element> promptElements = roundEnv.getElementsAnnotatedWith(Resource.class);
+        Set<? extends Element> elems = roundEnv.getElementsAnnotatedWith(Resource.class);
 
-        for (Element method : promptElements) {
+        for (Element method : elems) {
             if (isValidMethod(method)) {
                 ResourceEntry resourceEntry = buildResourceEntry((ExecutableElement) method);
                 resources.add(resourceEntry);

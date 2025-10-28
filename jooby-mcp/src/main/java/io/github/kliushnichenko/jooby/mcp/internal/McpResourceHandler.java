@@ -27,9 +27,9 @@ class McpResourceHandler {
 
         try {
             Object result = server.readResource(uri);
-            return toResourceResult(result, uri);
+            return toResourceResult(result, uri, mcpJsonMapper);
         } catch (Exception ex) {
-            LOG.error("Error reading resource by URI '{}': {}", uri, ex.getMessage(), ex);
+            LOG.error("Error reading resource by URI '{}':", uri, ex);
             throw new McpError(new McpSchema.JSONRPCResponse.JSONRPCError(
                     INTERNAL_ERROR,
                     ex.getMessage(),
@@ -38,7 +38,8 @@ class McpResourceHandler {
         }
     }
 
-    private McpSchema.ReadResourceResult toResourceResult(Object result, String uri) throws RuntimeException, IOException {
+    static McpSchema.ReadResourceResult toResourceResult(Object result, String uri, McpJsonMapper mcpJsonMapper)
+            throws RuntimeException, IOException {
         if (result == null) {
             return new McpSchema.ReadResourceResult(List.of());
         } else if (result instanceof McpSchema.ReadResourceResult resourceResult) {
@@ -54,15 +55,16 @@ class McpResourceHandler {
                     //noinspection unchecked
                     return new McpSchema.ReadResourceResult((List<McpSchema.ResourceContents>) contents);
                 } else {
-                    return toJsonResult(result, uri);
+                    return toJsonResult(result, uri, mcpJsonMapper);
                 }
             }
         } else {
-            return toJsonResult(result, uri);
+            return toJsonResult(result, uri, mcpJsonMapper);
         }
     }
 
-    private McpSchema.ReadResourceResult toJsonResult(Object result, String uri) throws IOException {
+    static McpSchema.ReadResourceResult toJsonResult(Object result, String uri, McpJsonMapper mcpJsonMapper)
+            throws IOException {
         var resultStr = mcpJsonMapper.writeValueAsString(result);
         var content = new McpSchema.TextResourceContents(uri, "application/json", resultStr);
         return new McpSchema.ReadResourceResult(List.of(content));

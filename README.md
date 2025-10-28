@@ -15,11 +15,12 @@ Features:
 - [X] Tools
 - [X] Prompts
 - [X] Resources
-- [ ] Resource Templates
+- [X] Resource Templates
 - [X] Prompt Completions
 - [ ] Resource Template Completions
 - [X] HTTP Streamable transport
-- [X] Required arguments validation in tools
+- [X] Required input arguments validation in tools
+- [X] Build time method signature and return type validation
 
 Table of Contents:
 - [Quick Start](#quick-start)
@@ -30,7 +31,7 @@ Table of Contents:
 - [Customizing Default Server Name and Package](#customizing-default-server-name-and-package)
 - [Supported return types in Tools](#supported-return-types-in-tools)
 - [Supported return types in Prompts](#supported-return-types-in-prompts)
-- [Supported return types in Resources](#supported-return-types-in-resources)
+- [Supported return types in Resources and Resource Templates](#supported-return-types-in-resources-and-resource-templates)
 - [Supported return types in Prompt Completions](#supported-return-types-in-prompt-completions)
 
 ## Quick Start
@@ -161,6 +162,28 @@ public class ResourceExamples {
 ```
 Find more examples in the [project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example/ResourceExamples.java)
 
+### Resource Template Example
+
+```java
+import io.github.kliushnichenko.jooby.mcp.annotation.ResourceTemplate;
+
+@Singleton
+public class ResourceTemplateExamples {
+
+   private static final Map<String, String> PROJECTS = Map.of(
+           "project-alpha", "This is Project Alpha.",
+           "project-beta", "This is Project Beta.",
+           "project-gamma", "This is Project Gamma."
+   );
+
+   @ResourceTemplate(uriTemplate = "file:///project/{name}")
+   public McpSchema.TextResourceContents getProject(String name, ResourceUri resourceUri) {
+      String content = PROJECTS.getOrDefault(name, "<Project not found>");
+      return new McpSchema.TextResourceContents(resourceUri.uri(), "text/markdown", content);
+   }
+}
+```
+
 ### Prompt Completion Example
 
 ```java
@@ -289,7 +312,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 - `String`
 - POJO (`toString()` method will be invoked to get the string representation)
 
-#### Supported return types in Resources
+#### Supported return types in Resources and Resource Templates
 
 - `McpSchema.ReadResourceResult`
 - `McpSchema.ResourceContents`

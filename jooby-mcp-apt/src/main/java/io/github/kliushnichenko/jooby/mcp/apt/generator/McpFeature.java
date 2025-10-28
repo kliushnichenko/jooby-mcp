@@ -6,6 +6,8 @@ import com.palantir.javapoet.MethodSpec;
 import com.palantir.javapoet.TypeSpec;
 import io.github.kliushnichenko.jooby.mcp.apt.ArgNameExtractor;
 import io.github.kliushnichenko.jooby.mcp.apt.McpServerDescriptor;
+import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourceEntry;
+import io.modelcontextprotocol.spec.McpSchema;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
@@ -48,6 +50,28 @@ abstract class McpFeature {
 
         methodCall.add(")");
         return methodCall.build();
+    }
+
+    protected static CodeBlock buildResourceAnnotations(ResourceEntry.Annotations annotations) {
+        if (annotations != null) {
+            CodeBlock.Builder audienceList = CodeBlock.builder().add("List.of(");
+            var roles = annotations.audience();
+            for (int i = 0; i < roles.length; i++) {
+                if (i > 0) {
+                    audienceList.add(", ");
+                }
+                audienceList.add("$T.$L", McpSchema.Role.class, roles[i].name());
+            }
+            audienceList.add(")");
+
+            return CodeBlock.of("new $T($L, $L, $S)",
+                    ClassName.get(McpSchema.Annotations.class),
+                    audienceList.build(),
+                    annotations.priority(),
+                    annotations.lastModified()
+            );
+        }
+        return null;
     }
 
     protected void addIfNotNull(Object value, CodeBlock.Builder codeBuilder, String format) {

@@ -11,6 +11,8 @@ import io.github.kliushnichenko.jooby.mcp.apt.prompts.PromptEntry;
 import io.github.kliushnichenko.jooby.mcp.apt.prompts.PromptsCollector;
 import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourceEntry;
 import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourcesCollector;
+import io.github.kliushnichenko.jooby.mcp.apt.resourcetemplates.ResourceTemplateEntry;
+import io.github.kliushnichenko.jooby.mcp.apt.resourcetemplates.ResourceTemplatesCollector;
 import io.github.kliushnichenko.jooby.mcp.apt.tools.ToolEntry;
 import io.github.kliushnichenko.jooby.mcp.apt.tools.ToolsCollector;
 
@@ -34,7 +36,10 @@ import static io.github.kliushnichenko.jooby.mcp.apt.McpProcessor.OPTION_TARGET_
 @AutoService(Processor.class)
 @SupportedAnnotationTypes({
         "io.github.kliushnichenko.jooby.mcp.annotation.Tool",
-        "io.github.kliushnichenko.jooby.mcp.annotation.Prompt"
+        "io.github.kliushnichenko.jooby.mcp.annotation.Prompt",
+        "io.github.kliushnichenko.jooby.mcp.annotation.Resource",
+        "io.github.kliushnichenko.jooby.mcp.annotation.ResourceTemplate",
+        "io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt"
 })
 @SupportedOptions({OPTION_DEFAULT_SERVER_KEY, OPTION_TARGET_PACKAGE})
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
@@ -53,6 +58,7 @@ public class McpProcessor extends AbstractProcessor {
     private PromptsCollector promptsCollector;
     private CompletionsCollector completionsCollector;
     private ResourcesCollector resourcesCollector;
+    private ResourceTemplatesCollector resourceTemplatesCollector;
     private McpServerGenerator mcpServerGenerator;
 
     private Set<String> serverKeys;
@@ -60,6 +66,7 @@ public class McpProcessor extends AbstractProcessor {
     private List<PromptEntry> prompts = new ArrayList<>();
     private List<CompletionEntry> completions = new ArrayList<>();
     private List<ResourceEntry> resources = new ArrayList<>();
+    private List<ResourceTemplateEntry> resourceTemplates = new ArrayList<>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -82,6 +89,7 @@ public class McpProcessor extends AbstractProcessor {
         this.promptsCollector = new PromptsCollector(messager, defaultServerKey);
         this.completionsCollector = new CompletionsCollector(messager, defaultServerKey);
         this.resourcesCollector = new ResourcesCollector(messager, defaultServerKey);
+        this.resourceTemplatesCollector = new ResourceTemplatesCollector(messager, defaultServerKey);
         this.mcpServerGenerator = new McpServerGenerator(processingEnv.getFiler());
     }
 
@@ -120,6 +128,7 @@ public class McpProcessor extends AbstractProcessor {
             List<String> promptRefs = prompts.stream().map(PromptEntry::promptName).toList();
             completions = completionsCollector.collectCompletions(roundEnv, promptRefs);
             resources = resourcesCollector.collectResources(roundEnv);
+            resourceTemplates = resourceTemplatesCollector.collectResourceTemplates(roundEnv);
 
             List<McpServerDescriptor> descriptors = buildServerDescriptors(defaultTargetPackage);
             mcpServerGenerator.generateMcpServers(descriptors);
@@ -162,7 +171,8 @@ public class McpProcessor extends AbstractProcessor {
                     tools.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
                     prompts.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
                     completions.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
-                    resources.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList()
+                    resources.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
+                    resourceTemplates.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList()
             ));
         }
         return descriptors;
