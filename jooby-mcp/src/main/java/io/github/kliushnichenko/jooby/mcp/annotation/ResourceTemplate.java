@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
  * Annotation to mark a method as a resource template provider.
  * Resource templates allow servers to expose parameterized resources using URI templates.
  * Arguments may be auto-completed through the completion API.
- * </p>
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)
@@ -49,7 +48,7 @@ public @interface ResourceTemplate {
      * Optional annotations for the client.
      * <p>
      * Note that the default value of this annotation member is ignored. In other words, the annotations have to be declared
-     * explicitly in order to be included in Resource metadata.
+     * explicitly in order to be included in Resource template metadata.
      */
     Annotations annotations() default @Annotations(audience = McpSchema.Role.USER, lastModified = "", priority = 0.5);
 }

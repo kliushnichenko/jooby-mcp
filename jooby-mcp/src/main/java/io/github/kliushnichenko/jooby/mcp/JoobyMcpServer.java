@@ -22,6 +22,8 @@ public interface JoobyMcpServer {
 
     Object readResource(String uri);
 
+    Object readResourceByTemplate(String uri, Map<String, Object> templateArgs);
+
     Map<String, ToolSpec> getTools();
 
     Map<String, McpSchema.Prompt> getPrompts();

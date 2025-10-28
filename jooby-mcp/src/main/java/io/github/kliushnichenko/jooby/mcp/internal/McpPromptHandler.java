@@ -26,7 +26,7 @@ class McpPromptHandler {
 
             return toPromptResult(result);
         } catch (Exception ex) {
-            LOG.error("Error invoking prompt '{}': {}", request.name(), ex.getMessage(), ex);
+            LOG.error("Error invoking prompt '{}':", request.name(), ex);
             throw new McpError(new McpSchema.JSONRPCResponse.JSONRPCError(
                     INTERNAL_ERROR,
                     ex.getMessage(),

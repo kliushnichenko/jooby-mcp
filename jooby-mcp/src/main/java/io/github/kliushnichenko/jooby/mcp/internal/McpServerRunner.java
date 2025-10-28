@@ -26,6 +26,7 @@ public class McpServerRunner {
     private final McpServerConfig serverConfig;
     private final McpToolHandler toolHandler;
     private final McpResourceHandler resourceHandler;
+    private final McpResourceTemplateHandler resourceTemplateHandler;
     private final McpJsonMapper mcpJsonMapper;
 
     public McpServerRunner(Jooby app,
@@ -38,6 +39,7 @@ public class McpServerRunner {
         this.mcpJsonMapper = mcpJsonMapper;
         this.toolHandler = new McpToolHandler(mcpJsonMapper);
         this.resourceHandler = new McpResourceHandler(mcpJsonMapper);
+        this.resourceTemplateHandler = new McpResourceTemplateHandler(mcpJsonMapper);
     }
 
     public McpSyncServer run() {
@@ -46,6 +48,7 @@ public class McpServerRunner {
         initTools(mcpServer);
         initPrompts(mcpServer);
         initResources(mcpServer);
+        initResourceTemplates(mcpServer);
 
         logMcpStart(mcpServer);
         return mcpServer;
@@ -132,16 +135,15 @@ public class McpServerRunner {
         }
     }
 
-//    private void initResourceTemplates(McpSyncServer mcpServer) {
-//        for (McpSchema.ResourceTemplate template : joobyMcpServer.getResourceTemplates()) {
-//            var syncTemplateSpec = new McpServerFeatures.SyncResourceTemplateSpecification(
-//                    template,
-//                    (exchange, request) -> McpResourceTemplateHandler.handle(joobyMcpServer, request)
-//            );
-//                    mcpServer.addResourceTemplate(syncTemplateSpec);
-//
-//        }
-//    }
+    private void initResourceTemplates(McpSyncServer mcpServer) {
+        for (McpSchema.ResourceTemplate template : joobyMcpServer.getResourceTemplates()) {
+            var syncTemplateSpec = new McpServerFeatures.SyncResourceTemplateSpecification(
+                    template,
+                    (exchange, request) -> resourceTemplateHandler.handle(joobyMcpServer, template, request)
+            );
+            mcpServer.addResourceTemplate(syncTemplateSpec);
+        }
+    }
 
     private McpSchema.ServerCapabilities computeCapabilities() {
         var builder = McpSchema.ServerCapabilities.builder();
