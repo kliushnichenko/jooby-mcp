@@ -1,0 +1,150 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- Excludes all 'module-info.java' files -->
+    <module name="BeforeExecutionExclusionFileFilter">
+        <property name="fileNamePattern" value="module\-info\.java$"/>
+    </module>
+
+    <module name="SuppressionFilter">
+        <property name="file" value="${org.checkstyle.sun.suppressionfilter.config}"
+                  default="checkstyle-suppressions.xml"/>
+        <property name="optional" value="true"/>
+    </module>
+
+    <module name="NewlineAtEndOfFile"/>
+
+    <module name="LineLength">
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://"/>
+    </module>
+
+    <module name="FileTabCharacter"/>
+
+    <module name="RegexpMultiline">
+        <property name="id" value="blankStartLineControlFlowStatement"/>
+        <property name="message"
+                  value="Blank line at start of control flow statement(condition, looping, exception) should be removed"/>
+        <property name="format" value="(?:\s|^)(?:if|else|while|for|do|try|catch|finally)\s.*\{\s*\n\s*\n"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+
+    <module name="RegexpMultiline">
+        <property name="id" value="blankStartLineMethods"/>
+        <property name="message" value="Blank line at start of method should be removed"/>
+        <property name="format" value="(?:\s|^)(private|protected|public)(?!.*\brecord\b).*\(.*\).*\{\s*\n\s*\n"/>
+        <property name="fileExtensions" value="java"/>
+    </module>
+
+    <module name="RegexpMultiline">
+        <property name="id" value="blankEndLine"/>
+        <property name="message" value="Blank line at end of block should be removed"/>
+        <property name="format" value="(?&lt;!\{\s{0,99}$)^$(?=^\s{0,99}\})"/>
+        <property name="fileExtensions" value="groovy,java"/>
+    </module>
+
+    <module name="SuppressWarningsFilter"/>
+
+    <module name="TreeWalker">
+
+        <!-- Checks for Naming Conventions -->
+        <module name="ConstantName"/>
+        <module name="LocalFinalVariableName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="PackageName"/>
+        <module name="ParameterName"/>
+        <module name="StaticVariableName"/>
+        <module name="TypeName"/>
+        <module name="LambdaParameterName"/>
+        <module name="CatchParameterName"/>
+
+        <!-- Checks for whitespace -->
+        <module name="EmptyForIteratorPad"/>
+        <module name="GenericWhitespace"/>
+        <module name="MethodParamPad"/>
+        <module name="NoWhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="ParenPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="WhitespaceAfter"/>
+        <module name="WhitespaceAround">
+            <property name="allowEmptyTypes" value="true"/>
+        </module>
+
+        <!-- Modifier Checks -->
+        <module name="ModifierOrder"/>
+
+        <!-- Checks for blocks -->
+        <module name="AvoidNestedBlocks"/>
+        <module name="EmptyBlock"/>
+        <module name="LeftCurly"/>
+        <module name="NeedBraces"/>
+        <module name="RightCurly"/>
+
+        <!-- Checks for common coding problems -->
+        <module name="MultipleVariableDeclarations"/>
+
+        <!-- Miscellaneous other checks. -->
+        <module name="ArrayTypeStyle"/>
+        <module name="TodoComment"/>
+        <module name="UpperEll"/>
+
+        <!-- Checks for unused and redundant imports -->
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+
+        <!-- Other -->
+        <module name="EmptyLineSeparator">
+            <property name="allowNoEmptyLineBetweenFields" value="true"/>
+            <property name="allowMultipleEmptyLines" value="false"/>
+            <property name="allowMultipleEmptyLinesInsideClassMembers" value="false"/>
+        </module>
+
+        <module name="UnnecessaryParentheses"/>
+        <module name="OneTopLevelClass"/>
+        <module name="NoArrayTrailingComma"/>
+        <module name="NoEnumTrailingComma"/>
+        <module name="UnnecessarySemicolonAfterTypeMemberDeclaration"/>
+        <module name="UnnecessarySemicolonInEnumeration"/>
+        <module name="UnnecessarySemicolonInTryWithResources"/>
+
+        <module name="SuppressWarningsHolder"/>
+
+        <module name="AvoidDoubleBraceInitialization"/>
+        <module name="AvoidNoArgumentSuperConstructorCall"/>
+        <module name="NoEnumTrailingComma"/>
+        <module name="UnnecessarySemicolonAfterOuterTypeDeclaration"/>
+        <module name="NoCodeInFile"/>
+        <module name="NoWhitespaceBeforeCaseDefaultColon"/>
+        <module name="UnusedLocalVariable"/>
+
+        <module name="SimplifyBooleanReturn"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="EqualsAvoidNull"/>
+
+        <module name="NestedForDepth">
+            <property name="max" value="2"/>
+        </module>
+        <module name="NestedIfDepth">
+            <property name="max" value="2"/>
+        </module>
+        <module name="NestedTryDepth">
+            <property name="max" value="2"/>
+        </module>
+
+        <!-- JDK 21-->
+        <!--        <module name="ConstructorsDeclarationGrouping"/>-->
+        <!--        <module name="MissingNullCaseInSwitch"/>-->
+        <!--        <module name="WhenShouldBeUsed"/>-->
+        <!--        <module name="SealedShouldHavePermitsList"/>-->
+    </module>
+
+</module>

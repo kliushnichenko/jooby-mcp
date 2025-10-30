@@ -3,6 +3,7 @@ package io.github.kliushnichenko.jooby.mcp.apt.completions;
 import io.github.kliushnichenko.jooby.mcp.annotation.CompleteArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt;
 import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
+import io.github.kliushnichenko.jooby.mcp.apt.util.ClassLiteral;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
@@ -24,7 +25,8 @@ public class CompletionsCollector extends BaseMethodCollector {
 
     public List<CompletionEntry> collectCompletions(RoundEnvironment roundEnv, List<String> definedPrompts) {
         List<CompletionEntry> completions = new ArrayList<>();
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(CompletePrompt.class/*, CompleteResourceTemplate.class*/);
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(CompletePrompt.class
+                /*, CompleteResourceTemplate.class*/);
 
         for (Element element : elements) {
             if (validator.isValidMethod(element)) {
@@ -67,7 +69,7 @@ public class CompletionsCollector extends BaseMethodCollector {
                 "io.modelcontextprotocol.spec.McpSchema.CompleteResult",
                 "io.modelcontextprotocol.spec.McpSchema.CompleteResult$CompleteCompletion",
                 "java.util.List<java.lang.String>",
-                "java.lang.String"
+                ClassLiteral.STRING
         );
 
         boolean isValidMethod(Element element) {
@@ -107,7 +109,7 @@ public class CompletionsCollector extends BaseMethodCollector {
 
             String paramType = params.get(0).asType().toString();
 
-            if (!paramType.equals("java.lang.String")) {
+            if (!ClassLiteral.STRING.equals(paramType)) {
                 var msg = String.format("Method '%s' must have a single String argument, but found: %s",
                         methodName, paramType);
                 reportError(msg, method);

@@ -52,5 +52,4 @@ public @interface Tool {
      * @return the tool description
      */
     String description() default "";
-
-} 
+}

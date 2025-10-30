@@ -63,5 +63,4 @@ public @interface ToolArg {
      * @return true if the parameter is required, false otherwise
      */
     boolean required() default true;
-
-} 
+}

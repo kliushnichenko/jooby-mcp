@@ -98,7 +98,6 @@ class SendError {
         return send(ctx, err);
     }
 
-
     public static Context error(Context ctx, StatusCode statusCode, int errCode, String msg) {
         ctx.setResponseCode(statusCode);
         var err = err(

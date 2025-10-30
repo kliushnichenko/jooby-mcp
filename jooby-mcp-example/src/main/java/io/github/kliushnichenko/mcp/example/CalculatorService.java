@@ -56,4 +56,4 @@ public class CalculatorService {
     public String patch(String entityId, Map<String, Object> data) {
         return "OK";
     }
-} 
+}

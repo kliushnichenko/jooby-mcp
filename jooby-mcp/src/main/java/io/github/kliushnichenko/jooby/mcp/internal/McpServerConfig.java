@@ -113,8 +113,8 @@ public class McpServerConfig {
 
     public static McpServerConfig fromConfig(Config config) {
         var srvConfig = new McpServerConfig(
-                resolveRequiredParam( config,"name"),
-                resolveRequiredParam( config,"version")
+                resolveRequiredParam(config, "name"),
+                resolveRequiredParam(config, "version")
         );
 
         if (config.hasPath("transport")) {

@@ -43,12 +43,20 @@ class McpCompletionHandler {
             return new McpSchema.CompleteResult(completion);
         } else if (result instanceof List<?> values) {
             if (values.isEmpty()) {
-                return new McpSchema.CompleteResult(new McpSchema.CompleteResult.CompleteCompletion(List.of(), 0, false));
+                return new McpSchema.CompleteResult(
+                        new McpSchema.CompleteResult.CompleteCompletion(List.of(), 0, false)
+                );
             } else {
                 var item = values.iterator().next();
                 if (item instanceof String) {
                     //noinspection unchecked
-                    return new McpSchema.CompleteResult(new McpSchema.CompleteResult.CompleteCompletion((List<String>) values, values.size(), false));
+                    return new McpSchema.CompleteResult(
+                            new McpSchema.CompleteResult.CompleteCompletion(
+                                    (List<String>) values,
+                                    values.size(),
+                                    false
+                            )
+                    );
                 }
             }
         } else if (result instanceof String singleValue) {

@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class McpServerRunner {
 
-    private final static Logger log = LoggerFactory.getLogger(McpServerRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(McpServerRunner.class);
 
     private final Jooby app;
     private final JoobyMcpServer joobyMcpServer;
@@ -168,7 +168,7 @@ public class McpServerRunner {
     }
 
     private void logMcpStart(McpSyncServer mcpServer) {
-        log.info("""
+        LOG.info("""
                                                 
                         MCP server started with:
                             name: {}

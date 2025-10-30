@@ -195,4 +195,4 @@ public class McpProcessor extends AbstractProcessor {
     private void log(String message) {
         messager.printMessage(Diagnostic.Kind.NOTE, message);
     }
-} 
+}

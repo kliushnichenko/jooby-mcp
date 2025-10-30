@@ -18,4 +18,4 @@ public class App extends Jooby {
     public static void main(String[] args) {
         runApp(args, App::new);
     }
-} 
+}

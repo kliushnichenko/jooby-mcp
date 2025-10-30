@@ -5,6 +5,7 @@ import io.github.kliushnichenko.jooby.mcp.annotation.ResourceTemplate;
 import io.github.kliushnichenko.jooby.mcp.apt.AnnMirrorUtils;
 import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
 import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourceEntry;
+import io.github.kliushnichenko.jooby.mcp.apt.util.ClassLiteral;
 import io.modelcontextprotocol.util.DefaultMcpUriTemplateManager;
 
 import javax.annotation.processing.Messager;
@@ -20,7 +21,6 @@ import java.util.Set;
 
 public class ResourceTemplatesCollector extends BaseMethodCollector {
 
-    private static final String RESOURCE_URI_CLASS = "io.github.kliushnichenko.jooby.mcp.ResourceUri";
     private final Validator validator = new Validator();
 
     public ResourceTemplatesCollector(Messager messager, String defaultServerKey) {
@@ -73,7 +73,6 @@ public class ResourceTemplatesCollector extends BaseMethodCollector {
                 .map(annMirror -> AnnMirrorUtils.hasProperty(annMirror, "annotations"))
                 .orElse(false);
     }
-
 
     private String extractResourceTemplateName(ExecutableElement method, ResourceTemplate annotation) {
         String name = annotation.name();
@@ -138,11 +137,11 @@ public class ResourceTemplatesCollector extends BaseMethodCollector {
         }
 
         private boolean isResourceUri(TypeMirror typeMirror) {
-            return RESOURCE_URI_CLASS.equals(typeMirror.toString());
+            return ClassLiteral.RESOURCE_URI.equals(typeMirror.toString());
         }
 
         private boolean isValidArgType(TypeMirror typeMirror) {
-            return "java.lang.String".equals(typeMirror.toString()) || isResourceUri(typeMirror);
+            return ClassLiteral.STRING.equals(typeMirror.toString()) || isResourceUri(typeMirror);
         }
     }
 }

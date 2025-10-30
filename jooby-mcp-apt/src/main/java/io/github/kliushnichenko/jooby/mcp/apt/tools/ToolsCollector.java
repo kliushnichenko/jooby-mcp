@@ -51,4 +51,4 @@ public class ToolsCollector extends BaseMethodCollector {
         String name = annotation.name();
         return name.isEmpty() ? method.getSimpleName().toString() : name;
     }
-} 
+}
