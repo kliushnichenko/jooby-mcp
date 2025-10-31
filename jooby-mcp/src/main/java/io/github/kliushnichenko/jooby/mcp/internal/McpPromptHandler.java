@@ -3,6 +3,7 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
+import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
 import static io.modelcontextprotocol.spec.McpSchema.Role.USER;
 
+@UtilityClass
 class McpPromptHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(McpPromptHandler.class);

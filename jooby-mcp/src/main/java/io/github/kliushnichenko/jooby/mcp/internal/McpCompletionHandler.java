@@ -3,6 +3,7 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
+import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import java.util.Objects;
 
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
 
+@UtilityClass
 class McpCompletionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(McpCompletionHandler.class);
@@ -34,7 +36,7 @@ class McpCompletionHandler {
         }
     }
 
-    private static McpSchema.CompleteResult toCompleteResult(Object result) throws RuntimeException {
+    private static McpSchema.CompleteResult toCompleteResult(Object result) {
         Objects.requireNonNull(result, "Completion result cannot be null");
 
         if (result instanceof McpSchema.CompleteResult completeResult) {

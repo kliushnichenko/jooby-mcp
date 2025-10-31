@@ -48,20 +48,7 @@ public class McpResourcesFeature extends McpFeature {
         for (ResourceEntry resource : descriptor.resources()) {
             CodeBlock resAnnotations = buildResourceAnnotations(resource.annotations());
 
-            CodeBlock.Builder newResourceBlock = CodeBlock.builder()
-                    .add("resources.add($T.builder().name($S)",
-                            ClassName.get(McpSchema.Resource.class),
-                            resource.name()
-                    );
-
-            addIfNotNull(resource.title(), newResourceBlock, ".title($S)");
-            addIfNotNull(resource.description(), newResourceBlock, ".description($S)");
-            addIfNotNull(resource.uri(), newResourceBlock, ".uri($S)");
-            addIfNotNull(resource.mimeType(), newResourceBlock, ".mimeType($S)");
-            addIfPositive(resource.size(), newResourceBlock, ".size(Long.valueOf($L))");
-            addIfNotNull(resAnnotations, newResourceBlock, ".annotations($L)");
-
-            newResourceBlock.add(".build());");
+            CodeBlock.Builder newResourceBlock = buildNewResourceBlock(resource, resAnnotations);
             methodBuilder.addCode(newResourceBlock.build()).addCode("\n");
         }
         methodBuilder.addCode("\n");
@@ -73,6 +60,24 @@ public class McpResourcesFeature extends McpFeature {
             methodBuilder.addCode(CodeBlock.of("resourceReaders.put($L);\n", mapEntry));
         }
         methodBuilder.addCode("\n");
+    }
+
+    private CodeBlock.Builder buildNewResourceBlock(ResourceEntry resource, CodeBlock resAnnotations) {
+        CodeBlock.Builder newResourceBlock = CodeBlock.builder()
+                .add("resources.add($T.builder().name($S)",
+                        ClassName.get(McpSchema.Resource.class),
+                        resource.name()
+                );
+
+        addIfNotNull(resource.title(), newResourceBlock, ".title($S)");
+        addIfNotNull(resource.description(), newResourceBlock, ".description($S)");
+        addIfNotNull(resource.uri(), newResourceBlock, ".uri($S)");
+        addIfNotNull(resource.mimeType(), newResourceBlock, ".mimeType($S)");
+        addIfPositive(resource.size(), newResourceBlock, ".size(Long.valueOf($L))");
+        addIfNotNull(resAnnotations, newResourceBlock, ".annotations($L)");
+
+        newResourceBlock.add(".build());");
+        return newResourceBlock;
     }
 
     protected CodeBlock buildMethodInvocation(ExecutableElement method, TypeElement serviceClass) {

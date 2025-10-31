@@ -48,10 +48,8 @@ public class CompletionsCollector extends BaseMethodCollector {
         CompleteArg argAnnotation = param.getAnnotation(CompleteArg.class);
 
         String argName = param.getSimpleName().toString();
-        if (argAnnotation != null) {
-            if (!argAnnotation.name().isEmpty()) {
-                argName = argAnnotation.name();
-            }
+        if (argAnnotation != null && !argAnnotation.name().isEmpty()) {
+            argName = argAnnotation.name();
         }
 
         return new CompletionEntry(
@@ -64,6 +62,8 @@ public class CompletionsCollector extends BaseMethodCollector {
     }
 
     class Validator {
+
+        private static final int MAX_ARGUMENTS = 1;
 
         private static final List<String> ALLOWED_RETURN_TYPES = List.of(
                 "io.modelcontextprotocol.spec.McpSchema.CompleteResult",
@@ -78,11 +78,7 @@ public class CompletionsCollector extends BaseMethodCollector {
                 return false;
             }
 
-            if (!isValidReturnType(method)) {
-                return false;
-            }
-
-            return isValidArgument(method);
+            return !isValidReturnType(method) && isValidArgument(method);
         }
 
         private boolean isValidReturnType(ExecutableElement method) {
@@ -101,7 +97,7 @@ public class CompletionsCollector extends BaseMethodCollector {
             var params = method.getParameters();
             var paramsCount = params.size();
 
-            if (paramsCount != 1) {
+            if (paramsCount != MAX_ARGUMENTS) {
                 var msg = String.format("Method '%s' must have exactly one argument", methodName);
                 reportError(msg, method);
                 return false;

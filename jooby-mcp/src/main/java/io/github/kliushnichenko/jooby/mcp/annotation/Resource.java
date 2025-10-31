@@ -56,7 +56,7 @@ public @interface Resource {
 
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.ANNOTATION_TYPE)
-    public @interface Annotations {
+    @interface Annotations {
 
         /**
          * An array indicating the intended audience(s) for this resource. Valid values are "user" and "assistant".

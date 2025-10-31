@@ -103,7 +103,7 @@ public class McpResourceTemplatesFeature extends McpFeature {
 
     private boolean isResourceUri(VariableElement param) {
         String paramType = param.asType().toString();
-        return paramType.equals(ClassLiteral.RESOURCE_URI);
+        return ClassLiteral.RESOURCE_URI.equals(paramType);
     }
 
     @Override

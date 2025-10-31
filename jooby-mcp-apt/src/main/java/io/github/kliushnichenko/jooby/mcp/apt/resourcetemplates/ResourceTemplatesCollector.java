@@ -121,19 +121,21 @@ public class ResourceTemplatesCollector extends BaseMethodCollector {
                     break;
                 }
 
-                if (!isResourceUri(paramTypeMirror)) {
-                    if (!templateVars.contains(param.getSimpleName().toString())) {
-                        var msg = String.format(
-                                "Method parameter '%s' does not match any variable in URI template '%s'.",
-                                param.getSimpleName().toString(), templateEntry.uriTemplate()
-                        );
-                        reportError(msg, method);
-                        isValid = false;
-                        break;
-                    }
+                if (!isResourceUri(paramTypeMirror) && !paramIsPresentInTemplate(param, templateVars)) {
+                    var msg = String.format(
+                            "Method parameter '%s' does not match any variable in URI template '%s'.",
+                            param.getSimpleName().toString(), templateEntry.uriTemplate()
+                    );
+                    reportError(msg, method);
+                    isValid = false;
+                    break;
                 }
             }
             return isValid;
+        }
+
+        private boolean paramIsPresentInTemplate(VariableElement param, List<String> templateVars) {
+            return templateVars.contains(param.getSimpleName().toString());
         }
 
         private boolean isResourceUri(TypeMirror typeMirror) {

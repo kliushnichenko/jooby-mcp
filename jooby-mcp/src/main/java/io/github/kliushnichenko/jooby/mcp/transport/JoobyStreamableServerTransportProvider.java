@@ -30,6 +30,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
     private static final Logger LOG = LoggerFactory.getLogger(JoobyStreamableServerTransportProvider.class);
 
     private static final MediaType TEXT_EVENT_STREAM = MediaType.valueOf("text/event-stream");
+    private static final String SSE_ERROR_EVENT = "Error";
     public static final String MESSAGE_EVENT_TYPE = "message";
     private final boolean disallowDelete;
     private final McpJsonMapper mcpJsonMapper;
@@ -120,12 +121,12 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                                                 .block();
                                     } catch (Exception e) {
                                         LOG.error("Failed to replay message: {}", e.getMessage());
-                                        sse.send("Error", e.getMessage());
+                                        sse.send(SSE_ERROR_EVENT, e.getMessage());
                                     }
                                 });
                     } catch (Exception e) {
                         LOG.error("Failed to replay messages: {}", e.getMessage());
-                        sse.send("Error", e.getMessage());
+                        sse.send(SSE_ERROR_EVENT, e.getMessage());
                     }
                 } else {
                     // Establish new listening stream
@@ -170,7 +171,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
 
             // Handle initialization request
             if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest
-                && jsonrpcRequest.method().equals(McpSchema.METHOD_INITIALIZE)) {
+                && McpSchema.METHOD_INITIALIZE.equals(jsonrpcRequest.method())) {
 
                 McpSchema.InitializeRequest initRequest = mcpJsonMapper.convertValue(
                         jsonrpcRequest.params(),
@@ -235,7 +236,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                                 .block();
                     } catch (Exception e) {
                         LOG.error("Failed to handle request stream: {}", e.getMessage());
-                        sse.send("Error", e.getMessage());
+                        sse.send(SSE_ERROR_EVENT, e.getMessage());
                     }
                 });
             } else {
@@ -302,7 +303,9 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
             return Mono.empty();
         }
 
-        LOG.debug("Attempting to broadcast message to {} active sessions", this.sessions.size());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Attempting to broadcast message to {} active sessions", this.sessions.size());
+        }
 
         return Mono.fromRunnable(() -> {
             this.sessions.values().parallelStream().forEach(session -> {
@@ -319,7 +322,9 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
     public Mono<Void> closeGracefully() {
         return Mono.fromRunnable(() -> {
             this.isClosing = true;
-            LOG.debug("Initiating graceful shutdown with {} active sessions", this.sessions.size());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initiating graceful shutdown with {} active sessions", this.sessions.size());
+            }
 
             this.sessions.values().parallelStream().forEach(session -> {
                 try {
@@ -386,7 +391,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                 } catch (Exception e) {
                     LOG.error("Failed to send message to session {}: {}", this.sessionId, e.getMessage());
                     try {
-                        sse.send("Error", e.getMessage());
+                        sse.send(SSE_ERROR_EVENT, e.getMessage());
                     } catch (Exception errorEx) {
                         LOG.error("Failed to send error to SSE session {}: {}", this.sessionId, errorEx.getMessage());
                     }
@@ -414,7 +419,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
          */
         @Override
         public Mono<Void> closeGracefully() {
-            return Mono.fromRunnable(JoobyStreamableMcpSessionTransport.this::close);
+            return Mono.fromRunnable(this::close);
         }
 
         /**

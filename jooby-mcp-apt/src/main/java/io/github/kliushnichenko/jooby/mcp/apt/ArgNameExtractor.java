@@ -2,12 +2,14 @@ package io.github.kliushnichenko.jooby.mcp.apt;
 
 import io.github.kliushnichenko.jooby.mcp.annotation.PromptArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
+import lombok.experimental.UtilityClass;
 
 import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.function.Function;
 
+@UtilityClass
 public final class ArgNameExtractor {
 
     private static final Map<Class<?>, Function<VariableElement, String>> EXTRACTORS = Map.of(
@@ -26,10 +28,6 @@ public final class ArgNameExtractor {
                 return argument.getSimpleName().toString();
             }
     );
-
-    private ArgNameExtractor() {
-        throw new UnsupportedOperationException("Utility class should not be instantiated");
-    }
 
     public static String extractName(VariableElement argument, Class<? extends Annotation> annotationClass) {
         return EXTRACTORS.getOrDefault(annotationClass, var -> var.getSimpleName().toString())

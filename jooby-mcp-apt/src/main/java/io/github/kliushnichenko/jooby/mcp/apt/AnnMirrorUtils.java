@@ -1,9 +1,12 @@
 package io.github.kliushnichenko.jooby.mcp.apt;
 
+import lombok.experimental.UtilityClass;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import java.util.Optional;
 
+@UtilityClass
 public class AnnMirrorUtils {
 
     public static Optional<AnnotationMirror> findAnnotationMirror(Element element, Class<?> annotationClass) {
