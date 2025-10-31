@@ -36,5 +36,4 @@ public @interface PromptArg {
      * An argument is required by default.
      */
     boolean required() default true;
-
-} 
+}

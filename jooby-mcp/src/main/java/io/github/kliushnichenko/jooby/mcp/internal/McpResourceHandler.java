@@ -39,7 +39,7 @@ class McpResourceHandler {
     }
 
     static McpSchema.ReadResourceResult toResourceResult(Object result, String uri, McpJsonMapper mcpJsonMapper)
-            throws RuntimeException, IOException {
+            throws IOException {
         if (result == null) {
             return new McpSchema.ReadResourceResult(List.of());
         } else if (result instanceof McpSchema.ReadResourceResult resourceResult) {

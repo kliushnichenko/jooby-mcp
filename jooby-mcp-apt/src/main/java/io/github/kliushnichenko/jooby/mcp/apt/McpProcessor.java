@@ -23,7 +23,6 @@ import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.Diagnostic;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +68,7 @@ public class McpProcessor extends AbstractProcessor {
     private List<ResourceTemplateEntry> resourceTemplates = new ArrayList<>();
 
     @Override
+    @SuppressWarnings("PMD.AvoidSynchronizedAtMethodLevel")
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.elementUtils = processingEnv.getElementUtils();
@@ -79,9 +79,9 @@ public class McpProcessor extends AbstractProcessor {
         boolean serverKeyIsValid = verifyServerKey(defaultServerKey);
 
         if (!serverKeyIsValid) {
-            throw new RuntimeException("Illegal value at '" + OPTION_DEFAULT_SERVER_KEY +
-                                       "' compilerArg. Server key must start with a letter and contain " +
-                                       "only letters and digits");
+            throw new IllegalArgumentException("Illegal value at '" + OPTION_DEFAULT_SERVER_KEY +
+                                               "' compilerArg. Server key must start with a letter and contain " +
+                                               "only letters and digits");
         }
 
         this.serverKeys = new HashSet<>(List.of(defaultServerKey));
@@ -107,6 +107,7 @@ public class McpProcessor extends AbstractProcessor {
     }
 
     @Override
+    @SuppressWarnings("PMD.AvoidCatchingGenericException")
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (roundEnv.processingOver()) {
             return false;
@@ -117,31 +118,45 @@ public class McpProcessor extends AbstractProcessor {
                 return false;
             }
 
-            String defaultTargetPackage = evalTargetPackage(roundEnv);
-
             log("Start McpProcessor");
-            serverKeys.addAll(collectServers(roundEnv));
+            collectServers(roundEnv);
+            collectMcpFeatures(roundEnv);
 
-            tools = toolsCollector.collectTools(roundEnv);
-            prompts = promptsCollector.collectPrompts(roundEnv);
-
-            List<String> promptRefs = prompts.stream().map(PromptEntry::promptName).toList();
-            completions = completionsCollector.collectCompletions(roundEnv, promptRefs);
-            resources = resourcesCollector.collectResources(roundEnv);
-            resourceTemplates = resourceTemplatesCollector.collectResourceTemplates(roundEnv);
-
-            List<McpServerDescriptor> descriptors = buildServerDescriptors(defaultTargetPackage);
+            List<McpServerDescriptor> descriptors = buildServerDescriptors(roundEnv);
             mcpServerGenerator.generateMcpServers(descriptors);
             log("End McpProcessor execution");
-
             return true;
-        } catch (IOException e) {
-            reportError("Failed to generate Mcp Server: " + e.getMessage());
-            return false;
         } catch (Exception e) {
             reportError("Unexpected error during McpProcessor execution: " + e.getMessage());
             return false;
         }
+    }
+
+    private void collectMcpFeatures(RoundEnvironment roundEnv) {
+        tools = toolsCollector.collectTools(roundEnv);
+        prompts = promptsCollector.collectPrompts(roundEnv);
+
+        List<String> promptRefs = prompts.stream().map(PromptEntry::promptName).toList();
+        completions = completionsCollector.collectCompletions(roundEnv, promptRefs);
+        resources = resourcesCollector.collectResources(roundEnv);
+        resourceTemplates = resourceTemplatesCollector.collectResourceTemplates(roundEnv);
+    }
+
+    private List<McpServerDescriptor> buildServerDescriptors(RoundEnvironment roundEnv) {
+        String targetPackage = evalTargetPackage(roundEnv);
+        List<McpServerDescriptor> descriptors = new ArrayList<>();
+        for (String serverKey : serverKeys) {
+            descriptors.add(new McpServerDescriptor(
+                    serverKey,
+                    targetPackage,
+                    tools.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
+                    prompts.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
+                    completions.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
+                    resources.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
+                    resourceTemplates.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList()
+            ));
+        }
+        return descriptors;
     }
 
     private String evalTargetPackage(RoundEnvironment roundEnv) {
@@ -162,30 +177,14 @@ public class McpProcessor extends AbstractProcessor {
         return targetPackage;
     }
 
-    private List<McpServerDescriptor> buildServerDescriptors(String defaultTargetPackage) {
-        List<McpServerDescriptor> descriptors = new ArrayList<>();
-        for (String serverKey : serverKeys) {
-            descriptors.add(new McpServerDescriptor(
-                    serverKey,
-                    defaultTargetPackage,
-                    tools.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
-                    prompts.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
-                    completions.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
-                    resources.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList(),
-                    resourceTemplates.stream().filter(entry -> entry.serverKey().equals(serverKey)).toList()
-            ));
-        }
-        return descriptors;
-    }
-
-    private Set<String> collectServers(RoundEnvironment roundEnv) {
+    private void collectServers(RoundEnvironment roundEnv) {
         Set<? extends Element> serverElements = roundEnv.getElementsAnnotatedWith(McpServer.class);
         Set<String> servers = new HashSet<>();
         for (Element element : serverElements) {
             McpServer annotation = element.getAnnotation(McpServer.class);
             servers.add(annotation.value());
         }
-        return servers;
+        serverKeys.addAll(servers);
     }
 
     private void reportError(String message) {
@@ -195,4 +194,4 @@ public class McpProcessor extends AbstractProcessor {
     private void log(String message) {
         messager.printMessage(Diagnostic.Kind.NOTE, message);
     }
-} 
+}

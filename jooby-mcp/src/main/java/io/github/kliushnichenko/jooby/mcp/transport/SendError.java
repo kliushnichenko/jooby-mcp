@@ -5,9 +5,11 @@ import io.jooby.MediaType;
 import io.jooby.StatusCode;
 import io.modelcontextprotocol.spec.HttpHeaders;
 import io.modelcontextprotocol.spec.McpSchema;
+import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
+@UtilityClass
 class SendError {
 
     static Context serverIsShuttingDown(Context ctx) {
@@ -97,7 +99,6 @@ class SendError {
         );
         return send(ctx, err);
     }
-
 
     public static Context error(Context ctx, StatusCode statusCode, int errCode, String msg) {
         ctx.setResponseCode(statusCode);

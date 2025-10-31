@@ -27,9 +27,10 @@ import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_REQUEST;
  */
 public class JoobyStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
 
-    private static final Logger log = LoggerFactory.getLogger(JoobyStreamableServerTransportProvider.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JoobyStreamableServerTransportProvider.class);
 
     private static final MediaType TEXT_EVENT_STREAM = MediaType.valueOf("text/event-stream");
+    private static final String SSE_ERROR_EVENT = "Error";
     public static final String MESSAGE_EVENT_TYPE = "message";
     private final boolean disallowDelete;
     private final McpJsonMapper mcpJsonMapper;
@@ -59,7 +60,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
         if (serverConfig.getKeepAliveInterval() != null) {
             var keepAliveInterval = Duration.ofSeconds(serverConfig.getKeepAliveInterval());
             this.keepAliveScheduler = KeepAliveScheduler
-                    .builder(() -> (isClosing) ? Flux.empty() : Flux.fromIterable(this.sessions.values()))
+                    .builder(() -> isClosing ? Flux.empty() : Flux.fromIterable(this.sessions.values()))
                     .initialDelay(keepAliveInterval)
                     .interval(keepAliveInterval)
                     .build();
@@ -95,12 +96,12 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
             return SendError.sessionNotFound(ctx, sessionId);
         }
 
-        log.debug("Handling GET request for session: {}", sessionId);
+        LOG.debug("Handling GET request for session: {}", sessionId);
 
         try {
             ctx.setResponseType(TEXT_EVENT_STREAM, StandardCharsets.UTF_8);
             return ctx.upgrade(sse -> {
-                sse.onClose(() -> log.debug("SSE connection closed by client for session: {}", sessionId));
+                sse.onClose(() -> LOG.debug("SSE connection closed by client for session: {}", sessionId));
 
                 var sessionTransport = new JoobyStreamableMcpSessionTransport(sessionId, sse);
 
@@ -115,16 +116,17 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                                 .forEach(message -> {
                                     try {
                                         sessionTransport.sendMessage(message)
-                                                .contextWrite(reactorCtx -> reactorCtx.put(McpTransportContext.KEY, transportContext))
+                                                .contextWrite(reactorCtx
+                                                        -> reactorCtx.put(McpTransportContext.KEY, transportContext))
                                                 .block();
                                     } catch (Exception e) {
-                                        log.error("Failed to replay message: {}", e.getMessage());
-                                        sse.send("Error", e.getMessage());
+                                        LOG.error("Failed to replay message: {}", e.getMessage());
+                                        sse.send(SSE_ERROR_EVENT, e.getMessage());
                                     }
                                 });
                     } catch (Exception e) {
-                        log.error("Failed to replay messages: {}", e.getMessage());
-                        sse.send("Error", e.getMessage());
+                        LOG.error("Failed to replay messages: {}", e.getMessage());
+                        sse.send(SSE_ERROR_EVENT, e.getMessage());
                     }
                 } else {
                     // Establish new listening stream
@@ -132,13 +134,13 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                             .listeningStream(sessionTransport);
 
                     sse.onClose(() -> {
-                        log.debug("SSE connection has been closed for session: {}", sessionId);
+                        LOG.debug("SSE connection has been closed for session: {}", sessionId);
                         listeningStream.close();
                     });
                 }
             });
         } catch (Exception e) {
-            log.error("Failed to handle GET request for session {}: {}", sessionId, e.getMessage());
+            LOG.error("Failed to handle GET request for session {}: {}", sessionId, e.getMessage());
             return SendError.internalError(ctx, sessionId);
         }
     }
@@ -169,7 +171,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
 
             // Handle initialization request
             if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest
-                && jsonrpcRequest.method().equals(McpSchema.METHOD_INITIALIZE)) {
+                && McpSchema.METHOD_INITIALIZE.equals(jsonrpcRequest.method())) {
 
                 McpSchema.InitializeRequest initRequest = mcpJsonMapper.convertValue(
                         jsonrpcRequest.params(),
@@ -191,7 +193,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                             null
                     );
                 } catch (Exception e) {
-                    log.error("Failed to initialize session: {}", e.getMessage());
+                    LOG.error("Failed to initialize session: {}", e.getMessage());
                     return SendError.internalError(ctx, sessionId);
                 }
             }
@@ -223,7 +225,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
 
                 String finalSessionId = sessionId;
                 return ctx.upgrade(sse -> {
-                    sse.onClose(() -> log.debug("Request response stream completed for session: {}", finalSessionId));
+                    sse.onClose(() -> LOG.debug("Request response stream completed for session: {}", finalSessionId));
 
                     JoobyStreamableMcpSessionTransport sessionTransport = new JoobyStreamableMcpSessionTransport(
                             finalSessionId, sse);
@@ -233,18 +235,18 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                                 .contextWrite(reactorCtx -> reactorCtx.put(McpTransportContext.KEY, transportContext))
                                 .block();
                     } catch (Exception e) {
-                        log.error("Failed to handle request stream: {}", e.getMessage());
-                        sse.send("Error", e.getMessage());
+                        LOG.error("Failed to handle request stream: {}", e.getMessage());
+                        sse.send(SSE_ERROR_EVENT, e.getMessage());
                     }
                 });
             } else {
                 return SendError.unknownMsgType(ctx, sessionId);
             }
         } catch (IllegalArgumentException | IOException e) {
-            log.error("Failed to deserialize message: {}", e.getMessage());
+            LOG.error("Failed to deserialize message: {}", e.getMessage());
             return SendError.msgParseError(ctx, sessionId);
         } catch (Exception e) {
-            log.error("Unexpected error occurred while handling message: {}", e.getMessage());
+            LOG.error("Unexpected error occurred while handling message: {}", e.getMessage());
             return SendError.internalError(ctx, sessionId);
         }
     }
@@ -284,7 +286,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
             this.sessions.remove(sessionId);
             return StatusCode.NO_CONTENT;
         } catch (Exception e) {
-            log.error("Failed to delete session {}: {}", sessionId, e.getMessage());
+            LOG.error("Failed to delete session {}: {}", sessionId, e.getMessage());
             return SendError.internalError(ctx, sessionId);
         }
     }
@@ -297,18 +299,20 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
     @Override
     public Mono<Void> notifyClients(String method, Object params) {
         if (this.sessions.isEmpty()) {
-            log.debug("No active sessions to broadcast message to");
+            LOG.debug("No active sessions to broadcast message to");
             return Mono.empty();
         }
 
-        log.debug("Attempting to broadcast message to {} active sessions", this.sessions.size());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Attempting to broadcast message to {} active sessions", this.sessions.size());
+        }
 
         return Mono.fromRunnable(() -> {
             this.sessions.values().parallelStream().forEach(session -> {
                 try {
                     session.sendNotification(method, params).block();
                 } catch (Exception e) {
-                    log.error("Failed to send message to session {}: {}", session.getId(), e.getMessage());
+                    LOG.error("Failed to send message to session {}: {}", session.getId(), e.getMessage());
                 }
             });
         });
@@ -318,18 +322,20 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
     public Mono<Void> closeGracefully() {
         return Mono.fromRunnable(() -> {
             this.isClosing = true;
-            log.debug("Initiating graceful shutdown with {} active sessions", this.sessions.size());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initiating graceful shutdown with {} active sessions", this.sessions.size());
+            }
 
             this.sessions.values().parallelStream().forEach(session -> {
                 try {
                     session.closeGracefully().block();
                 } catch (Exception e) {
-                    log.error("Failed to close session {}: {}", session.getId(), e.getMessage());
+                    LOG.error("Failed to close session {}: {}", session.getId(), e.getMessage());
                 }
             });
 
             this.sessions.clear();
-            log.debug("Graceful shutdown completed");
+            LOG.debug("Graceful shutdown completed");
         }).then().doOnSuccess(v -> {
             if (this.keepAliveScheduler != null) {
                 this.keepAliveScheduler.shutdown();
@@ -346,7 +352,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
         JoobyStreamableMcpSessionTransport(String sessionId, ServerSentEmitter sse) {
             this.sessionId = sessionId;
             this.sse = sse;
-            log.debug("Streamable session transport {} initialized with SSE", sessionId);
+            LOG.debug("Streamable session transport {} initialized with SSE", sessionId);
         }
 
         /**
@@ -373,7 +379,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
             return Mono.fromRunnable(() -> {
                 try {
                     if (this.closed) {
-                        log.debug("Session {} was closed during message send attempt", this.sessionId);
+                        LOG.debug("Session {} was closed during message send attempt", this.sessionId);
                         return;
                     }
 
@@ -381,13 +387,13 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                     sse.send(new ServerSentMessage(jsonText)
                             .setId(messageId != null ? messageId : this.sessionId)
                             .setEvent(MESSAGE_EVENT_TYPE));
-                    log.debug("Message sent to session {} with ID {}", this.sessionId, messageId);
+                    LOG.debug("Message sent to session {} with ID {}", this.sessionId, messageId);
                 } catch (Exception e) {
-                    log.error("Failed to send message to session {}: {}", this.sessionId, e.getMessage());
+                    LOG.error("Failed to send message to session {}: {}", this.sessionId, e.getMessage());
                     try {
-                        sse.send("Error", e.getMessage());
+                        sse.send(SSE_ERROR_EVENT, e.getMessage());
                     } catch (Exception errorEx) {
-                        log.error("Failed to send error to SSE session {}: {}", this.sessionId, errorEx.getMessage());
+                        LOG.error("Failed to send error to SSE session {}: {}", this.sessionId, errorEx.getMessage());
                     }
                 }
             });
@@ -413,7 +419,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
          */
         @Override
         public Mono<Void> closeGracefully() {
-            return Mono.fromRunnable(JoobyStreamableMcpSessionTransport.this::close);
+            return Mono.fromRunnable(this::close);
         }
 
         /**
@@ -423,15 +429,15 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
         public void close() {
             try {
                 if (this.closed) {
-                    log.debug("Session transport {} already closed", this.sessionId);
+                    LOG.debug("Session transport {} already closed", this.sessionId);
                     return;
                 }
 
                 this.closed = true;
                 sse.close();
-                log.debug("Successfully closed SSE session {}", sessionId);
+                LOG.debug("Successfully closed SSE session {}", sessionId);
             } catch (Exception e) {
-                log.warn("Failed to close SSE session {}: {}", sessionId, e.getMessage());
+                LOG.warn("Failed to close SSE session {}: {}", sessionId, e.getMessage());
             }
         }
     }

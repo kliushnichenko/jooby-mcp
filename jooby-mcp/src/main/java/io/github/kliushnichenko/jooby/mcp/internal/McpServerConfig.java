@@ -2,7 +2,11 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 
 import com.typesafe.config.Config;
 import io.jooby.exception.StartupException;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class McpServerConfig {
     public static final String DEFAULT_SSE_ENDPOINT = "/mcp/sse";
     public static final String DEFAULT_MESSAGE_ENDPOINT = "/mcp/message";
@@ -22,6 +26,7 @@ public class McpServerConfig {
         this.version = version;
     }
 
+    @Getter
     public enum Transport {
         SSE("sse"),
         STREAMABLE_HTTP("streamable-http");
@@ -33,12 +38,8 @@ public class McpServerConfig {
             this.value = value;
         }
 
-        public String getValue() {
-            return value;
-        }
-
         public static Transport of(String value) {
-            for (Transport transport : Transport.values()) {
+            for (Transport transport : values()) {
                 if (transport.value.equalsIgnoreCase(value)) {
                     return transport;
                 }
@@ -47,74 +48,10 @@ public class McpServerConfig {
         }
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public Transport getTransport() {
-        return transport;
-    }
-
-    public void setTransport(Transport transport) {
-        this.transport = transport;
-    }
-
-    public String getSseEndpoint() {
-        return sseEndpoint;
-    }
-
-    public void setSseEndpoint(String sseEndpoint) {
-        this.sseEndpoint = sseEndpoint;
-    }
-
-    public String getMessageEndpoint() {
-        return messageEndpoint;
-    }
-
-    public void setMessageEndpoint(String messageEndpoint) {
-        this.messageEndpoint = messageEndpoint;
-    }
-
-    public String getMcpEndpoint() {
-        return mcpEndpoint;
-    }
-
-    public void setMcpEndpoint(String mcpEndpoint) {
-        this.mcpEndpoint = mcpEndpoint;
-    }
-
-    public boolean isDisallowDelete() {
-        return disallowDelete;
-    }
-
-    public void setDisallowDelete(boolean disallowDelete) {
-        this.disallowDelete = disallowDelete;
-    }
-
-    public Integer getKeepAliveInterval() {
-        return keepAliveInterval;
-    }
-
-    public void setKeepAliveInterval(Integer keepAliveInterval) {
-        this.keepAliveInterval = keepAliveInterval;
-    }
-
     public static McpServerConfig fromConfig(Config config) {
         var srvConfig = new McpServerConfig(
-                resolveRequiredParam( config,"name"),
-                resolveRequiredParam( config,"version")
+                resolveRequiredParam(config, "name"),
+                resolveRequiredParam(config, "version")
         );
 
         if (config.hasPath("transport")) {

@@ -7,7 +7,6 @@ import jakarta.inject.Singleton;
 
 import java.util.List;
 
-
 @Singleton
 public class PromptCompletionsExample {
 

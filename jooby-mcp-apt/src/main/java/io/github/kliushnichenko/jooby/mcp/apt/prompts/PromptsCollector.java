@@ -3,6 +3,7 @@ package io.github.kliushnichenko.jooby.mcp.apt.prompts;
 import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
 import io.github.kliushnichenko.jooby.mcp.annotation.PromptArg;
 import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
+import lombok.experimental.UtilityClass;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
@@ -10,7 +11,9 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 public class PromptsCollector extends BaseMethodCollector {
 
@@ -34,10 +37,7 @@ public class PromptsCollector extends BaseMethodCollector {
 
     private boolean isValidMethod(Element element) {
         ExecutableElement method = (ExecutableElement) element;
-        if (!isPublicMethod(method)) {
-            return false;
-        }
-        return true;
+        return isPublicMethod(method);
     }
 
     private PromptEntry buildPromptEntry(ExecutableElement method) {
@@ -71,6 +71,7 @@ public class PromptsCollector extends BaseMethodCollector {
         return name.isEmpty() ? method.getSimpleName().toString() : name;
     }
 
+    @UtilityClass
     static class ArgExtractor {
 
         public static String extractName(VariableElement element, PromptArg arg) {
@@ -89,10 +90,7 @@ public class PromptsCollector extends BaseMethodCollector {
         }
 
         public static boolean extractRequired(PromptArg arg) {
-            if (arg != null) {
-                return arg.required();
-            }
-            return true;
+            return arg == null || arg.required();
         }
     }
 }

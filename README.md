@@ -1,12 +1,21 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg)](https://search.maven.org/artifact/io.github.kliushnichenko/jooby-mcp)
+[![Javadoc](https://javadoc.io/badge/io.github.kliushnichenko/jooby-mcp/jooby-mcp.svg)](https://javadoc.io/doc/io.github.kliushnichenko/jooby-mcp/latest)  
 
-# jooby-mcp
+## jooby-mcp
 
-This module provides a lightweight wrapper over the official Java MCP [SDK](https://github.com/modelcontextprotocol/java-sdk), adapted for use with Jooby’s routing, server capabilities and DI.
+This module provides a lightweight wrapper over the
+official [Java MCP SDK](https://github.com/modelcontextprotocol/java-sdk), adapted for use
+with [Jooby](https://github.com/jooby-project/jooby)’s routing, server capabilities and DI.
 
 The module provides declarative(annotation-based) registration of tools, prompts and resources.
 Annotations discovery is done at build-time using APT, so no reflection is used at runtime.
 Hence, you will need to add an annotation processor in addition to the module dependency.
+
+Compatibility:
+
+| Jooby Version | Jooby MCP Version |
+|---------------|-------------------|
+| 3.x           | 1.x               |
 
 Features:
 
@@ -23,6 +32,7 @@ Features:
 - [X] Build time method signature and return type validation
 
 Table of Contents:
+
 - [Quick Start](#quick-start)
 - [Tools & Prompts Example](#tools--prompts-example)
 - [Resource Example](#resource-example)
@@ -72,7 +82,7 @@ Table of Contents:
      messageEndpoint: "/mcp/message"   # Optional (default: /mcp/message), applicable only to SSE transport
    }
    ```
-      
+
    Full config for `Streamable HTTP` transport:
    ```
     mcp.default {
@@ -85,17 +95,18 @@ Table of Contents:
     }
     ```
    `keepAliveInterval` - enables sending periodic keep-alive messages to the client.  
-    Disabled by default to avoid excessive network overhead. Set to a positive integer value (in seconds) to enable.
+   Disabled by default to avoid excessive network overhead. Set to a positive integer value (in seconds) to enable.
 
-4. Implement your features (tools, prompts, resources, etc.), see examples below and in the [example-project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example)
+4. Implement your features (tools, prompts, resources, etc.), see examples below or in
+   the [example-project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example)
 
 5. Install the module. After compilation, you can observe generated `DefaultMcpServer` class. Now register its instance
    in the module:
    ```java
    {
-      install(new JacksonModule()); // some JSON encode/decoder is required
-      install(AvajeInjectModule.of()); // or other DI module of your choice
-      install(new McpModule(new DefaultMcpServer());
+      install(new JacksonModule());                    // a JSON encode/decoder is required for JSONRPC
+      install(AvajeInjectModule.of());                 // or other DI module of your choice
+      install(new McpModule(new DefaultMcpServer());   // register MCP server
    }
    ```
 
@@ -107,30 +118,30 @@ import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
 
 @Singleton
-public class CalculatorService {
+public class ToolsAndPromptsExample {
 
-   @Tool(name = "add", description = "Adds two numbers together")
-   public String add(
-           @ToolArg(name = "first", description = "First number to add") int a,
-           @ToolArg(name = "second", description = "Second number to add") int b
-   ) {
-       int result = a + b;
-       return String.valueOf(result);
-   }
+    @Tool(name = "add", description = "Adds two numbers together")
+    public String add(
+            @ToolArg(name = "first", description = "First number to add") int a,
+            @ToolArg(name = "second", description = "Second number to add") int b
+    ) {
+        int result = a + b;
+        return String.valueOf(result);
+    }
 
-   @Tool
-   public String subtract(int a, int b) {
-       int result = a - b;
-       return String.valueOf(result);
-   }
+    @Tool
+    public String subtract(int a, int b) {
+        int result = a - b;
+        return String.valueOf(result);
+    }
 
-   @Prompt(name = "summarizeText", description = "Summarizes the provided text into a specified number of sentences")
-   public String summarizeText(@PromptArg(name = "text") String text, String maxSentences) {
-       return String.format("""
-               Please provide a clear and concise summary of the following text in no more than %s sentences:
-               %s
-               """, maxSentences, text);
-   }
+    @Prompt(name = "summarizeText", description = "Summarizes the provided text into a specified number of sentences")
+    public String summarizeText(@PromptArg(name = "text") String text, String maxSentences) {
+        return String.format("""
+                Please provide a clear and concise summary of the following text in no more than %s sentences:
+                %s
+                """, maxSentences, text);
+    }
 } 
 ```
 
@@ -142,25 +153,27 @@ import io.github.kliushnichenko.jooby.mcp.annotation.Resource;
 @Singleton
 public class ResourceExamples {
 
-   @Resource(uri = "file:///project/README.md", name = "README.md", title = "README", mimeType = "text/markdown")
-   public McpSchema.TextResourceContents textResource() {
-       String content = """
-               # Project Title
+    @Resource(uri = "file:///project/README.md", name = "README.md", title = "README", mimeType = "text/markdown")
+    public McpSchema.TextResourceContents textResource() {
+        String content = """
+                # Project Title
 
-               This is an example README file for the project.
+                This is an example README file for the project.
 
-               ## Features
+                ## Features
 
-               - Feature 1
-               - Feature 2
-               - Feature 3
+                - Feature 1
+                - Feature 2
+                - Feature 3
 
-               """;
-       return new McpSchema.TextResourceContents("file:///project/README.md", "text/markdown", content);
-   }
+                """;
+        return new McpSchema.TextResourceContents("file:///project/README.md", "text/markdown", content);
+    }
 }
 ```
-Find more examples in the [project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example/ResourceExamples.java)
+
+Find more examples in
+the [project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example/ResourceExamples.java)
 
 ### Resource Template Example
 
@@ -170,17 +183,17 @@ import io.github.kliushnichenko.jooby.mcp.annotation.ResourceTemplate;
 @Singleton
 public class ResourceTemplateExamples {
 
-   private static final Map<String, String> PROJECTS = Map.of(
-           "project-alpha", "This is Project Alpha.",
-           "project-beta", "This is Project Beta.",
-           "project-gamma", "This is Project Gamma."
-   );
+    private static final Map<String, String> PROJECTS = Map.of(
+            "project-alpha", "This is Project Alpha.",
+            "project-beta", "This is Project Beta.",
+            "project-gamma", "This is Project Gamma."
+    );
 
-   @ResourceTemplate(uriTemplate = "file:///project/{name}")
-   public McpSchema.TextResourceContents getProject(String name, ResourceUri resourceUri) {
-      String content = PROJECTS.getOrDefault(name, "<Project not found>");
-      return new McpSchema.TextResourceContents(resourceUri.uri(), "text/markdown", content);
-   }
+    @ResourceTemplate(uriTemplate = "file:///project/{name}")
+    public McpSchema.TextResourceContents getProject(String name, ResourceUri resourceUri) {
+        String content = PROJECTS.getOrDefault(name, "<Project not found>");
+        return new McpSchema.TextResourceContents(resourceUri.uri(), "text/markdown", content);
+    }
 }
 ```
 
@@ -194,28 +207,28 @@ import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
 @Singleton
 public class PromptCompletionsExample {
 
-   private static final List<String> SUPPORTED_LANGUAGES = List.of("Java", "Python", "JavaScript", "Go", "TypeScript");
+    private static final List<String> SUPPORTED_LANGUAGES = List.of("Java", "Python", "JavaScript", "Go", "TypeScript");
 
-   @Prompt(name = "code_review", description = "Code Review Prompt")
-   public String codeReviewPrompt(String codeSnippet, String language) {
-       return """
-               You are a senior software engineer tasked with reviewing the following %s code snippet:
-                  
-               %s
-                  
-               Please provide feedback on:
-               1. Code readability and maintainability.
-               2. Potential bugs or issues.
-               3. Suggestions for improvement.
-                """.formatted(language, codeSnippet);
-   }
+    @Prompt(name = "code_review", description = "Code Review Prompt")
+    public String codeReviewPrompt(String codeSnippet, String language) {
+        return """
+                You are a senior software engineer tasked with reviewing the following %s code snippet:
+                   
+                %s
+                   
+                Please provide feedback on:
+                1. Code readability and maintainability.
+                2. Potential bugs or issues.
+                3. Suggestions for improvement.
+                 """.formatted(language, codeSnippet);
+    }
 
-   @CompletePrompt("code_review")
-   public List<String> completeCodeReviewLang(@CompleteArg(name = "language") String partialInput) {
-       return SUPPORTED_LANGUAGES.stream()
-               .filter(lang -> lang.toLowerCase().contains(partialInput.toLowerCase()))
-               .toList();
-   }
+    @CompletePrompt("code_review")
+    public List<String> completeCodeReviewLang(@CompleteArg(name = "language") String partialInput) {
+        return SUPPORTED_LANGUAGES.stream()
+                .filter(lang -> lang.toLowerCase().contains(partialInput.toLowerCase()))
+                .toList();
+    }
 }
 ```
 
@@ -227,26 +240,26 @@ method level.
    ```java
    import io.github.kliushnichenko.jooby.mcp.annotation.McpServer;
 
-   @Singleton
-   @McpServer("weather")
-   public class WeatherService {
-   
-       public record Coordinates(double latitude, double longitude) {
-       }
-   
-       @Tool(name = "get_weather")
-       public String getWeather(Coordinates coordinates) {
+@Singleton
+@McpServer("weather")
+public class WeatherService {
+
+    public record Coordinates(double latitude, double longitude) {
+    }
+
+    @Tool(name = "get_weather")
+    public String getWeather(Coordinates coordinates) {
             ...
-       }
-   }
+    }
+}
    ```
 
 As a result, additional `WeatherMcpServer` class will be generated. Register it in the module:
 
    ```java
    {
-     install(new McpModule(new DefaultMcpServer(), new WeatherMcpServer()));
-   }
+        install(new McpModule(new DefaultMcpServer(),new WeatherMcpServer()));
+        }
    ```
 
 The weather MCP server should have its own configuration section in `application.conf`:
@@ -267,23 +280,24 @@ compiler arguments. For example, to set the default server name to `CalculatorMc
 to `com.acme.corp.mcp`, you can add the following configuration to your `pom.xml`:
 
    ```xml
-   <plugin>
-       <groupId>org.apache.maven.plugins</groupId>
-       <artifactId>maven-compiler-plugin</artifactId>
-       <configuration>
-           <annotationProcessorPaths>
-               <path>
-                   <groupId>io.github.kliushnichenko</groupId>
-                   <artifactId>jooby-mcp-apt</artifactId>
-                   <version>${version}</version>
-               </path>
-           </annotationProcessorPaths>
-           <compilerArgs>
-               <arg>-Amcp.default.server.key=calculator</arg>
-               <arg>-Amcp.target.package=com.acme.corp.mcp</arg>
-           </compilerArgs>
-       </configuration>
-   </plugin>
+
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-compiler-plugin</artifactId>
+    <configuration>
+        <annotationProcessorPaths>
+            <path>
+                <groupId>io.github.kliushnichenko</groupId>
+                <artifactId>jooby-mcp-apt</artifactId>
+                <version>${version}</version>
+            </path>
+        </annotationProcessorPaths>
+        <compilerArgs>
+            <arg>-Amcp.default.server.key=calculator</arg>
+            <arg>-Amcp.target.package=com.acme.corp.mcp</arg>
+        </compilerArgs>
+    </configuration>
+</plugin>
    ```
 
 Mind, that `mcp.default.server.key` should match the configuration section in `application.conf`:

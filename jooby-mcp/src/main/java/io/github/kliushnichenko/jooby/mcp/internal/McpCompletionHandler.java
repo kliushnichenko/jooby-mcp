@@ -3,6 +3,7 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
+import lombok.experimental.UtilityClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import java.util.Objects;
 
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
 
+@UtilityClass
 class McpCompletionHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(McpCompletionHandler.class);
@@ -34,7 +36,7 @@ class McpCompletionHandler {
         }
     }
 
-    private static McpSchema.CompleteResult toCompleteResult(Object result) throws RuntimeException {
+    private static McpSchema.CompleteResult toCompleteResult(Object result) {
         Objects.requireNonNull(result, "Completion result cannot be null");
 
         if (result instanceof McpSchema.CompleteResult completeResult) {
@@ -43,12 +45,20 @@ class McpCompletionHandler {
             return new McpSchema.CompleteResult(completion);
         } else if (result instanceof List<?> values) {
             if (values.isEmpty()) {
-                return new McpSchema.CompleteResult(new McpSchema.CompleteResult.CompleteCompletion(List.of(), 0, false));
+                return new McpSchema.CompleteResult(
+                        new McpSchema.CompleteResult.CompleteCompletion(List.of(), 0, false)
+                );
             } else {
                 var item = values.iterator().next();
                 if (item instanceof String) {
                     //noinspection unchecked
-                    return new McpSchema.CompleteResult(new McpSchema.CompleteResult.CompleteCompletion((List<String>) values, values.size(), false));
+                    return new McpSchema.CompleteResult(
+                            new McpSchema.CompleteResult.CompleteCompletion(
+                                    (List<String>) values,
+                                    values.size(),
+                                    false
+                            )
+                    );
                 }
             }
         } else if (result instanceof String singleValue) {

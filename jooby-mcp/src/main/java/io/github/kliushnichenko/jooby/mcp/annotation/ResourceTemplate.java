@@ -46,9 +46,9 @@ public @interface ResourceTemplate {
 
     /**
      * Optional annotations for the client.
-     * <p>
-     * Note that the default value of this annotation member is ignored. In other words, the annotations have to be declared
-     * explicitly in order to be included in Resource template metadata.
+     * Note that the default value of this annotation member is ignored.
+     * In other words, the annotations have to be declared explicitly in order
+     * to be included in Resource template metadata.
      */
     Annotations annotations() default @Annotations(audience = McpSchema.Role.USER, lastModified = "", priority = 0.5);
 }

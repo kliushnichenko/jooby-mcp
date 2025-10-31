@@ -4,6 +4,7 @@ import com.palantir.javapoet.*;
 import io.github.kliushnichenko.jooby.mcp.ResourceUri;
 import io.github.kliushnichenko.jooby.mcp.apt.McpServerDescriptor;
 import io.github.kliushnichenko.jooby.mcp.apt.resourcetemplates.ResourceTemplateEntry;
+import io.github.kliushnichenko.jooby.mcp.apt.util.ClassLiteral;
 import io.github.kliushnichenko.jooby.mcp.internal.MethodInvoker;
 import io.modelcontextprotocol.spec.McpSchema;
 
@@ -102,7 +103,7 @@ public class McpResourceTemplatesFeature extends McpFeature {
 
     private boolean isResourceUri(VariableElement param) {
         String paramType = param.asType().toString();
-        return paramType.equals("io.github.kliushnichenko.jooby.mcp.ResourceUri");
+        return ClassLiteral.RESOURCE_URI.equals(paramType);
     }
 
     @Override

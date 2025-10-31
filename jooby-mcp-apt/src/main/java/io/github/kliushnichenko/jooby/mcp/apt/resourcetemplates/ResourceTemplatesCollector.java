@@ -5,6 +5,7 @@ import io.github.kliushnichenko.jooby.mcp.annotation.ResourceTemplate;
 import io.github.kliushnichenko.jooby.mcp.apt.AnnMirrorUtils;
 import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
 import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourceEntry;
+import io.github.kliushnichenko.jooby.mcp.apt.util.ClassLiteral;
 import io.modelcontextprotocol.util.DefaultMcpUriTemplateManager;
 
 import javax.annotation.processing.Messager;
@@ -20,7 +21,6 @@ import java.util.Set;
 
 public class ResourceTemplatesCollector extends BaseMethodCollector {
 
-    private static final String RESOURCE_URI_CLASS = "io.github.kliushnichenko.jooby.mcp.ResourceUri";
     private final Validator validator = new Validator();
 
     public ResourceTemplatesCollector(Messager messager, String defaultServerKey) {
@@ -74,7 +74,6 @@ public class ResourceTemplatesCollector extends BaseMethodCollector {
                 .orElse(false);
     }
 
-
     private String extractResourceTemplateName(ExecutableElement method, ResourceTemplate annotation) {
         String name = annotation.name();
         return name.isEmpty() ? method.getSimpleName().toString() : name;
@@ -122,27 +121,29 @@ public class ResourceTemplatesCollector extends BaseMethodCollector {
                     break;
                 }
 
-                if (!isResourceUri(paramTypeMirror)) {
-                    if (!templateVars.contains(param.getSimpleName().toString())) {
-                        var msg = String.format(
-                                "Method parameter '%s' does not match any variable in URI template '%s'.",
-                                param.getSimpleName().toString(), templateEntry.uriTemplate()
-                        );
-                        reportError(msg, method);
-                        isValid = false;
-                        break;
-                    }
+                if (!isResourceUri(paramTypeMirror) && !paramIsPresentInTemplate(param, templateVars)) {
+                    var msg = String.format(
+                            "Method parameter '%s' does not match any variable in URI template '%s'.",
+                            param.getSimpleName().toString(), templateEntry.uriTemplate()
+                    );
+                    reportError(msg, method);
+                    isValid = false;
+                    break;
                 }
             }
             return isValid;
         }
 
+        private boolean paramIsPresentInTemplate(VariableElement param, List<String> templateVars) {
+            return templateVars.contains(param.getSimpleName().toString());
+        }
+
         private boolean isResourceUri(TypeMirror typeMirror) {
-            return RESOURCE_URI_CLASS.equals(typeMirror.toString());
+            return ClassLiteral.RESOURCE_URI.equals(typeMirror.toString());
         }
 
         private boolean isValidArgType(TypeMirror typeMirror) {
-            return "java.lang.String".equals(typeMirror.toString()) || isResourceUri(typeMirror);
+            return ClassLiteral.STRING.equals(typeMirror.toString()) || isResourceUri(typeMirror);
         }
     }
 }

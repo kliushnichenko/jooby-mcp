@@ -3,6 +3,7 @@ package io.github.kliushnichenko.jooby.mcp.apt.generator;
 import com.palantir.javapoet.CodeBlock;
 import io.github.kliushnichenko.jsonschema.generator.TypeUtils;
 import io.modelcontextprotocol.json.TypeRef;
+import lombok.experimental.UtilityClass;
 
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
@@ -14,11 +15,8 @@ import javax.lang.model.type.TypeMirror;
  * <p>This class provides methods to generate appropriate type casting expressions
  * for different parameter types when creating method invoker lambdas.</p>
  */
+@UtilityClass
 class ParameterTypeHandler {
-
-    private ParameterTypeHandler() {
-        throw new UnsupportedOperationException("Utility class should not be instantiated");
-    }
 
     /**
      * Builds a parameter cast expression based on the parameter type.
@@ -35,13 +33,18 @@ class ParameterTypeHandler {
         String paramType = param.asType().toString();
 
         if (TypeUtils.isIterableType(typeMirror)) {
-            return handleIterableTypes(parameterName, typeMirror, paramType);
+            return castIterableTypes(parameterName, typeMirror, paramType);
         }
 
         if (TypeUtils.isMapType(typeMirror)) {
-            return handleMapTypes(parameterName, paramType);
+            return castMapTypes(parameterName, paramType);
         }
 
+        return castScalarType(parameterName, paramType);
+    }
+
+    @SuppressWarnings("PMD")
+    private static CodeBlock castScalarType(String parameterName, String paramType) {
         return switch (paramType) {
             case "byte" -> CodeBlock.of("(byte) args.get($S)", parameterName);
             case "short" -> CodeBlock.of("(short) args.get($S)", parameterName);
@@ -64,7 +67,7 @@ class ParameterTypeHandler {
         };
     }
 
-    private static CodeBlock handleMapTypes(String parameterName, String paramType) {
+    private static CodeBlock castMapTypes(String parameterName, String paramType) {
         return CodeBlock.of("($L) mcpJsonMapper.convertValue(args.get($S), new $T<$L>() {})",
                 paramType,
                 parameterName,
@@ -72,7 +75,7 @@ class ParameterTypeHandler {
                 paramType);
     }
 
-    private static CodeBlock handleIterableTypes(String parameterName, TypeMirror typeMirror, String paramType) {
+    private static CodeBlock castIterableTypes(String parameterName, TypeMirror typeMirror, String paramType) {
         TypeMirror componentType = TypeUtils.getCollectionComponentType(typeMirror);
         if (TypeKind.ARRAY == typeMirror.getKind()) {
             return CodeBlock.of("($L) mcpJsonMapper.convertValue(args.get($S), $L[].class)",
@@ -88,4 +91,4 @@ class ParameterTypeHandler {
                     paramType);
         }
     }
-} 
+}

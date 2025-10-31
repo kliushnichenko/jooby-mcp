@@ -105,7 +105,7 @@ public class McpServerGenerator {
     }
 
     private String capitalize(String str) {
-        str = str.toLowerCase();
-        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+        var lowerCase = str.toLowerCase();
+        return Character.toUpperCase(lowerCase.charAt(0)) + lowerCase.substring(1);
     }
-} 
+}

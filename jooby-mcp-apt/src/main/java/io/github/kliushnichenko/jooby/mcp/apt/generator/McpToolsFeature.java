@@ -19,7 +19,8 @@ import static io.github.kliushnichenko.jooby.mcp.apt.generator.AnnotationMappers
 
 class McpToolsFeature extends McpFeature {
 
-    private final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(MAPPERS); // todo: looks like only TOOL_ARG_MAPPER is used
+    // todo: looks like only TOOL_ARG_MAPPER is used
+    private final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(MAPPERS);
 
     @Override
     public void generateFields(TypeSpec.Builder builder) {
@@ -66,7 +67,8 @@ class McpToolsFeature extends McpFeature {
             CodeBlock requiredArgs = buildRequiredArguments(jsonSchemaObj.getRequired());
 
             builder.addStatement(
-                    "tools.put($S, $T.builder().name($S).title($S).description($S).inputSchema($S).requiredArguments($L).build())",
+                    "tools.put($S, $T.builder().name($S).title($S).description($S)" +
+                    ".inputSchema($S).requiredArguments($L).build())",
                     tool.toolName(),
                     ClassName.get(ToolSpec.class),
                     tool.toolName(),
