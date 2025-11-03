@@ -8,11 +8,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a method as an MCP (Model Context Protocol) resource.
+ * Marks a method as an MCP resource.
  * <p>
  * Methods annotated with {@code @Resource} will be automatically discovered by the annotation processor
  * and registered as MCP resources that can be accessed by MCP clients.
  * </p>
+ * The result of a "resource read" operation is always represented as a {@link McpSchema.ReadResourceResult }. However,
+ * the annotated method can also return other types that are converted according to the following rules.
+ * <ul>
+ * <li>If it returns {@link McpSchema.ResourceContents} then the response contains the single contents object.</li>
+ * <li>If it returns a {@link java.util.List} of {@link McpSchema.ResourceContents} then
+ * the response contains the list of contents objects.</li>
+ * <li>Any other type will be encoded to JSON string.</li>
+ * </ul>
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)

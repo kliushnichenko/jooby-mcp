@@ -19,15 +19,14 @@ Compatibility:
 
 Features:
 
-- [X] SSE transport
+- [X] SSE and Streamable-HTTP transport
 - [X] Multiple servers support
 - [X] Tools
 - [X] Prompts
 - [X] Resources
 - [X] Resource Templates
 - [X] Prompt Completions
-- [ ] Resource Template Completions
-- [X] HTTP Streamable transport
+- [X] Resource Template Completions
 - [X] Required input arguments validation in tools
 - [X] Build time method signature and return type validation
 
@@ -36,6 +35,7 @@ Table of Contents:
 - [Quick Start](#quick-start)
 - [Tools & Prompts Example](#tools--prompts-example)
 - [Resource Example](#resource-example)
+- [Resource Template Example](#resource-template-example)
 - [Prompt Completion Example](#prompt-completion-example)
 - [Multiple Servers Support](#multiple-servers-support)
 - [Customizing Default Server Name and Package](#customizing-default-server-name-and-package)
@@ -90,7 +90,7 @@ Table of Contents:
       version: "0.1.0"                 # Required
       transport: "streamable-http"     # Optional (default: streamable-http)
       mcpEndpoint: "/mcp/streamable"   # Optional (default: /mcp), applicable only to Streamable HTTP transport
-      disallowDelete: true,            # Optional (default: false)
+      disallowDelete: true             # Optional (default: false)
       keepAliveInterval: 45            # Optional (default: N/A), in seconds
     }
     ```
@@ -179,6 +179,7 @@ the [project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-exa
 
 ```java
 import io.github.kliushnichenko.jooby.mcp.annotation.ResourceTemplate;
+import io.github.kliushnichenko.jooby.mcp.annotation.CompleteResourceTemplate;
 
 @Singleton
 public class ResourceTemplateExamples {
@@ -189,10 +190,18 @@ public class ResourceTemplateExamples {
             "project-gamma", "This is Project Gamma."
     );
 
-    @ResourceTemplate(uriTemplate = "file:///project/{name}")
+    @ResourceTemplate(name = "get_project", uriTemplate = "file:///project/{name}")
     public McpSchema.TextResourceContents getProject(String name, ResourceUri resourceUri) {
         String content = PROJECTS.getOrDefault(name, "<Project not found>");
         return new McpSchema.TextResourceContents(resourceUri.uri(), "text/markdown", content);
+    }
+
+    @CompleteResourceTemplate("get_project")
+    public List<String> projectNameCompletion(@CompleteArg(name = "name") String partialInput) {
+        return PROJECTS.keySet()
+                .stream()
+                .filter(name -> name.contains(partialInput))
+                .toList();
     }
 }
 ```
@@ -335,7 +344,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 - `McpSchema.BlobResourceContents`
 - POJO (will be serialized to JSON)
 
-#### Supported return types in Prompt Completions
+#### Supported return types in Completions
 
 - `McpSchema.CompleteResult`
 - `McpSchema.CompleteResult.CompleteCompletion`

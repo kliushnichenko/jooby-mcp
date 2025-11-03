@@ -1,5 +1,9 @@
 package io.github.kliushnichenko.jooby.mcp.apt.completions;
 
+import com.palantir.javapoet.ClassName;
+import io.modelcontextprotocol.spec.McpSchema;
+import lombok.Getter;
+
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
@@ -10,8 +14,22 @@ import javax.lang.model.element.TypeElement;
  */
 public record CompletionEntry(String identifier,
                               String argumentName,
-                              String type,
+                              Type type,
                               String serverKey,
                               TypeElement serviceClass,
                               ExecutableElement method) {
+
+    @Getter
+    public enum Type {
+        PROMPT("ref/prompt", ClassName.get(McpSchema.PromptReference.class)),
+        RESOURCE("ref/resource", ClassName.get(McpSchema.ResourceReference.class));
+
+        private final String value;
+        private final ClassName className;
+
+        Type(String value, ClassName className) {
+            this.value = value;
+            this.className = className;
+        }
+    }
 }

@@ -2,7 +2,9 @@ package io.github.kliushnichenko.jooby.mcp.apt.completions;
 
 import io.github.kliushnichenko.jooby.mcp.annotation.CompleteArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt;
+import io.github.kliushnichenko.jooby.mcp.annotation.CompleteResourceTemplate;
 import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
+import io.github.kliushnichenko.jooby.mcp.apt.resourcetemplates.ResourceTemplateEntry;
 import io.github.kliushnichenko.jooby.mcp.apt.util.ClassLiteral;
 
 import javax.annotation.processing.Messager;
@@ -23,17 +25,23 @@ public class CompletionsCollector extends BaseMethodCollector {
         super(messager, defaultServerKey);
     }
 
-    public List<CompletionEntry> collectCompletions(RoundEnvironment roundEnv, List<String> definedPrompts) {
+    public List<CompletionEntry> collectCompletions(RoundEnvironment roundEnv,
+                                                    List<String> definedPrompts,
+                                                    List<ResourceTemplateEntry> resourceTemplates) {
         List<CompletionEntry> completions = new ArrayList<>();
-        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(CompletePrompt.class
-                /*, CompleteResourceTemplate.class*/);
+        Set<? extends Element> elements = roundEnv.getElementsAnnotatedWithAny(
+                Set.of(CompletePrompt.class, CompleteResourceTemplate.class)
+        );
 
         for (Element element : elements) {
-            if (validator.isValidMethod(element)) {
-                CompletionEntry entry = buildCompletionEntry((ExecutableElement) element);
+            var method = (ExecutableElement) element;
 
-                if (validator.isValidPromptRef(entry.identifier(), definedPrompts, element)) {
+            if (validator.isValidMethod(method)) {
+                try {
+                    CompletionEntry entry = buildCompletionEntry(method, definedPrompts, resourceTemplates);
                     completions.add(entry);
+                } catch (InvalidCompletionReferenceException ex) {
+                    reportError(ex.getMessage(), method);
                 }
             }
         }
@@ -41,9 +49,10 @@ public class CompletionsCollector extends BaseMethodCollector {
         return completions;
     }
 
-    private CompletionEntry buildCompletionEntry(ExecutableElement method) {
+    private CompletionEntry buildCompletionEntry(ExecutableElement method,
+                                                 List<String> definedPrompts,
+                                                 List<ResourceTemplateEntry> resourceTemplates) {
         TypeElement serviceClass = (TypeElement) method.getEnclosingElement();
-        CompletePrompt promptAnnotation = method.getAnnotation(CompletePrompt.class);
         VariableElement param = method.getParameters().get(0);
         CompleteArg argAnnotation = param.getAnnotation(CompleteArg.class);
 
@@ -53,12 +62,51 @@ public class CompletionsCollector extends BaseMethodCollector {
         }
 
         return new CompletionEntry(
-                promptAnnotation.value(),
+                resolveCompletionReference(method, definedPrompts, resourceTemplates),
                 argName,
-                "ref/prompt", // todo: for resources 'ref/resource'
+                resolveCompletionType(method),
                 extractServerKey(method, serviceClass),
                 serviceClass,
                 method);
+    }
+
+    private String resolveCompletionReference(ExecutableElement method,
+                                              List<String> definedPrompts,
+                                              List<ResourceTemplateEntry> resourceTemplates) {
+        CompletePrompt promptAnnotation = method.getAnnotation(CompletePrompt.class);
+        if (promptAnnotation != null) {
+            var promptRef = promptAnnotation.value();
+            if (!definedPrompts.contains(promptRef)) {
+                var msg = String.format("No such prompt found '%s' at method '%s'. Please verify the prompt reference.",
+                        promptRef, method.getSimpleName().toString());
+                throw new InvalidCompletionReferenceException(msg);
+            }
+
+            return promptRef;
+        } else {
+            var refName = method.getAnnotation(CompleteResourceTemplate.class).value();
+            var templateOptional = resourceTemplates.stream()
+                    .filter(templateEntry -> refName.equals(templateEntry.name()))
+                    .findFirst();
+
+            if (templateOptional.isEmpty()) {
+                var msg = String.format("No such resource found '%s' at method '%s'. " +
+                                        "Please verify resource template reference.",
+                        refName, method.getSimpleName().toString());
+                throw new InvalidCompletionReferenceException(msg);
+            }
+
+            return templateOptional.get().uriTemplate();
+        }
+    }
+
+    private CompletionEntry.Type resolveCompletionType(ExecutableElement method) {
+        CompletePrompt promptAnnotation = method.getAnnotation(CompletePrompt.class);
+        if (promptAnnotation != null) {
+            return CompletionEntry.Type.PROMPT;
+        } else {
+            return CompletionEntry.Type.RESOURCE;
+        }
     }
 
     class Validator {
@@ -78,7 +126,11 @@ public class CompletionsCollector extends BaseMethodCollector {
                 return false;
             }
 
-            return !isValidReturnType(method) && isValidArgument(method);
+            if (!isValidReturnType(method)) {
+                return false;
+            }
+
+            return isValidArgument(method);
         }
 
         private boolean isValidReturnType(ExecutableElement method) {
@@ -109,16 +161,6 @@ public class CompletionsCollector extends BaseMethodCollector {
                 var msg = String.format("Method '%s' must have a single String argument, but found: %s",
                         methodName, paramType);
                 reportError(msg, method);
-                return false;
-            }
-            return true;
-        }
-
-        boolean isValidPromptRef(String promptRef, List<String> definedPrompts, Element element) {
-            if (!definedPrompts.contains(promptRef)) {
-                var msg = String.format("No such prompt found '%s' at method '%s'. Please verify the prompt reference.",
-                        promptRef, element.getSimpleName().toString());
-                reportError(msg, element);
                 return false;
             }
             return true;

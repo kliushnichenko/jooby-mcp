@@ -38,7 +38,8 @@ import static io.github.kliushnichenko.jooby.mcp.apt.McpProcessor.OPTION_TARGET_
         "io.github.kliushnichenko.jooby.mcp.annotation.Prompt",
         "io.github.kliushnichenko.jooby.mcp.annotation.Resource",
         "io.github.kliushnichenko.jooby.mcp.annotation.ResourceTemplate",
-        "io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt"
+        "io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt",
+        "io.github.kliushnichenko.jooby.mcp.annotation.CompleteResourceTemplate"
 })
 @SupportedOptions({OPTION_DEFAULT_SERVER_KEY, OPTION_TARGET_PACKAGE})
 @SupportedSourceVersion(SourceVersion.RELEASE_17)
@@ -135,11 +136,11 @@ public class McpProcessor extends AbstractProcessor {
     private void collectMcpFeatures(RoundEnvironment roundEnv) {
         tools = toolsCollector.collectTools(roundEnv);
         prompts = promptsCollector.collectPrompts(roundEnv);
-
-        List<String> promptRefs = prompts.stream().map(PromptEntry::promptName).toList();
-        completions = completionsCollector.collectCompletions(roundEnv, promptRefs);
         resources = resourcesCollector.collectResources(roundEnv);
         resourceTemplates = resourceTemplatesCollector.collectResourceTemplates(roundEnv);
+
+        List<String> promptRefs = prompts.stream().map(PromptEntry::promptName).toList();
+        completions = completionsCollector.collectCompletions(roundEnv, promptRefs, resourceTemplates);
     }
 
     private List<McpServerDescriptor> buildServerDescriptors(RoundEnvironment roundEnv) {

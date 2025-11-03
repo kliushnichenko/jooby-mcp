@@ -6,12 +6,13 @@ import io.github.kliushnichenko.mcp.example.mcp.WeatherMcpServer;
 import io.jooby.Jooby;
 import io.jooby.avaje.inject.AvajeInjectModule;
 import io.jooby.handler.AccessLogHandler;
+import io.jooby.jackson.JacksonModule;
 
 public class App extends Jooby {
 
     {
         use(new AccessLogHandler());
-//        install(new JacksonModule());
+        install(new JacksonModule());
         install(AvajeInjectModule.of());
         install(new McpModule(new CalculatorMcpServer(), new WeatherMcpServer()));
     }

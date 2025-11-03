@@ -9,7 +9,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
- * Annotates a method used to complete a prompt argument.
+ * Annotates method used to complete an expression argument of a resource template URI.
  * <p>
  * The result of a "complete" operation is always represented as a {@link McpSchema.CompleteResult}.
  * However, the annotated method can also return other types that are converted according to the following rules.
@@ -26,16 +26,16 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * <li>{@code String}</li>
  * </ul>
  * <p>
- * A prompt completion method must consume exactly one {@link String} argument.
+ * A resource template completion method must consume exactly one {@link String} argument.
  *
- * @see Prompt#name()
+ * @see ResourceTemplate#name()
  */
 @Retention(SOURCE)
 @Target(METHOD)
-public @interface CompletePrompt {
+public @interface CompleteResourceTemplate {
 
     /**
-     * The name reference to a prompt. If no such {@link Prompt} exists then the build fails.
+     * Reference to a resource template. If no such {@link ResourceTemplate} exists then the build fails.
      */
     String value();
 }
