@@ -50,7 +50,7 @@ public class McpCompletionsFeature extends McpFeature {
         for (CompletionEntry completion : descriptor.completions()) {
             builder.addStatement(
                     "completions.add(new $T($S))",
-                    ClassName.get(McpSchema.PromptReference.class), // or McpSchema.ResourceReference
+                    completion.type().getClassName(),
                     completion.identifier()
             );
         }

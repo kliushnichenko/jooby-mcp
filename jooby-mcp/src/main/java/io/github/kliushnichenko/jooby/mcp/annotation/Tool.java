@@ -1,31 +1,27 @@
 package io.github.kliushnichenko.jooby.mcp.annotation;
 
+import io.modelcontextprotocol.spec.McpSchema;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a method as an MCP (Model Context Protocol) tool.
+ * Marks a method as an MCP tool.
  * <p>
  * Methods annotated with {@code @Tool} will be automatically discovered by the annotation processor
  * and registered as MCP tools that can be called by MCP clients.
  * </p>
- * 
- * <p>Example usage:</p>
- * <pre>
- * {@code
- * @Tool(name = "calculator", description = "Performs basic arithmetic operations")
- * public CalculatorResult calculate(
- *     @ToolArg(name = "operation", description = "The operation to perform") String operation,
- *     @ToolArg(name = "a", description = "First operand") double a,
- *     @ToolArg(name = "b", description = "Second operand") double b
- * ) {
- *     // implementation
- * }
- * }
- * </pre>
- * 
+ * The result of a "tool invocation" operation is always represented as a {@link McpSchema.CallToolResult}. However,
+ * the annotated method can also return other types that are converted according to the following rules.
+ * <ul>
+ * <li>If it returns {@link McpSchema.Content} then the response contains the single content object.</li>
+ * <li>If it returns a {@link java.lang.String} then the response contains
+ * the single {@link McpSchema.TextContent} object.</li>
+ * <li>Any other type will be encoded to JSON string.</li>
+ * </ul>
+ *
  * @see ToolArg
  */
 @Target(ElementType.METHOD)
