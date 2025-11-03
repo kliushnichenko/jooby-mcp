@@ -3,13 +3,11 @@
 
 ## jooby-mcp
 
-This module provides a lightweight wrapper over the
-official [Java MCP SDK](https://github.com/modelcontextprotocol/java-sdk), adapted for use
-with [Jooby](https://github.com/jooby-project/jooby)’s routing, server capabilities and DI.
+This module integrates the official [Java MCP SDK](https://github.com/modelcontextprotocol/java-sdk) with [Jooby](https://github.com/jooby-project/jooby)’s routing, server features, and dependency injection.  
 
-The module provides declarative(annotation-based) registration of tools, prompts and resources.
-Annotations discovery is done at build-time using APT, so no reflection is used at runtime.
-Hence, you will need to add an annotation processor in addition to the module dependency.
+This module enables declarative (annotation-based) registration of tools, prompts, and resources.
+Annotations are discovered at build time using APT, eliminating the need for runtime reflection.
+To use it, add the annotation processor alongside the module dependency.
 
 Compatibility:
 
@@ -268,7 +266,7 @@ As a result, additional `WeatherMcpServer` class will be generated. Register it 
    ```java
    {
         install(new McpModule(new DefaultMcpServer(),new WeatherMcpServer()));
-        }
+   }
    ```
 
 The weather MCP server should have its own configuration section in `application.conf`:
@@ -277,8 +275,7 @@ The weather MCP server should have its own configuration section in `application
    mcp.weather {
      name: "weather-mcp-server"
      version: "0.1.0"
-     sseEndpoint: "/weather-mcp/sse"
-     messageEndpoint: "/weather-mcp/message"
+     mcpEndpoint: "/mcp/weather"
    }
    ```
 
@@ -315,8 +312,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
    mcp.calculator {
      name: "calculator-mcp-server"
      version: "0.1.0"
-     sseEndpoint: "/calculator-mcp/sse"
-     messageEndpoint: "/calculator-mcp/message"
+     mcpEndpoint: "/mcp/calculator"
    }
    ```
 
