@@ -29,7 +29,6 @@
             <version>${revision}</version>
         </dependency>
 
-        <!-- Jooby Framework -->
         <dependency>
             <groupId>io.jooby</groupId>
             <artifactId>jooby</artifactId>
@@ -54,6 +53,10 @@
         <dependency>
             <groupId>io.jooby</groupId>
             <artifactId>jooby-logback</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
     </dependencies>
 
@@ -89,7 +92,7 @@
                         </path>
                     </annotationProcessorPaths>
                     <compilerArgs>
-                        <arg>-Amcp.default.server.key=calculator</arg>
+                        <arg>-Amcp.default.server.key=example</arg>
                         <arg>-Amcp.target.package=io.github.kliushnichenko.mcp.example.mcp</arg>
                     </compilerArgs>
                 </configuration>
