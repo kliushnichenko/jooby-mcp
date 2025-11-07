@@ -1,5 +1,6 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg)](https://search.maven.org/artifact/io.github.kliushnichenko/jooby-mcp)
-[![Javadoc](https://javadoc.io/badge/io.github.kliushnichenko/jooby-mcp/jooby-mcp.svg)](https://javadoc.io/doc/io.github.kliushnichenko/jooby-mcp/latest)  
+[![Javadoc](https://javadoc.io/badge/io.github.kliushnichenko/jooby-mcp/jooby-mcp.svg)](https://javadoc.io/doc/io.github.kliushnichenko/jooby-mcp/latest)
+[![Github](https://github.com/kliushnichenko/jooby-mcp/actions/workflows/maven.yml/badge.svg)](https://github.com/kliushnichenko/jooby-mcp/actions)
 
 ## jooby-mcp
 
