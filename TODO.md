@@ -9,5 +9,10 @@
 - json-lib agnostic
 - tests
 - stateless streamable transport
------ document how to use utilities
------ review documentation
+  ----- review documentation
+- Utilities
+- - Support Sampling (need to support Exchange object as argument in tools); enable in capabilities
+- - Support Elicitation (same as above); enable in capabilities
+
+- pmd/checkstyle
+- CI/CD

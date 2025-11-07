@@ -3,15 +3,24 @@ package io.github.kliushnichenko.mcp.example;
 import io.github.kliushnichenko.jooby.mcp.annotation.CompleteArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt;
 import io.github.kliushnichenko.jooby.mcp.annotation.Prompt;
+import io.github.kliushnichenko.jooby.mcp.annotation.PromptArg;
 import jakarta.inject.Singleton;
 
 import java.util.List;
 
 @Singleton
-public class PromptCompletionsExample {
+public class PromptsExample {
 
     private static final List<String> SUPPORTED_LANGUAGES = List.of("Java", "Python", "JavaScript", "Go", "TypeScript");
     private static final List<String> SCRUTINY_LEVELS = List.of("light", "moderate", "high", "extreme");
+
+    @Prompt(name = "summarizeText", description = "Summarizes the provided text into a specified number of sentences")
+    public String summarizeText(@PromptArg(name = "text_to_summarize") String text, String maxSentences) {
+        return String.format("""
+                Please provide a clear and concise summary of the following text in no more than %s sentences:
+                %s
+                """, maxSentences, text);
+    }
 
     @Prompt(name = "code_review", description = "Code Review Prompt")
     public String codeReviewPrompt(String codeSnippet, String language, String scrutinyLevel) {
