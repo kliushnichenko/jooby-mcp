@@ -17,6 +17,10 @@
     <name>jooby-mcp</name>
     <description>Jooby module that lets you run a Model Context Protocol (MCP) server</description>
 
+    <properties>
+        <jooby.mcp.apt.version>1.6.0</jooby.mcp.apt.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -36,7 +40,7 @@
                         <path>
                             <groupId>io.github.kliushnichenko</groupId>
                             <artifactId>jooby-mcp-apt</artifactId>
-                            <version>${project.parent.version}</version>
+                            <version>${jooby.mcp.apt.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
