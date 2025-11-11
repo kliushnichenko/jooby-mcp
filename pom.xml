@@ -42,6 +42,7 @@
 
         <jooby.version>3.11.0</jooby.version>
         <jackson.version>2.19.2</jackson.version>
+        <lombok.version>1.18.42</lombok.version>
         <junit.version>6.0.0</junit.version>
         <pmd.version>7.16.0</pmd.version>
     </properties>
@@ -126,7 +127,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.42</version>
+                <version>${lombok.version}</version>
                 <scope>provided</scope>
             </dependency>
 

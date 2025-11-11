@@ -50,6 +50,21 @@ class McpPromptHandler {
         } else if (result instanceof String str) {
             var promptMessage = new McpSchema.PromptMessage(USER, new McpSchema.TextContent(str));
             return new McpSchema.GetPromptResult(null, List.of(promptMessage));
+        } else if (result instanceof List<?> items) {
+            if (items.isEmpty()) {
+                return new McpSchema.GetPromptResult(null, List.of());
+            } else {
+                var item = items.iterator().next();
+                if (item instanceof McpSchema.PromptMessage) {
+                    //noinspection unchecked
+                    return new McpSchema.GetPromptResult(null, (List<McpSchema.PromptMessage>) result);
+                } else {
+                    var msgs = items.stream()
+                            .map(i -> new McpSchema.PromptMessage(USER, new McpSchema.TextContent(i.toString())))
+                            .toList();
+                    return new McpSchema.GetPromptResult(null, msgs);
+                }
+            }
         } else {
             var promptMessage = new McpSchema.PromptMessage(USER, new McpSchema.TextContent(result.toString()));
             return new McpSchema.GetPromptResult(null, List.of(promptMessage));

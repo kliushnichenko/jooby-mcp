@@ -88,7 +88,7 @@
                         <path>
                             <groupId>io.github.kliushnichenko</groupId>
                             <artifactId>jooby-mcp-apt</artifactId>
-                            <version>${revision}</version>
+                            <version>${project.parent.version}</version>
                         </path>
                     </annotationProcessorPaths>
                     <compilerArgs>

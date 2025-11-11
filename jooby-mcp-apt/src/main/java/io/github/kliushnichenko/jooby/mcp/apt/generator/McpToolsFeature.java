@@ -131,4 +131,9 @@ class McpToolsFeature extends McpFeature {
 
         builder.addMethod(getter);
     }
+
+    @Override
+    boolean hasItems(McpServerDescriptor descriptor) {
+        return !descriptor.tools().isEmpty();
+    }
 }

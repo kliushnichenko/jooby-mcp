@@ -62,7 +62,6 @@ public class McpPromptsFeature extends McpFeature {
             var mapEntry = CodeBlock.of("$S, $L", entry.promptName(), methodCall);
             builder.addCode(CodeBlock.of("promptInvokers.put($L);\n", mapEntry));
         }
-        builder.addCode("\n");
     }
 
     @Override
@@ -94,6 +93,11 @@ public class McpPromptsFeature extends McpFeature {
                 .build();
 
         builder.addMethod(getter);
+    }
+
+    @Override
+    boolean hasItems(McpServerDescriptor descriptor) {
+        return !descriptor.prompts().isEmpty();
     }
 
     private CodeBlock buildPromptArgs(List<PromptEntry.Arg> promptArgs) {

@@ -1,4 +1,4 @@
-package app;
+package transport;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;

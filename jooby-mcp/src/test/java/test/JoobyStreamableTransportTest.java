@@ -1,5 +1,6 @@
 package test;
 
+import transport.StreamableTransportApp;
 import io.jooby.StatusCode;
 import io.jooby.test.JoobyTest;
 import io.modelcontextprotocol.spec.HttpHeaders;
@@ -13,7 +14,7 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@JoobyTest(value = app.StreamableTransportApp.class, port = 8099)
+@JoobyTest(value = StreamableTransportApp.class, port = 8099)
 class JoobyStreamableTransportTest {
 
     static {

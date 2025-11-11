@@ -25,6 +25,8 @@ abstract class McpFeature {
 
     abstract void generateGetter(TypeSpec.Builder builder);
 
+    abstract boolean hasItems(McpServerDescriptor descriptor);
+
     /**
      * Builds a method invocation lambda expression.
      */
