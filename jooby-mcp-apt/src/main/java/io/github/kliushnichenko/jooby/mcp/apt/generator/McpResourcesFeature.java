@@ -114,4 +114,9 @@ public class McpResourcesFeature extends McpFeature {
 
         builder.addMethod(getter);
     }
+
+    @Override
+    boolean hasItems(McpServerDescriptor descriptor) {
+        return !descriptor.resources().isEmpty();
+    }
 }

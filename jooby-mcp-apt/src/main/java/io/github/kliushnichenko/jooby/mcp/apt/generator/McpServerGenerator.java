@@ -75,7 +75,13 @@ public class McpServerGenerator {
 
         initMethodBuilder.addStatement("this.app = app");
 
-        FEATURES.forEach(feature -> feature.generateInitializers(initMethodBuilder, descriptor));
+        System.out.println("##################################################");
+        System.out.println("##################################################");
+        System.out.println("##################################################");
+        System.out.println("##################################################");
+        FEATURES.stream()
+                .filter(mcpFeature -> mcpFeature.hasItems(descriptor))
+                .forEach(feature -> feature.generateInitializers(initMethodBuilder, descriptor));
 
         serverBuilder.addMethod(initMethodBuilder.build());
     }

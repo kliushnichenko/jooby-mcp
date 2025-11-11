@@ -115,4 +115,9 @@ public class McpCompletionsFeature extends McpFeature {
 
         builder.addMethod(getter);
     }
+
+    @Override
+    boolean hasItems(McpServerDescriptor descriptor) {
+        return !descriptor.completions().isEmpty();
+    }
 }

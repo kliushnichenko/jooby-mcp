@@ -137,4 +137,9 @@ public class McpResourceTemplatesFeature extends McpFeature {
 
         builder.addMethod(getter);
     }
+
+    @Override
+    boolean hasItems(McpServerDescriptor descriptor) {
+        return !descriptor.resourceTemplates().isEmpty();
+    }
 }
