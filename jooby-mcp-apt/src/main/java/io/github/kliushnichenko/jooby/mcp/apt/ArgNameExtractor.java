@@ -9,6 +9,9 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * @author kliushnichenko
+ */
 @UtilityClass
 public final class ArgNameExtractor {
 

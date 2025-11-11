@@ -9,6 +9,9 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.tools.Diagnostic;
 
+/**
+ * @author kliushnichenko
+ */
 public class BaseMethodCollector {
 
     protected String defaultServerKey;

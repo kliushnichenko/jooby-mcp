@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * @author kliushnichenko
+ */
 public class McpCompletionsFeature extends McpFeature {
 
     @Override

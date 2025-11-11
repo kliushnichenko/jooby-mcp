@@ -14,6 +14,9 @@ import java.util.Map;
 
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
 
+/**
+ * @author kliushnichenko
+ */
 class McpResourceTemplateHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(McpResourceTemplateHandler.class);

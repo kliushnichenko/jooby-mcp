@@ -5,6 +5,9 @@ import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Singleton;
 
+/**
+ * @author kliushnichenko
+ */
 @Singleton
 public class ToolsExample {
 

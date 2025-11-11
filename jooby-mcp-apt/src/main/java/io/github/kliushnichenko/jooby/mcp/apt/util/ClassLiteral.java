@@ -1,5 +1,8 @@
 package io.github.kliushnichenko.jooby.mcp.apt.util;
 
+/**
+ * @author kliushnichenko
+ */
 public class ClassLiteral {
 
     public static final String STRING = "java.lang.String";

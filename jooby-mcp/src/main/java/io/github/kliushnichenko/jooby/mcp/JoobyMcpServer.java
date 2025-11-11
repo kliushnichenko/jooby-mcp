@@ -8,6 +8,9 @@ import io.modelcontextprotocol.spec.McpSchema;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author kliushnichenko
+ */
 public interface JoobyMcpServer {
 
     String getServerKey();

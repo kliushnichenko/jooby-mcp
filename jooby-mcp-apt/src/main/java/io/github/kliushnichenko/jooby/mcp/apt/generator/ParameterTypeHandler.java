@@ -14,6 +14,8 @@ import javax.lang.model.type.TypeMirror;
  *
  * <p>This class provides methods to generate appropriate type casting expressions
  * for different parameter types when creating method invoker lambdas.</p>
+ *
+ * @author kliushnichenko
  */
 @UtilityClass
 class ParameterTypeHandler {

@@ -5,6 +5,9 @@ import io.modelcontextprotocol.spec.McpSchema;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
+/**
+ * @author kliushnichenko
+ */
 public record ResourceEntry(
         String name,
         String title,

@@ -6,6 +6,9 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import java.util.Optional;
 
+/**
+ * @author kliushnichenko
+ */
 @UtilityClass
 public class AnnMirrorUtils {
 

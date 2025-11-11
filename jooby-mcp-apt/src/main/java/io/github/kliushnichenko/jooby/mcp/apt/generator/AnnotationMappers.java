@@ -8,6 +8,9 @@ import io.github.kliushnichenko.jsonschema.model.JsonSchemaProps;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+/**
+ * @author kliushnichenko
+ */
 class AnnotationMappers {
 
     private static final JsonSchemaAnnotationMapper<ToolArg> TOOL_ARG_MAPPER = (ToolArg annotation) -> {

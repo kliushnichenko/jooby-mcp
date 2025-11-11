@@ -9,6 +9,9 @@ import lombok.experimental.UtilityClass;
 
 import java.util.List;
 
+/**
+ * @author kliushnichenko
+ */
 @UtilityClass
 class SendError {
 

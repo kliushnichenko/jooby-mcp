@@ -10,6 +10,9 @@ import jakarta.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author kliushnichenko
+ */
 @Singleton
 public class ResourceTemplateExamples {
 

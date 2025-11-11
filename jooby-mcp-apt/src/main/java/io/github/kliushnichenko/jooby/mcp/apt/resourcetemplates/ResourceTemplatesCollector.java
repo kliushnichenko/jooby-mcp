@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author kliushnichenko
+ */
 public class ResourceTemplatesCollector extends BaseMethodCollector {
 
     private final Validator validator = new Validator();

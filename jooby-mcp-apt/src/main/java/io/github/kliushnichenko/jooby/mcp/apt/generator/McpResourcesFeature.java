@@ -14,7 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * @author kliushnichenko
+ */
 public class McpResourcesFeature extends McpFeature {
+
     @Override
     void generateFields(TypeSpec.Builder builder) {
         FieldSpec resourcesField = FieldSpec.builder(

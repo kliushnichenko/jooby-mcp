@@ -5,6 +5,9 @@ import io.jooby.exception.StartupException;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * @author kliushnichenko
+ */
 @Getter
 @Setter
 public class McpServerConfig {

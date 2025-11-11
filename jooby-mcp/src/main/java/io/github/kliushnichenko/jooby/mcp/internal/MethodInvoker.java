@@ -2,6 +2,9 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 
 import java.util.Map;
 
+/**
+ * @author kliushnichenko
+ */
 @FunctionalInterface
 public interface MethodInvoker {
     /**

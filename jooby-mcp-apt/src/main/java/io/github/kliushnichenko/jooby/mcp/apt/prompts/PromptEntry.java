@@ -4,6 +4,9 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import java.util.List;
 
+/**
+ * @author kliushnichenko
+ */
 public record PromptEntry(String promptName,
                           String promptDescription,
                           List<Arg> promptArgs,

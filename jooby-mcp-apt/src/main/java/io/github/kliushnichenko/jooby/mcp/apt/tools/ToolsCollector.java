@@ -5,14 +5,20 @@ import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
 
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.RoundEnvironment;
-import javax.lang.model.element.*;
-import java.util.*;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.TypeElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Responsible for collecting and validating @Tool annotated methods.
  *
  * <p>This class handles the discovery phase of annotation processing, finding all
  * methods annotated with @Tool.</p>
+ *
+ * @author kliushnichenko
  */
 public class ToolsCollector extends BaseMethodCollector {
 

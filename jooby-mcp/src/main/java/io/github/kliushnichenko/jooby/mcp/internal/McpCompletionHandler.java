@@ -12,6 +12,9 @@ import java.util.Objects;
 
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
 
+/**
+ * @author kliushnichenko
+ */
 @UtilityClass
 class McpCompletionHandler {
 

@@ -10,6 +10,9 @@ import javax.lang.model.element.Modifier;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author kliushnichenko
+ */
 public class McpServerGenerator {
 
     private static final String MCP_SERVER_CLASS_NAME = "McpServer";

@@ -12,6 +12,9 @@ import java.util.List;
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
 import static io.modelcontextprotocol.spec.McpSchema.Role.USER;
 
+/**
+ * @author kliushnichenko
+ */
 @UtilityClass
 class McpPromptHandler {
 

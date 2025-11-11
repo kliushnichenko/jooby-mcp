@@ -8,6 +8,9 @@ import io.github.kliushnichenko.jooby.mcp.apt.tools.ToolEntry;
 
 import java.util.List;
 
+/**
+ * @author kliushnichenko
+ */
 public record McpServerDescriptor(String serverKey,
                                   String targetPackage,
                                   List<ToolEntry> tools,

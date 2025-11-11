@@ -5,6 +5,9 @@ import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourceEntry;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 
+/**
+ * @author kliushnichenko
+ */
 public record ResourceTemplateEntry(
         String name,
         String title,

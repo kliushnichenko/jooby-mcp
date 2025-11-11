@@ -24,6 +24,8 @@ import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_REQUEST;
 
 /**
  * Jooby implementation of Streamable HTTP transport. Inspired by <a href="https://github.com/modelcontextprotocol/java-sdk/blob/main/mcp-spring/mcp-spring-webmvc/src/main/java/io/modelcontextprotocol/server/transport/WebMvcStreamableServerTransportProvider.java">WebMvcStreamableServerTransportProvider</a>
+ *
+ * @author kliushnichenko
  */
 public class JoobyStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
 

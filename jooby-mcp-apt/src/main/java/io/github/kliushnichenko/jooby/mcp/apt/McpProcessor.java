@@ -32,6 +32,9 @@ import java.util.regex.Pattern;
 import static io.github.kliushnichenko.jooby.mcp.apt.McpProcessor.OPTION_DEFAULT_SERVER_KEY;
 import static io.github.kliushnichenko.jooby.mcp.apt.McpProcessor.OPTION_TARGET_PACKAGE;
 
+/**
+ * @author kliushnichenko
+ */
 @AutoService(Processor.class)
 @SupportedAnnotationTypes({
         "io.github.kliushnichenko.jooby.mcp.annotation.Tool",

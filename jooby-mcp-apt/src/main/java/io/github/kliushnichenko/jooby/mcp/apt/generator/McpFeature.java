@@ -15,6 +15,9 @@ import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+/**
+ * @author kliushnichenko
+ */
 abstract class McpFeature {
 
     abstract void generateFields(TypeSpec.Builder builder);

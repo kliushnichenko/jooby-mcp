@@ -8,6 +8,9 @@ import jakarta.inject.Singleton;
 
 import java.util.List;
 
+/**
+ * @author kliushnichenko
+ */
 @Singleton
 public class PromptsExample {
 

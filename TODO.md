@@ -11,3 +11,4 @@
 - - Support Elicitation (same as above); enable in capabilities
 
 - pmd/checkstyle
+- support async server?

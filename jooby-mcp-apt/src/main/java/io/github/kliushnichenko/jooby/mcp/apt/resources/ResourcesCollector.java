@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author kliushnichenko
+ */
 public class ResourcesCollector extends BaseMethodCollector {
 
     public ResourcesCollector(Messager messager, String defaultServerKey) {

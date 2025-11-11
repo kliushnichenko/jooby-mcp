@@ -5,6 +5,9 @@ import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
 import jakarta.inject.Singleton;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * @author kliushnichenko
+ */
 @Singleton
 @McpServer("weather")
 @RequiredArgsConstructor

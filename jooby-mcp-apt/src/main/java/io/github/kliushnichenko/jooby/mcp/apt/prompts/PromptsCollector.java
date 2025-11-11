@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author kliushnichenko
+ */
 public class PromptsCollector extends BaseMethodCollector {
 
     public PromptsCollector(Messager messager, String defaultServerKey) {

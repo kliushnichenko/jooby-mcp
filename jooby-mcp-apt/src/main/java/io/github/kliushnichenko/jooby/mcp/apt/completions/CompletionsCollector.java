@@ -17,6 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author kliushnichenko
+ */
 public class CompletionsCollector extends BaseMethodCollector {
 
     private final Validator validator = new Validator();

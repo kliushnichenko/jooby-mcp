@@ -8,6 +8,9 @@ import io.jooby.avaje.inject.AvajeInjectModule;
 import io.jooby.handler.AccessLogHandler;
 import io.jooby.jackson.JacksonModule;
 
+/**
+ * @author kliushnichenko
+ */
 public class App extends Jooby {
 
     {
