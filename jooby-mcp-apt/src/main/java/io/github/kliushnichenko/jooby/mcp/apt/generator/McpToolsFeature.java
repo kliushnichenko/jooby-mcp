@@ -9,6 +9,7 @@ import io.github.kliushnichenko.jooby.mcp.internal.ToolSpec;
 import io.github.kliushnichenko.jsonschema.generator.JsonSchemaGenerator;
 import io.github.kliushnichenko.jsonschema.model.JsonSchemaObj;
 import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 
 import javax.lang.model.element.Modifier;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ class McpToolsFeature extends McpFeature {
 
         // fill tools map
         for (ToolEntry tool : descriptor.tools()) {
-            JsonSchemaObj jsonSchemaObj = schemaGenerator.generateAsObject(tool.method());
+            JsonSchemaObj jsonSchemaObj = schemaGenerator.generateAsObject(tool.method(), IGNORE_TYPES);
             String jsonSchema = JsonSchemaGenerator.serializeSchemaObj(jsonSchemaObj);
             CodeBlock requiredArgs = buildRequiredArguments(jsonSchemaObj.getRequired());
 
@@ -110,6 +111,7 @@ class McpToolsFeature extends McpFeature {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(String.class, "toolName", Modifier.FINAL)
                 .addParameter(ParameterizedTypeName.get(Map.class, String.class, Object.class), "args", Modifier.FINAL)
+                .addParameter(McpSyncServerExchange.class, "exchange", Modifier.FINAL)
                 .returns(Object.class)
                 .addJavadoc("""
                         Invokes a tool by name with the provided arguments.
@@ -118,7 +120,7 @@ class McpToolsFeature extends McpFeature {
                         @return the result of the tool invocation
                         """)
                 .addStatement("$T invoker = toolInvokers.get(toolName)", ClassName.get(MethodInvoker.class))
-                .addStatement("return invoker.invoke(args)")
+                .addStatement("return invoker.invoke(args, exchange)")
                 .build();
 
         builder.addMethod(invokeMethod);

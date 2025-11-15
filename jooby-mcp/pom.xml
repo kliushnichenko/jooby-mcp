@@ -40,7 +40,7 @@
                         <path>
                             <groupId>io.github.kliushnichenko</groupId>
                             <artifactId>jooby-mcp-apt</artifactId>
-                            <version>${jooby.mcp.apt.version}</version>
+                            <version>${project.parent.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
@@ -58,6 +58,11 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>io.github.kliushnichenko</groupId>
+            <artifactId>jooby-mcp-common</artifactId>
+            <version>${revision}</version>
+        </dependency>
         <dependency>
             <groupId>io.modelcontextprotocol.sdk</groupId>
             <artifactId>mcp</artifactId>

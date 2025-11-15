@@ -2,6 +2,7 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,9 @@ public class McpToolHandler {
         this.mcpJsonMapper = mcpJsonMapper;
     }
 
-    public McpSchema.CallToolResult handle(McpSchema.CallToolRequest request, JoobyMcpServer server) {
+    public McpSchema.CallToolResult handle(McpSchema.CallToolRequest request,
+                                           JoobyMcpServer server,
+                                           McpSyncServerExchange exchange) {
         String toolName = request.name();
         try {
             ToolSpec toolSpec = server.getTools().get(toolName);
@@ -33,7 +36,7 @@ public class McpToolHandler {
 
             verifyRequiredArguments(request.arguments(), toolSpec.getRequiredArguments());
 
-            Object result = server.invokeTool(toolName, request.arguments());
+            Object result = server.invokeTool(toolName, request.arguments(), exchange);
 
             if (result == null) {
                 return new McpSchema.CallToolResult("null", false);

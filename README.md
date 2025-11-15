@@ -28,6 +28,7 @@ Features:
 - [X] Resource Template Completions
 - [X] Required input arguments validation in tools
 - [X] Build time method signature and return type validation
+- [X] Elicitation, Sampling, Progress support via exchange object 
 
 Table of Contents:
 
@@ -36,6 +37,7 @@ Table of Contents:
 - [Resource Example](#resource-example)
 - [Resource Template Example](#resource-template-example)
 - [Prompt Completion Example](#prompt-completion-example)
+- [Exchange Object](#exchange-object)
 - [Multiple Servers Support](#multiple-servers-support)
 - [Customizing Default Server Name and Package](#customizing-default-server-name-and-package)
 - [Supported return types in Tools](#supported-return-types-in-tools)
@@ -239,6 +241,26 @@ public class PromptCompletionsExample {
     }
 }
 ```
+### Exchange Object
+
+An exchange object can be used to access request metadata, and support `Elicitation`, `Sampling` or `Progress` features.  
+Add `McpSyncServerExchange` argument to your tool method:
+
+```java
+public class ElicitationExample {
+    
+    @Tool(name = "elicitation_example")
+    public String elicitationExample(McpSyncServerExchange exchange) {
+        ...
+        exchange.createElicitation(request);
+        ...
+    }
+} 
+```
+See full example at [example-project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example/ElicitationExample.java)
+
+In the similar manner you can support Sampling, Progress and other features by using `McpSyncServerExchange` object.  
+Explore SDK documentation for more details: https://modelcontextprotocol.io/sdk/java/mcp-server#using-sampling-from-a-server
 
 ### Multiple Servers Support
 

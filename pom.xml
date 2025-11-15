@@ -38,7 +38,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
-        <revision>1.6.1-SNAPSHOT</revision>
+        <revision>1.7.0-SNAPSHOT</revision>
 
         <jooby.version>3.11.0</jooby.version>
         <jackson.version>2.19.2</jackson.version>
@@ -48,8 +48,9 @@
     </properties>
 
     <modules>
-        <module>jooby-mcp</module>
+        <module>jooby-mcp-common</module>
         <module>jooby-mcp-apt</module>
+        <module>jooby-mcp</module>
         <module>jooby-mcp-example</module>
     </modules>
 
@@ -109,7 +110,7 @@
             <dependency>
                 <groupId>io.github.kliushnichenko</groupId>
                 <artifactId>jsonschema-generator-apt</artifactId>
-                <version>0.3.0</version>
+                <version>0.4.0</version>
             </dependency>
 
             <dependency>

@@ -5,6 +5,7 @@ import io.github.kliushnichenko.jooby.mcp.annotation.PromptArg;
 import io.github.kliushnichenko.jooby.mcp.apt.McpServerDescriptor;
 import io.github.kliushnichenko.jooby.mcp.apt.prompts.PromptEntry;
 import io.github.kliushnichenko.jooby.mcp.internal.MethodInvoker;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import javax.lang.model.element.Modifier;
@@ -73,6 +74,7 @@ public class McpPromptsFeature extends McpFeature {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(String.class, "promptName", Modifier.FINAL)
                 .addParameter(ParameterizedTypeName.get(Map.class, String.class, Object.class), "args", Modifier.FINAL)
+                .addParameter(McpSyncServerExchange.class, "exchange", Modifier.FINAL)
                 .returns(Object.class)
                 .addJavadoc("""
                          Invokes a prompt by name with the provided arguments.
@@ -81,7 +83,7 @@ public class McpPromptsFeature extends McpFeature {
                          @return the result of the prompt invocation
                         """)
                 .addStatement("$T invoker = promptInvokers.get(promptName)", ClassName.get(MethodInvoker.class))
-                .addStatement("return invoker.invoke(args)")
+                .addStatement("return invoker.invoke(args, exchange)")
                 .build();
 
         builder.addMethod(invokeMethod);
