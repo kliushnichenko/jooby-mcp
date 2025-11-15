@@ -350,6 +350,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 
 - `McpSchema.GetPromptResult`
 - `McpSchema.PromptMessage`
+- `List<McpSchema.PromptMessage>`
 - `McpSchema.Content`
 - `String`
 - POJO (`toString()` method will be invoked to get the string representation)

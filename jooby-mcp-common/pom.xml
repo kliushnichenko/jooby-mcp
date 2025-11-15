@@ -12,6 +12,8 @@
     <artifactId>jooby-mcp-common</artifactId>
     <packaging>jar</packaging>
 
+    <name>jooby-mcp-common</name>
+
     <build>
         <plugins>
             <plugin>

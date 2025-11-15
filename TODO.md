@@ -7,10 +7,10 @@
 - stateless streamable transport
   ----- review documentation
 - Utilities
-- - Support Sampling (need to support Exchange object as argument in tools); enable in capabilities
-- - Support Elicitation (same as above); enable in capabilities
-- - Progress
-- - Logging
+- - Support example
+- - Progress example
+- - Logging example
+- - Roots example
 
 - pmd/checkstyle
 - support async server?
