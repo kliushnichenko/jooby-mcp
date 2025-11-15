@@ -5,7 +5,6 @@ import io.github.kliushnichenko.jooby.mcp.ResourceUri;
 import io.github.kliushnichenko.jooby.mcp.apt.McpServerDescriptor;
 import io.github.kliushnichenko.jooby.mcp.apt.resourcetemplates.ResourceTemplateEntry;
 import io.github.kliushnichenko.jooby.mcp.apt.util.ClassLiteral;
-import io.github.kliushnichenko.jooby.mcp.internal.MethodInvoker;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import javax.lang.model.element.ExecutableElement;
@@ -16,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * @author kliushnichenko
@@ -32,11 +32,16 @@ public class McpResourceTemplatesFeature extends McpFeature {
                 .addJavadoc("List of resource templates.")
                 .build();
 
+        var function = ParameterizedTypeName.get(
+                ClassName.get(Function.class),
+                ParameterizedTypeName.get(Map.class, String.class, Object.class),
+                ClassName.get(Object.class)
+        );
         FieldSpec resourceTmplReadersField = FieldSpec.builder(
                         ParameterizedTypeName.get(
                                 ClassName.get(Map.class),
                                 ClassName.get(String.class),
-                                ClassName.get(MethodInvoker.class)
+                                function
                         ),
                         "resourceTemplateReaders",
                         Modifier.PRIVATE, Modifier.FINAL)
@@ -123,7 +128,7 @@ public class McpResourceTemplatesFeature extends McpFeature {
                         """)
                 .addCode("""
                         var reader = resourceTemplateReaders.get(uriTemplate);
-                        return reader.invoke(args);
+                        return reader.apply(args);
                         """)
                 .build();
 

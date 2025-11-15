@@ -1,4 +1,4 @@
-package io.github.kliushnichenko.mcp.example;
+package io.github.kliushnichenko.jooby.mcp.example;
 
 import io.github.kliushnichenko.jooby.mcp.annotation.CompleteArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.CompletePrompt;

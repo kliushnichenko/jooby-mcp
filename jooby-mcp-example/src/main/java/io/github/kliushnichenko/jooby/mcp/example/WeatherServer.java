@@ -1,4 +1,4 @@
-package io.github.kliushnichenko.mcp.example;
+package io.github.kliushnichenko.jooby.mcp.example;
 
 import io.github.kliushnichenko.jooby.mcp.annotation.McpServer;
 import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @Singleton
 @McpServer("weather")
 @RequiredArgsConstructor
-public class WeatherMcpServer {
+public class WeatherServer {
 
     private WeatherService weatherService;
 

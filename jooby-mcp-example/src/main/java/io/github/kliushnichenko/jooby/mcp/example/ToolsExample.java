@@ -1,7 +1,8 @@
-package io.github.kliushnichenko.mcp.example;
+package io.github.kliushnichenko.jooby.mcp.example;
 
 import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
 import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Singleton;
 
@@ -26,7 +27,7 @@ public class ToolsExample {
     }
 
     @Tool
-    public String subtract(int a, int b) {
+    public String subtract(int a, int b, McpSyncServerExchange exchange) {
         int result = a - b;
         return String.valueOf(result);
     }
@@ -34,5 +35,10 @@ public class ToolsExample {
     @Tool(name = "pi_sign_image", description = "Returns an image of the Pi")
     public McpSchema.ImageContent getPiSIgnImage() {
         return new McpSchema.ImageContent(null, PI_SIGN_IMAGE, "image/png");
+    }
+
+    @Tool(name = "get_client_info", description = "Returns the information about the client initiated the request")
+    public McpSchema.Implementation getClientInfo(McpSyncServerExchange exchange) {
+        return exchange.getClientInfo();
     }
 }

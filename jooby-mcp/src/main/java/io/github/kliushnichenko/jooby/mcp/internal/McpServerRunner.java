@@ -109,7 +109,7 @@ public class McpServerRunner {
 
             var syncToolSpec = new McpServerFeatures.SyncToolSpecification.Builder()
                     .tool(tool)
-                    .callHandler((exchange, callToolRequest) -> toolHandler.handle(callToolRequest, joobyMcpServer))
+                    .callHandler((exchange, request) -> toolHandler.handle(request, joobyMcpServer, exchange))
                     .build();
 
             mcpServer.addTool(syncToolSpec);
@@ -121,7 +121,7 @@ public class McpServerRunner {
             mcpServer.addPrompt(
                     new McpServerFeatures.SyncPromptSpecification(
                             entry.getValue(),
-                            (exchange, request) -> McpPromptHandler.handle(joobyMcpServer, request)
+                            (exchange, request) -> McpPromptHandler.handle(joobyMcpServer, request, exchange)
                     )
             );
         }

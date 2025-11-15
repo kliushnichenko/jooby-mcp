@@ -1,6 +1,7 @@
 package io.github.kliushnichenko.jooby.mcp.internal;
 
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import lombok.experimental.UtilityClass;
@@ -20,14 +21,16 @@ class McpPromptHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(McpPromptHandler.class);
 
-    public static McpSchema.GetPromptResult handle(JoobyMcpServer server, McpSchema.GetPromptRequest request) {
+    public static McpSchema.GetPromptResult handle(JoobyMcpServer server,
+                                                   McpSchema.GetPromptRequest request,
+                                                   McpSyncServerExchange exchange) {
         try {
             var promptName = request.name();
             if (!server.getPrompts().containsKey(promptName)) {
                 throw new IllegalArgumentException("Prompt '" + promptName + "' is not registered.");
             }
 
-            Object result = server.invokePrompt(promptName, request.arguments());
+            Object result = server.invokePrompt(promptName, request.arguments(), exchange);
 
             return toPromptResult(result);
         } catch (Exception ex) {

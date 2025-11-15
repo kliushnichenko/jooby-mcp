@@ -14,11 +14,11 @@
     <artifactId>jooby-mcp-example</artifactId>
     <packaging>jar</packaging>
 
-    <name>Jooby MCP Example</name>
+    <name>jooby-mcp-example</name>
     <description>Example application demonstrating MCP integration with Jooby</description>
 
     <properties>
-        <application.class>io.github.kliushnichenko.mcp.example.App</application.class>
+        <application.class>io.github.kliushnichenko.jooby.mcp.example.App</application.class>
         <avaje.inject.version>11.4</avaje.inject.version>
     </properties>
 

@@ -7,6 +7,8 @@ import com.palantir.javapoet.TypeSpec;
 import io.github.kliushnichenko.jooby.mcp.apt.ArgNameExtractor;
 import io.github.kliushnichenko.jooby.mcp.apt.McpServerDescriptor;
 import io.github.kliushnichenko.jooby.mcp.apt.resources.ResourceEntry;
+import io.github.kliushnichenko.jsonschema.generator.TypeUtils;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import javax.lang.model.element.ExecutableElement;
@@ -14,11 +16,16 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import java.lang.annotation.Annotation;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author kliushnichenko
  */
 abstract class McpFeature {
+
+    protected static final Set<String> IGNORE_TYPES = Set.of(
+            McpSyncServerExchange.class.getCanonicalName()
+    );
 
     abstract void generateFields(TypeSpec.Builder builder);
 
@@ -34,13 +41,13 @@ abstract class McpFeature {
      * Builds a method invocation lambda expression.
      */
     protected CodeBlock buildMethodInvocation(ExecutableElement method,
-                                            TypeElement serviceClass,
-                                            Class<? extends Annotation> annotationClass) {
+                                              TypeElement serviceClass,
+                                              Class<? extends Annotation> annotationClass) {
         List<? extends VariableElement> parameters = method.getParameters();
 
         ClassName serviceClassName = ClassName.get(serviceClass);
         CodeBlock.Builder methodCall = CodeBlock.builder();
-        methodCall.add("(args) -> app.require($T.class).$L(", serviceClassName, method.getSimpleName());
+        methodCall.add("(args, exchange) -> app.require($T.class).$L(", serviceClassName, method.getSimpleName());
 
         for (int i = 0; i < parameters.size(); i++) {
             if (i > 0) {
@@ -48,9 +55,15 @@ abstract class McpFeature {
             }
 
             VariableElement param = parameters.get(i);
-            String parameterName = ArgNameExtractor.extractName(param, annotationClass);
-            CodeBlock parameterCast = ParameterTypeHandler.buildParameterCast(param, parameterName);
-            methodCall.add("$L", parameterCast);
+            var typeName = TypeUtils.getTypeName(param.asType());
+
+            if (IGNORE_TYPES.contains(typeName)) {
+                methodCall.add("$L", param.getSimpleName().toString());
+            } else {
+                String parameterName = ArgNameExtractor.extractName(param, annotationClass);
+                CodeBlock parameterCast = ParameterTypeHandler.buildParameterCast(param, parameterName);
+                methodCall.add("$L", parameterCast);
+            }
         }
 
         methodCall.add(")");
