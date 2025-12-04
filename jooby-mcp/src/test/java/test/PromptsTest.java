@@ -1,11 +1,5 @@
 package test;
 
-import app.TestApp;
-import io.jooby.test.JoobyTest;
-import io.modelcontextprotocol.client.McpClient;
-import io.modelcontextprotocol.client.McpSyncClient;
-import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
-import io.modelcontextprotocol.spec.McpClientTransport;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Test;
 
@@ -14,18 +8,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@JoobyTest(value = TestApp.class, port = 8099)
-public class PromptsTest {
-
-    private static final McpSyncClient mcpClient;
-
-    static {
-        McpClientTransport transport = HttpClientStreamableHttpTransport
-                .builder("http://localhost:8099/mcp")
-                .build();
-
-        mcpClient = McpClient.sync(transport).build();
-    }
+public class PromptsTest extends BaseTest {
 
     @Test
     void list_prompt_messages() {

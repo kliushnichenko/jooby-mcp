@@ -93,7 +93,7 @@
                     </annotationProcessorPaths>
                     <compilerArgs>
                         <arg>-Amcp.default.server.key=example</arg>
-                        <arg>-Amcp.target.package=io.github.kliushnichenko.mcp.example.mcp</arg>
+                        <arg>-Amcp.target.package=io.github.kliushnichenko.jooby.mcp.example</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

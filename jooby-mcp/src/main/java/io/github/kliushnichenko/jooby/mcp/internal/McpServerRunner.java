@@ -100,12 +100,17 @@ public class McpServerRunner {
     private void initTools(McpSyncServer mcpServer) {
         for (Map.Entry<String, ToolSpec> entry : joobyMcpServer.getTools().entrySet()) {
             ToolSpec toolSpec = entry.getValue();
-            McpSchema.Tool tool = McpSchema.Tool.builder()
+            McpSchema.Tool.Builder toolBuilder = McpSchema.Tool.builder()
                     .name(toolSpec.getName())
                     .title(toolSpec.getTitle())
                     .description(toolSpec.getDescription())
-                    .inputSchema(mcpJsonMapper, toolSpec.getInputSchema())
-                    .build();
+                    .inputSchema(mcpJsonMapper, toolSpec.getInputSchema());
+
+            if (toolSpec.getOutputSchema() != null) {
+                toolBuilder.outputSchema(mcpJsonMapper, toolSpec.getOutputSchema());
+            }
+
+            McpSchema.Tool tool = toolBuilder.build();
 
             var syncToolSpec = new McpServerFeatures.SyncToolSpecification.Builder()
                     .tool(tool)

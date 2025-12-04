@@ -1,13 +1,12 @@
 - build-time verification of the return type for each handler (tool, prompt, completion..)
 - add detailed annotation processor result logging
 - support java module system
-- support output schema generation
 - json-lib agnostic
 - tests
 - stateless streamable transport
   ----- review documentation
 - Utilities
-- - Support example
+- - Sampling example
 - - Progress example
 - - Logging example
 - - Roots example

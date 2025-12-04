@@ -14,6 +14,7 @@ public class TestApp extends Jooby {
         install(new JacksonModule(objectMapper));
 
         getServices().put(Prompts.class, new Prompts());
+        getServices().put(ToolsOutputSchemaTestCases.class, new ToolsOutputSchemaTestCases());
 
         install(new McpModule(new DefaultMcpServer()));
     }

@@ -89,7 +89,7 @@ public class McpProcessor extends AbstractProcessor {
         }
 
         this.serverKeys = new HashSet<>(List.of(defaultServerKey));
-        this.toolsCollector = new ToolsCollector(messager, defaultServerKey);
+        this.toolsCollector = new ToolsCollector(processingEnv, defaultServerKey);
         this.promptsCollector = new PromptsCollector(messager, defaultServerKey);
         this.completionsCollector = new CompletionsCollector(messager, defaultServerKey);
         this.resourcesCollector = new ResourcesCollector(messager, defaultServerKey);

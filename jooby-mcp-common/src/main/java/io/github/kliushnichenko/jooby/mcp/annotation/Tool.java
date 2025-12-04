@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 /**
  * Marks a method as an MCP tool.
  * <p>
- * Methods annotated with {@code @Tool} will be automatically discovered by the annotation processor
+ * Methods annotated with {@link Tool} will be automatically discovered by the annotation processor
  * and registered as MCP tools that can be called by MCP clients.
  * </p>
  * The result of a "tool invocation" operation is always represented as a {@link McpSchema.CallToolResult}. However,
@@ -37,6 +37,11 @@ public @interface Tool {
      * @return the tool name
      */
     String name() default "";
+
+    /**
+     * A human-readable title for the tool.
+     */
+    String title() default "";
 
     /**
      * A human-readable description of what the tool does.
