@@ -39,20 +39,20 @@ public class McpToolHandler {
             Object result = server.invokeTool(toolName, request.arguments(), exchange);
 
             if (result == null) {
-                return new McpSchema.CallToolResult("null", false);
+                return buildTextResult("null", false);
             } else if (result instanceof McpSchema.CallToolResult callToolResult) {
                 return callToolResult;
             } else if (result instanceof String str) {
-                return new McpSchema.CallToolResult(str, false);
+                return buildTextResult(str, false);
             } else if (result instanceof McpSchema.Content content) {
                 return McpSchema.CallToolResult.builder().content(List.of(content)).isError(false).build();
             } else {
                 var resultStr = mcpJsonMapper.writeValueAsString(result);
-                return new McpSchema.CallToolResult(resultStr, false);
+                return buildTextResult(resultStr, false);
             }
         } catch (Exception ex) {
             LOG.error("Error invoking tool '{}':", toolName, ex);
-            return new McpSchema.CallToolResult(ex.getMessage(), true);
+            return buildTextResult(ex.getMessage(), true);
         }
     }
 
@@ -67,5 +67,12 @@ public class McpToolHandler {
                 throw new IllegalArgumentException("Required argument is empty: " + requiredArg);
             }
         }
+    }
+
+    private McpSchema.CallToolResult buildTextResult(String text, boolean isError) {
+        return McpSchema.CallToolResult.builder()
+                .addTextContent(text)
+                .isError(isError)
+                .build();
     }
 }

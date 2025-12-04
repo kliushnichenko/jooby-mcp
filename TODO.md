@@ -3,8 +3,8 @@
 - support java module system
 - json-lib agnostic
 - tests
+- - tools Annotations
 - stateless streamable transport
-  ----- review documentation
 - Utilities
 - - Sampling example
 - - Progress example
