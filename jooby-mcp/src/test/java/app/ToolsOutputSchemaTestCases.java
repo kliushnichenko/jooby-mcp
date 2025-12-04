@@ -24,7 +24,7 @@ public class ToolsOutputSchemaTestCases {
 
     @Tool(name = "test_reserved_type_for_output_scheme")
     public McpSchema.CallToolResult getPetName() {
-        return new McpSchema.CallToolResult("Buddy", false);
+        return buildTextResult("Buddy", false);
     }
 
     @Tool(name = "test_output_scheme_from_scalar_annotation")
@@ -35,7 +35,7 @@ public class ToolsOutputSchemaTestCases {
                     "name": "Buddy"
                 }
                 """;
-        return new McpSchema.CallToolResult(pet, false);
+        return buildTextResult(pet, false);
     }
 
     @Tool(name = "test_output_scheme_from_array_annotation")
@@ -46,7 +46,7 @@ public class ToolsOutputSchemaTestCases {
                     "name": "Buddy"
                 }]
                 """;
-        return new McpSchema.CallToolResult(pet, false);
+        return buildTextResult(pet, false);
     }
 
     @Tool(name = "test_output_scheme_for_list")
@@ -64,6 +64,13 @@ public class ToolsOutputSchemaTestCases {
                     }
                 }
                 """;
-        return new McpSchema.CallToolResult(pet, false);
+        return buildTextResult(pet, false);
+    }
+
+    private McpSchema.CallToolResult buildTextResult(String text, boolean isError) {
+        return McpSchema.CallToolResult.builder()
+                .addTextContent(text)
+                .isError(isError)
+                .build();
     }
 }

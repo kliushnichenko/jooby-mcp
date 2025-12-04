@@ -96,7 +96,6 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
         JoobyMcpSessionTransport transport = new JoobyMcpSessionTransport(sse);
         McpServerSession session = sessionFactory.create(transport);
         String sessionId = session.getId();
-        transport.setSessionId(sessionId);
 
         LOG.debug("New SSE connection has been established. Session ID: {}", sessionId);
         sessions.put(sessionId, session);
@@ -158,14 +157,9 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
     private class JoobyMcpSessionTransport implements McpServerTransport {
 
         private final ServerSentEmitter sse;
-        private String sessionId;
 
         public JoobyMcpSessionTransport(ServerSentEmitter sse) {
             this.sse = sse;
-        }
-
-        public void setSessionId(String sessionId) {
-            this.sessionId = sessionId;
         }
 
         @Override
@@ -174,9 +168,8 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
                 try {
                     String jsonText = mcpJsonMapper.writeValueAsString(message);
                     sse.send(new ServerSentMessage(jsonText).setEvent(MESSAGE_EVENT_TYPE));
-                    LOG.debug("Message sent to session {}: {}", sessionId, message);
                 } catch (Exception e) {
-                    LOG.error("Failed to send message to session {}: {}", sessionId, e.getMessage());
+                    LOG.error("Failed to send message: {}", e.getMessage());
                     sse.send("Error", e.getMessage());
                 }
             });
