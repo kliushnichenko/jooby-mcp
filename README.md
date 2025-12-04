@@ -146,6 +146,40 @@ public class ToolsAndPromptsExample {
 } 
 ```
 
+#### Tools Output Schema
+
+The output schema is automatically generated based on the return type of the method.
+For example, for the `find_pet` tool below
+
+```java
+@Tool(name = "find_pet", description = "Finds a pet by its ID")
+public Pet findPet(String petId) {
+    ...
+}
+```
+the generated output schema will reflect the `Pet` class structure.  
+
+If the return type is one of the reserved types (`String`, `McpSchema.CallToolResult`, `McpSchema.Content`) 
+auto-generation step is omitted. 
+Use `@OutputSchema` annotation to explicitly define the output schema in such cases:  
+- `@OutputSchema.From(Pet.class)` - to use schema generated from a specific class
+- `@OutputSchema.ArrayOf(Pet.class)` - to use array of specific class as output schema
+- `@OutputSchema.MapOf(Pet.class)` - to use map of specific class as output schema
+
+Example:
+```java
+@Tool(name = "find_pet", description = "Finds a pet by its ID")
+@OutputSchema.From(Pet.class)
+public McpSchema.CallToolResult findPet(String petId) {
+    ...
+    
+    return new McpSchema.CallToolResult(pet, false);
+}
+```
+
+**Tip**: You can use `@OutputSchema.Suppressed` to skip output schema generation from return type.
+
+
 ### Resource Example
 
 ```java
@@ -344,6 +378,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 - `String`
 - `McpSchema.CallToolResult`
 - `McpSchema.Content`
+- `McpSchema.TextContent`
 - POJO (will be serialized to JSON)
 
 #### Supported return types in Prompts

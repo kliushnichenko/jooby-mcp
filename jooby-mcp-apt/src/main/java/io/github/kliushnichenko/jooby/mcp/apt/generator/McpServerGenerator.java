@@ -72,9 +72,11 @@ public class McpServerGenerator {
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(ClassName.get("io.jooby", "Jooby"), "app", Modifier.FINAL)
                 .addParameter(ClassName.get(McpJsonMapper.class), "mcpJsonMapper", Modifier.FINAL)
-                .addJavadoc("Initialize a new server.")
-                .addJavadoc("@param app the Jooby application instance")
-                .addJavadoc("@param mcpJsonMapper json serializer instance");
+                .addJavadoc("""
+                        Initialize a new server.
+                        @param app the Jooby application instance
+                        @param mcpJsonMapper json serializer instance
+                        """);
 
         initMethodBuilder.addStatement("this.app = app");
 

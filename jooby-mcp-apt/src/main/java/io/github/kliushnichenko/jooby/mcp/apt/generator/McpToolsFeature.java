@@ -60,36 +60,50 @@ class McpToolsFeature extends McpFeature {
     }
 
     @Override
-    public void generateInitializers(MethodSpec.Builder builder, McpServerDescriptor descriptor) {
-        builder.addStatement("this.mcpJsonMapper = mcpJsonMapper");
-        builder.addCode("\n");
+    @SuppressWarnings("PMD.NcssCount")
+    public void generateInitializers(MethodSpec.Builder methodBuilder, McpServerDescriptor descriptor) {
+        methodBuilder.addStatement("this.mcpJsonMapper = mcpJsonMapper");
+        methodBuilder.addCode("\n");
 
         // fill tools map
         for (ToolEntry tool : descriptor.tools()) {
             JsonSchemaObj jsonSchemaObj = schemaGenerator.generateAsObject(tool.method(), IGNORE_TYPES);
-            String jsonSchema = JsonSchemaGenerator.serializeSchemaObj(jsonSchemaObj);
+            String inputSchema = JsonSchemaGenerator.serializeSchemaObj(jsonSchemaObj);
+
+            String outputSchema = null;
+            if (tool.outputType() != null) {
+                outputSchema = schemaGenerator.generate(tool.outputType());
+            }
             CodeBlock requiredArgs = buildRequiredArguments(jsonSchemaObj.getRequired());
 
-            builder.addStatement(
-                    "tools.put($S, $T.builder().name($S).title($S).description($S)" +
-                    ".inputSchema($S).requiredArguments($L).build())",
-                    tool.toolName(),
-                    ClassName.get(ToolSpec.class),
-                    tool.toolName(),
-                    tool.toolName(), // todo: add title support in annotations
-                    tool.toolDescription(),
-                    jsonSchema,
-                    requiredArgs);
-        }
-        builder.addCode("\n");
+            CodeBlock.Builder newToolBlock = CodeBlock.builder()
+                    .add("tools.put($S, $T.builder().name($S)",
+                            tool.toolName(),
+                            ClassName.get(ToolSpec.class),
+                            tool.toolName()
+                    );
 
-        // fill tool invokers map
+            addIfNotNull(tool.toolTitle(), newToolBlock, ".title($S)");
+            addIfNotNull(tool.toolDescription(), newToolBlock, ".description($S)");
+            addIfNotNull(inputSchema, newToolBlock, ".inputSchema($S)");
+            addIfNotNull(outputSchema, newToolBlock, ".outputSchema($S)");
+            addIfNotNull(requiredArgs, newToolBlock, ".requiredArguments($L)");
+
+            newToolBlock.add(".build());");
+            methodBuilder.addCode(newToolBlock.build()).addCode("\n");
+        }
+        methodBuilder.addCode("\n");
+
+        populateInvokersMap(methodBuilder, descriptor);
+    }
+
+    private void populateInvokersMap(MethodSpec.Builder methodBuilder, McpServerDescriptor descriptor) {
         for (ToolEntry entry : descriptor.tools()) {
             CodeBlock methodCall = buildMethodInvocation(entry.method(), entry.serviceClass(), ToolArg.class);
             var mapEntry = CodeBlock.of("$S, $L", entry.toolName(), methodCall);
-            builder.addCode(CodeBlock.of("toolInvokers.put($L);\n", mapEntry));
+            methodBuilder.addCode(CodeBlock.of("toolInvokers.put($L);\n", mapEntry));
         }
-        builder.addCode("\n");
+        methodBuilder.addCode("\n");
     }
 
     private CodeBlock buildRequiredArguments(List<String> requiredArgs) {

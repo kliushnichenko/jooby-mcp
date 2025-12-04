@@ -1,13 +1,17 @@
 package io.github.kliushnichenko.jooby.mcp.apt.tools;
 
+import io.github.kliushnichenko.jooby.mcp.annotation.OutputSchema;
 import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
 import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
+import io.modelcontextprotocol.spec.McpSchema;
 
-import javax.annotation.processing.Messager;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.MirroredTypeException;
+import javax.lang.model.type.TypeMirror;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -22,8 +26,18 @@ import java.util.Set;
  */
 public class ToolsCollector extends BaseMethodCollector {
 
-    public ToolsCollector(Messager messager, String defaultServerKey) {
-        super(messager, defaultServerKey);
+    private final ProcessingEnvironment processingEnv;
+
+    private static final Set<String> RESERVED_RETURN_TYPES = Set.of(
+            McpSchema.CallToolResult.class.getCanonicalName(),
+            McpSchema.Content.class.getCanonicalName(),
+            McpSchema.TextContent.class.getCanonicalName(),
+            String.class.getCanonicalName()
+    );
+
+    public ToolsCollector(ProcessingEnvironment processingEnv, String defaultServerKey) {
+        super(processingEnv.getMessager(), defaultServerKey);
+        this.processingEnv = processingEnv;
     }
 
     public List<ToolEntry> collectTools(RoundEnvironment roundEnv) {
@@ -36,12 +50,17 @@ public class ToolsCollector extends BaseMethodCollector {
                 ExecutableElement method = (ExecutableElement) element;
                 TypeElement serviceClass = (TypeElement) method.getEnclosingElement();
                 Tool toolAnnotation = method.getAnnotation(Tool.class);
+                TypeMirror outputType = evalOutputType(method);
 
-                String toolName = extractToolName(method, toolAnnotation);
-                String toolDescription = toolAnnotation.description();
-                String serverKey = extractServerKey(method, serviceClass);
-
-                toolEntries.add(new ToolEntry(toolName, toolDescription, serverKey, serviceClass, method));
+                toolEntries.add(new ToolEntry(
+                        extractToolName(method, toolAnnotation),
+                        toNullIfEmpty(toolAnnotation.title()),
+                        toNullIfEmpty(toolAnnotation.description()),
+                        outputType,
+                        extractServerKey(method, serviceClass),
+                        serviceClass,
+                        method)
+                );
             }
         }
 
@@ -56,5 +75,88 @@ public class ToolsCollector extends BaseMethodCollector {
     private String extractToolName(ExecutableElement method, Tool annotation) {
         String name = annotation.name();
         return name.isEmpty() ? method.getSimpleName().toString() : name;
+    }
+
+    private TypeMirror evalOutputType(ExecutableElement method) {
+        var isSuppressed = method.getAnnotation(OutputSchema.Suppressed.class) != null;
+        if (isSuppressed) {
+            return null;
+        }
+
+        TypeMirror typeMirror = getOutputTypeMirror(method);
+
+        if (typeMirror != null) {
+            return typeMirror;
+        } else {
+            typeMirror = method.getReturnType();
+            if (RESERVED_RETURN_TYPES.contains(typeMirror.toString())) {
+                return null;
+            }
+            return typeMirror;
+        }
+    }
+
+    private TypeMirror getOutputTypeMirror(ExecutableElement method) {
+        OutputSchema.From scalarAnnotation = method.getAnnotation(OutputSchema.From.class);
+        if (scalarAnnotation != null) {
+            return evalOutputByClass(scalarAnnotation);
+        }
+
+        OutputSchema.ArrayOf arrayAnnotation = method.getAnnotation(OutputSchema.ArrayOf.class);
+        if (arrayAnnotation != null) {
+            return evalOutputArrayByClass(arrayAnnotation);
+        }
+
+        OutputSchema.MapOf mapAnnotation = method.getAnnotation(OutputSchema.MapOf.class);
+        if (mapAnnotation != null) {
+            return evalOutputMapByClass(mapAnnotation);
+        }
+
+        return null;
+    }
+
+    private TypeMirror evalOutputMapByClass(OutputSchema.MapOf mapAnnotation) {
+        TypeMirror typeMirror = null;
+        try {
+            @SuppressWarnings({"checkstyle:UnusedLocalVariable", "PMD.UnusedLocalVariable"})
+            Class<?> clazz = mapAnnotation.value();
+        } catch (MirroredTypeException mte) {
+            var strTypeMirror = processingEnv.getElementUtils()
+                    .getTypeElement("java.lang.String")
+                    .asType();
+            typeMirror = processingEnv.getTypeUtils()
+                    .getDeclaredType(
+                            processingEnv.getElementUtils().getTypeElement("java.util.Map"),
+                            strTypeMirror,
+                            mte.getTypeMirror()
+                    );
+        }
+        return typeMirror;
+    }
+
+    private TypeMirror evalOutputArrayByClass(OutputSchema.ArrayOf arrayAnnotation) {
+        TypeMirror typeMirror = null;
+        try {
+            @SuppressWarnings({"checkstyle:UnusedLocalVariable", "PMD.UnusedLocalVariable"})
+            Class<?> clazz = arrayAnnotation.value();
+        } catch (MirroredTypeException mte) {
+            typeMirror = processingEnv.getTypeUtils()
+                    .getDeclaredType(
+                            processingEnv.getElementUtils().getTypeElement("java.util.List"),
+                            mte.getTypeMirror()
+                    );
+        }
+        return typeMirror;
+    }
+
+    private TypeMirror evalOutputByClass(OutputSchema.From annotation) {
+        TypeMirror typeMirror = null;
+        try {
+            @SuppressWarnings({"checkstyle:UnusedLocalVariable", "PMD.UnusedLocalVariable"})
+            Class<?> clazz = annotation.value();
+        } catch (MirroredTypeException mte) {
+            typeMirror = mte.getTypeMirror();
+        }
+        return typeMirror;
     }
 }

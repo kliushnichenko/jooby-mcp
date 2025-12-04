@@ -2,8 +2,6 @@ package io.github.kliushnichenko.jooby.mcp.example;
 
 import io.github.kliushnichenko.jooby.mcp.McpModule;
 
-import io.github.kliushnichenko.mcp.example.mcp.ExampleMcpServer;
-import io.github.kliushnichenko.mcp.example.mcp.WeatherMcpServer;
 import io.jooby.Jooby;
 import io.jooby.avaje.inject.AvajeInjectModule;
 import io.jooby.handler.AccessLogHandler;

@@ -38,10 +38,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
-        <revision>1.7.0</revision>
+        <revision>1.8.0-SNAPSHOT</revision>
 
-        <jooby.version>3.11.0</jooby.version>
+        <jooby.version>3.11.5</jooby.version>
         <jackson.version>2.19.2</jackson.version>
+        <mcp.sdk.version>0.16.0</mcp.sdk.version>
         <lombok.version>1.18.42</lombok.version>
         <junit.version>6.0.0</junit.version>
         <pmd.version>7.16.0</pmd.version>
@@ -104,13 +105,13 @@
             <dependency>
                 <groupId>io.modelcontextprotocol.sdk</groupId>
                 <artifactId>mcp</artifactId>
-                <version>0.15.0</version>
+                <version>${mcp.sdk.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.github.kliushnichenko</groupId>
                 <artifactId>jsonschema-generator-apt</artifactId>
-                <version>0.4.0</version>
+                <version>0.5.1</version>
             </dependency>
 
             <dependency>

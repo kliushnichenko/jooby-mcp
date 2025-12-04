@@ -14,11 +14,11 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@JoobyTest(value = StreamableTransportApp.class, port = 8099)
+@JoobyTest(value = StreamableTransportApp.class, port = 8095)
 class JoobyStreamableTransportTest {
 
     static {
-        RestAssured.port = 8099;
+        RestAssured.port = 8095;
     }
 
     private static final McpSchema.JSONRPCRequest DUMMY_BODY = new McpSchema.JSONRPCRequest(

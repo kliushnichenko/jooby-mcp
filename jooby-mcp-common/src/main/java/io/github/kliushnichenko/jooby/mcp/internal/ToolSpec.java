@@ -17,5 +17,6 @@ public class ToolSpec {
     private String title;
     private String description;
     private String inputSchema;
+    private String outputSchema;
     private List<String> requiredArguments;
 }
