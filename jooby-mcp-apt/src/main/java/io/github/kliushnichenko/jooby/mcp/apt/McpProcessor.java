@@ -94,7 +94,7 @@ public class McpProcessor extends AbstractProcessor {
         this.completionsCollector = new CompletionsCollector(messager, defaultServerKey);
         this.resourcesCollector = new ResourcesCollector(messager, defaultServerKey);
         this.resourceTemplatesCollector = new ResourceTemplatesCollector(messager, defaultServerKey);
-        this.mcpServerGenerator = new McpServerGenerator(processingEnv.getFiler());
+        this.mcpServerGenerator = new McpServerGenerator(processingEnv);
     }
 
     private boolean verifyServerKey(String defaultServerKey) {
@@ -128,7 +128,6 @@ public class McpProcessor extends AbstractProcessor {
 
             List<McpServerDescriptor> descriptors = buildServerDescriptors(roundEnv);
             mcpServerGenerator.generateMcpServers(descriptors);
-            log("End McpProcessor execution");
             return true;
         } catch (Exception e) {
             reportError("Unexpected error during McpProcessor execution: " + e.getMessage());
