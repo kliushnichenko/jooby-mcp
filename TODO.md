@@ -1,5 +1,4 @@
 - build-time verification of the return type for each handler (tool, prompt, completion..)
-- add detailed annotation processor result logging
 - support java module system
 - json-lib agnostic
 - tests
