@@ -1,4 +1,3 @@
-- build-time verification of the return type for each handler (tool, prompt, completion..)
 - support java module system
 - json-lib agnostic
 - tests

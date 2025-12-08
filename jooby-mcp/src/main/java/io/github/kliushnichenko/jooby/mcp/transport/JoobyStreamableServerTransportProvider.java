@@ -27,13 +27,11 @@ import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_REQUEST;
  *
  * @author kliushnichenko
  */
-public class JoobyStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
+public class JoobyStreamableServerTransportProvider extends BaseTransport
+        implements McpStreamableServerTransportProvider  {
 
     private static final Logger LOG = LoggerFactory.getLogger(JoobyStreamableServerTransportProvider.class);
 
-    private static final MediaType TEXT_EVENT_STREAM = MediaType.valueOf("text/event-stream");
-    private static final String SSE_ERROR_EVENT = "Error";
-    public static final String MESSAGE_EVENT_TYPE = "message";
     private final boolean disallowDelete;
     private final McpJsonMapper mcpJsonMapper;
     private final ConcurrentHashMap<String, McpStreamableServerSession> sessions = new ConcurrentHashMap<>();

@@ -81,6 +81,17 @@ class SendError {
         return send(ctx, err);
     }
 
+    static Context badRequest(Context ctx, String message) {
+        ctx.setResponseCode(StatusCode.BAD_REQUEST);
+        var err = err(
+                new McpSchema.JSONRPCResponse.JSONRPCError(
+                        McpSchema.ErrorCodes.INVALID_REQUEST,
+                        message,
+                        null)
+        );
+        return send(ctx, err);
+    }
+
     static Context deletionNotAllowed(Context ctx) {
         ctx.setResponseCode(StatusCode.METHOD_NOT_ALLOWED);
         var err = err(
@@ -98,6 +109,17 @@ class SendError {
                 new McpSchema.JSONRPCResponse.JSONRPCError(
                         McpSchema.ErrorCodes.INTERNAL_ERROR,
                         "Internal Server Error. Session ID: %s".formatted(sessionId),
+                        null)
+        );
+        return send(ctx, err);
+    }
+
+    static Context internalError(Context ctx) {
+        ctx.setResponseCode(StatusCode.SERVER_ERROR);
+        var err = err(
+                new McpSchema.JSONRPCResponse.JSONRPCError(
+                        McpSchema.ErrorCodes.INTERNAL_ERROR,
+                        "Internal Server Error",
                         null)
         );
         return send(ctx, err);
