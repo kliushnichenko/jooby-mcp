@@ -18,11 +18,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Provides SSE transport implementation for MCP server using Jooby framework.
  * Handles client connections, message routing, and session management.
  */
-public class JoobySseTransportProvider implements McpServerTransportProvider {
+public class JoobySseTransportProvider extends BaseTransport implements McpServerTransportProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(JoobySseTransportProvider.class);
 
-    private static final String MESSAGE_EVENT_TYPE = "message";
     private static final String ENDPOINT_EVENT_TYPE = "endpoint";
     private static final String SESSION_ID_KEY = "sessionId";
 
@@ -45,10 +44,7 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
         this.messageEndpoint = serverConfig.getMessageEndpoint();
         String sseEndpoint = serverConfig.getSseEndpoint();
 
-        app.head(sseEndpoint, ctx -> {
-            ctx.setResponseHeader("Content-Type", "text/event-stream");
-            return StatusCode.OK;
-        });
+        app.head(sseEndpoint, ctx -> StatusCode.OK).produces(TEXT_EVENT_STREAM);
         app.sse(sseEndpoint, this::handleSseConnection);
         app.post(this.messageEndpoint, this::handleMessage);
     }
@@ -170,7 +166,7 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
                     sse.send(new ServerSentMessage(jsonText).setEvent(MESSAGE_EVENT_TYPE));
                 } catch (Exception e) {
                     LOG.error("Failed to send message: {}", e.getMessage());
-                    sse.send("Error", e.getMessage());
+                    sse.send(SSE_ERROR_EVENT, e.getMessage());
                 }
             });
         }
