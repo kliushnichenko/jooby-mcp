@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INTERNAL_ERROR;
+import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_PARAMS;
 import static io.modelcontextprotocol.spec.McpSchema.Role.USER;
 
 /**
@@ -24,14 +25,13 @@ class McpPromptHandler {
     public static McpSchema.GetPromptResult handle(JoobyMcpServer server,
                                                    McpSchema.GetPromptRequest request,
                                                    McpSyncServerExchange exchange) {
+        var promptName = request.name();
+        if (!server.getPrompts().containsKey(promptName)) {
+            throwUnknownPromptErr(promptName);
+        }
+
         try {
-            var promptName = request.name();
-            if (!server.getPrompts().containsKey(promptName)) {
-                throw new IllegalArgumentException("Prompt '" + promptName + "' is not registered.");
-            }
-
             Object result = server.invokePrompt(promptName, request.arguments(), exchange);
-
             return toPromptResult(result);
         } catch (Exception ex) {
             LOG.error("Error invoking prompt '{}':", request.name(), ex);
@@ -43,6 +43,7 @@ class McpPromptHandler {
         }
     }
 
+    @SuppressWarnings("PMD.NcssCount")
     private static McpSchema.GetPromptResult toPromptResult(Object result) {
         if (result == null) {
             return new McpSchema.GetPromptResult(null, List.of());
@@ -57,23 +58,35 @@ class McpPromptHandler {
             var promptMessage = new McpSchema.PromptMessage(USER, new McpSchema.TextContent(str));
             return new McpSchema.GetPromptResult(null, List.of(promptMessage));
         } else if (result instanceof List<?> items) {
-            if (items.isEmpty()) {
-                return new McpSchema.GetPromptResult(null, List.of());
-            } else {
-                var item = items.iterator().next();
-                if (item instanceof McpSchema.PromptMessage) {
-                    //noinspection unchecked
-                    return new McpSchema.GetPromptResult(null, (List<McpSchema.PromptMessage>) result);
-                } else {
-                    var msgs = items.stream()
-                            .map(i -> new McpSchema.PromptMessage(USER, new McpSchema.TextContent(i.toString())))
-                            .toList();
-                    return new McpSchema.GetPromptResult(null, msgs);
-                }
-            }
+            //noinspection unchecked
+            return handleListReturnType((List<McpSchema.PromptMessage>) result, items);
         } else {
             var promptMessage = new McpSchema.PromptMessage(USER, new McpSchema.TextContent(result.toString()));
             return new McpSchema.GetPromptResult(null, List.of(promptMessage));
         }
+    }
+
+    private static McpSchema.GetPromptResult handleListReturnType(List<McpSchema.PromptMessage> result, List<?> items) {
+        if (items.isEmpty()) {
+            return new McpSchema.GetPromptResult(null, List.of());
+        } else {
+            var item = items.iterator().next();
+            if (item instanceof McpSchema.PromptMessage) {
+                return new McpSchema.GetPromptResult(null, result);
+            } else {
+                var msgs = items.stream()
+                        .map(i -> new McpSchema.PromptMessage(USER, new McpSchema.TextContent(i.toString())))
+                        .toList();
+                return new McpSchema.GetPromptResult(null, msgs);
+            }
+        }
+    }
+
+    private static void throwUnknownPromptErr(String promptName) {
+        throw new McpError(new McpSchema.JSONRPCResponse.JSONRPCError(
+                INVALID_PARAMS,
+                "Unknown prompt name '" + promptName + "'. Please verify such a prompt is registered.",
+                null
+        ));
     }
 }

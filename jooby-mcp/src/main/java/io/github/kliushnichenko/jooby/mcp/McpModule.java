@@ -148,12 +148,16 @@ public class McpModule implements Extension {
     }
 
     private void addToJoobyRegistry(Jooby app, JoobyMcpServer joobyMcpServer, McpSyncServer mcpServer) {
-        if (this.mcpServers.size() == 1) {
+        if (hasSingleMcpServer()) {
             app.getServices().put(McpSyncServer.class, mcpServer);
         } else {
             var serviceKey = ServiceKey.key(McpSyncServer.class, joobyMcpServer.getServerKey());
             app.getServices().put(serviceKey, mcpServer);
         }
+    }
+
+    private boolean hasSingleMcpServer() {
+        return this.mcpServers.size() == 1;
     }
 
     private McpServerConfig resolveServerConfig(Config config, String serverKey) {

@@ -18,14 +18,17 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.util.List;
 
+import static io.github.kliushnichenko.jooby.mcp.transport.TransportConstants.TEXT_EVENT_STREAM;
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_REQUEST;
 
 /**
  * Jooby-based implementation of a stateless MCP server transport.
  * Inspired by <a href="https://github.com/modelcontextprotocol/java-sdk/blob/main/mcp-spring/mcp-spring-webmvc/src/main/java/io/modelcontextprotocol/server/transport/WebMvcStatelessServerTransport.java">WebMvcStatelessServerTransport</a>.
+ *
  * @author kliushnichenko
  */
-public class JoobyStatelessServerTransport extends BaseTransport implements McpStatelessServerTransport {
+@SuppressWarnings("PMD")
+public class JoobyStatelessServerTransport implements McpStatelessServerTransport {
 
     private static final Logger LOG = LoggerFactory.getLogger(JoobyStatelessServerTransport.class);
 

@@ -3,12 +3,16 @@ package io.github.kliushnichenko.jooby.mcp.internal;
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+
+import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_PARAMS;
 
 /**
  * @author kliushnichenko
@@ -27,32 +31,33 @@ public class McpToolHandler {
                                            JoobyMcpServer server,
                                            McpSyncServerExchange exchange) {
         String toolName = request.name();
+        ToolSpec toolSpec = server.getTools().get(toolName);
+        if (toolSpec == null) {
+            throwUnknownToolErr(toolName);
+        }
         try {
-            ToolSpec toolSpec = server.getTools().get(toolName);
-
-            if (toolSpec == null) {
-                throw new IllegalArgumentException("Tool not found: " + toolName);
-            }
-
             verifyRequiredArguments(request.arguments(), toolSpec.getRequiredArguments());
 
             Object result = server.invokeTool(toolName, request.arguments(), exchange);
-
-            if (result == null) {
-                return buildTextResult("null", false);
-            } else if (result instanceof McpSchema.CallToolResult callToolResult) {
-                return callToolResult;
-            } else if (result instanceof String str) {
-                return buildTextResult(str, false);
-            } else if (result instanceof McpSchema.Content content) {
-                return McpSchema.CallToolResult.builder().content(List.of(content)).isError(false).build();
-            } else {
-                var resultStr = mcpJsonMapper.writeValueAsString(result);
-                return buildTextResult(resultStr, false);
-            }
+            return toCallToolResult(result);
         } catch (Exception ex) {
             LOG.error("Error invoking tool '{}':", toolName, ex);
             return buildTextResult(ex.getMessage(), true);
+        }
+    }
+
+    private McpSchema.CallToolResult toCallToolResult(Object result) throws IOException {
+        if (result == null) {
+            return buildTextResult("null", false);
+        } else if (result instanceof McpSchema.CallToolResult callToolResult) {
+            return callToolResult;
+        } else if (result instanceof String str) {
+            return buildTextResult(str, false);
+        } else if (result instanceof McpSchema.Content content) {
+            return McpSchema.CallToolResult.builder().content(List.of(content)).isError(false).build();
+        } else {
+            var resultStr = mcpJsonMapper.writeValueAsString(result);
+            return buildTextResult(resultStr, false);
         }
     }
 
@@ -74,5 +79,13 @@ public class McpToolHandler {
                 .addTextContent(text)
                 .isError(isError)
                 .build();
+    }
+
+    private static void throwUnknownToolErr(String toolName) {
+        throw new McpError(new McpSchema.JSONRPCResponse.JSONRPCError(
+                INVALID_PARAMS,
+                "Unknown tool '" + toolName + "'. Please verify such a tool is registered.",
+                null
+        ));
     }
 }

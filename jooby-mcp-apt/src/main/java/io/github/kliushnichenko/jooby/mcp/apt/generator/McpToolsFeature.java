@@ -23,7 +23,6 @@ import static io.github.kliushnichenko.jooby.mcp.apt.generator.AnnotationMappers
  */
 class McpToolsFeature extends McpFeature {
 
-    // todo: looks like only TOOL_ARG_MAPPER is used
     private final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(MAPPERS);
 
     @Override
