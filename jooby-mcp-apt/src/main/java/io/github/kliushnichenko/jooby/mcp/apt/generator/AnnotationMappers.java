@@ -1,6 +1,5 @@
 package io.github.kliushnichenko.jooby.mcp.apt.generator;
 
-import io.github.kliushnichenko.jooby.mcp.annotation.PromptArg;
 import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.github.kliushnichenko.jsonschema.model.JsonSchemaAnnotationMapper;
 import io.github.kliushnichenko.jsonschema.model.JsonSchemaProps;
