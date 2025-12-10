@@ -9,5 +9,4 @@
 - - Logging example
 - - Roots example
 
-- pmd/checkstyle
 - support async server?

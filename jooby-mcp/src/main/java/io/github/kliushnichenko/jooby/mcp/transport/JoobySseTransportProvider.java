@@ -14,11 +14,14 @@ import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static io.github.kliushnichenko.jooby.mcp.transport.TransportConstants.*;
+
 /**
  * Provides SSE transport implementation for MCP server using Jooby framework.
  * Handles client connections, message routing, and session management.
  */
-public class JoobySseTransportProvider extends BaseTransport implements McpServerTransportProvider {
+@SuppressWarnings("PMD")
+public class JoobySseTransportProvider implements McpServerTransportProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(JoobySseTransportProvider.class);
 

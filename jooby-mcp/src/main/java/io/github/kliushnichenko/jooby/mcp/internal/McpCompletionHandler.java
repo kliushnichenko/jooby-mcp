@@ -39,6 +39,7 @@ class McpCompletionHandler {
         }
     }
 
+    @SuppressWarnings("PMD.NcssCount")
     private static McpSchema.CompleteResult toCompleteResult(Object result) {
         Objects.requireNonNull(result, "Completion result cannot be null");
 
@@ -70,6 +71,6 @@ class McpCompletionHandler {
         }
 
         LOG.error("Unsupported completion result type: {}", result.getClass().getName());
-        throw new RuntimeException("Unexpected error occurred while handling completion result");
+        throw new IllegalStateException("Unexpected error occurred while handling completion result");
     }
 }

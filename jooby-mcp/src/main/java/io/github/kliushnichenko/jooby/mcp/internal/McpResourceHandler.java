@@ -41,8 +41,9 @@ class McpResourceHandler {
         }
     }
 
-    static McpSchema.ReadResourceResult toResourceResult(Object result, String uri, McpJsonMapper mcpJsonMapper)
-            throws IOException {
+    static McpSchema.ReadResourceResult toResourceResult(Object result,
+                                                         String uri,
+                                                         McpJsonMapper mcpJsonMapper) throws IOException {
         if (result == null) {
             return new McpSchema.ReadResourceResult(List.of());
         } else if (result instanceof McpSchema.ReadResourceResult resourceResult) {
@@ -50,19 +51,27 @@ class McpResourceHandler {
         } else if (result instanceof McpSchema.ResourceContents resourceContents) {
             return new McpSchema.ReadResourceResult(List.of(resourceContents));
         } else if (result instanceof List<?> contents) {
-            if (contents.isEmpty()) {
-                return new McpSchema.ReadResourceResult(List.of());
-            } else {
-                var item = contents.iterator().next();
-                if (item instanceof McpSchema.ResourceContents) {
-                    //noinspection unchecked
-                    return new McpSchema.ReadResourceResult((List<McpSchema.ResourceContents>) contents);
-                } else {
-                    return toJsonResult(result, uri, mcpJsonMapper);
-                }
-            }
+            return handleListReturnType(result, uri, mcpJsonMapper, contents);
         } else {
             return toJsonResult(result, uri, mcpJsonMapper);
+        }
+    }
+
+    private static McpSchema.ReadResourceResult handleListReturnType(
+            Object result,
+            String uri,
+            McpJsonMapper mcpJsonMapper, List<?> contents
+    ) throws IOException {
+        if (contents.isEmpty()) {
+            return new McpSchema.ReadResourceResult(List.of());
+        } else {
+            var item = contents.iterator().next();
+            if (item instanceof McpSchema.ResourceContents) {
+                //noinspection unchecked
+                return new McpSchema.ReadResourceResult((List<McpSchema.ResourceContents>) contents);
+            } else {
+                return toJsonResult(result, uri, mcpJsonMapper);
+            }
         }
     }
 

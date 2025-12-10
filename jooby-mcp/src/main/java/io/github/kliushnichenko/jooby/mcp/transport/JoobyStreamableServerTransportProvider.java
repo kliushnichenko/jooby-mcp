@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static io.github.kliushnichenko.jooby.mcp.transport.TransportConstants.*;
 import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_REQUEST;
 
 /**
@@ -27,8 +28,8 @@ import static io.modelcontextprotocol.spec.McpSchema.ErrorCodes.INVALID_REQUEST;
  *
  * @author kliushnichenko
  */
-public class JoobyStreamableServerTransportProvider extends BaseTransport
-        implements McpStreamableServerTransportProvider  {
+@SuppressWarnings("PMD")
+public class JoobyStreamableServerTransportProvider implements McpStreamableServerTransportProvider {
 
     private static final Logger LOG = LoggerFactory.getLogger(JoobyStreamableServerTransportProvider.class);
 

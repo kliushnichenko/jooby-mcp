@@ -153,6 +153,7 @@ public class McpServerRunner {
         }
     }
 
+    @SuppressWarnings("PMD.NPathComplexity")
     private McpSchema.ServerCapabilities computeCapabilities() {
         var builder = McpSchema.ServerCapabilities.builder();
 
