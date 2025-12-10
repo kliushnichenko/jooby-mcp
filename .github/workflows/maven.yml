@@ -32,7 +32,7 @@ jobs:
     - name: Checkstyle
       run: mvn checkstyle:check -pl jooby-mcp-common,jooby-mcp,jooby-mcp-apt
     - name: PMD
-      run: mvn pmd:check pmd:cpd-check -pl jooby-mcp-common,jooby-mcp-apt
+      run: mvn pmd:check pmd:cpd-check -pl jooby-mcp-common,jooby-mcp,jooby-mcp-apt
 
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
