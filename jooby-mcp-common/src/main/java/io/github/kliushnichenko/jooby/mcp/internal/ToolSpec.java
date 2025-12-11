@@ -1,5 +1,6 @@
 package io.github.kliushnichenko.jooby.mcp.internal;
 
+import io.modelcontextprotocol.spec.McpSchema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,4 +20,5 @@ public class ToolSpec {
     private String inputSchema;
     private String outputSchema;
     private List<String> requiredArguments;
+    private McpSchema.ToolAnnotations annotations;
 }

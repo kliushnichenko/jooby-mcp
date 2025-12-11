@@ -110,6 +110,10 @@ public class McpServerRunner {
                 toolBuilder.outputSchema(mcpJsonMapper, toolSpec.getOutputSchema());
             }
 
+            if (toolSpec.getAnnotations() != null) {
+                toolBuilder.annotations(toolSpec.getAnnotations());
+            }
+
             McpSchema.Tool tool = toolBuilder.build();
 
             var syncToolSpec = new McpServerFeatures.SyncToolSpecification.Builder()
