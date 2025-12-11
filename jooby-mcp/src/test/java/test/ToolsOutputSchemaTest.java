@@ -1,6 +1,5 @@
 package test;
 
-import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -85,12 +84,5 @@ public class ToolsOutputSchemaTest extends BaseTest {
         assertThat(tool.outputSchema())
                 .usingRecursiveComparison()
                 .isEqualTo(PETS_MAP_OUTPUT_SCHEMA);
-    }
-
-    private McpSchema.Tool findTool(String name) {
-        return mcpClient.listTools().tools().stream()
-                .filter(tool -> tool.name().equals(name))
-                .findFirst()
-                .orElseThrow();
     }
 }

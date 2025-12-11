@@ -6,6 +6,7 @@ import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
 import io.modelcontextprotocol.spec.McpClientTransport;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 /**
@@ -27,5 +28,12 @@ public abstract class BaseTest {
                 .build();
 
         mcpClient = McpClient.sync(transport).build();
+    }
+
+    protected McpSchema.Tool findTool(String name) {
+        return mcpClient.listTools().tools().stream()
+                .filter(tool -> tool.name().equals(name))
+                .findFirst()
+                .orElseThrow();
     }
 }

@@ -2,6 +2,7 @@ package io.github.kliushnichenko.jooby.mcp.apt.tools;
 
 import io.github.kliushnichenko.jooby.mcp.annotation.OutputSchema;
 import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
+import io.github.kliushnichenko.jooby.mcp.apt.AnnMirrorUtils;
 import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
 import io.modelcontextprotocol.spec.McpSchema;
 
@@ -51,12 +52,14 @@ public class ToolsCollector extends BaseMethodCollector {
                 TypeElement serviceClass = (TypeElement) method.getEnclosingElement();
                 Tool toolAnnotation = method.getAnnotation(Tool.class);
                 TypeMirror outputType = evalOutputType(method);
+                McpSchema.ToolAnnotations toolAnnotations = evalToolAnnotations(method, toolAnnotation);
 
                 toolEntries.add(new ToolEntry(
                         extractToolName(method, toolAnnotation),
                         toNullIfEmpty(toolAnnotation.title()),
                         toNullIfEmpty(toolAnnotation.description()),
                         outputType,
+                        toolAnnotations,
                         extractServerKey(method, serviceClass),
                         serviceClass,
                         method)
@@ -65,6 +68,28 @@ public class ToolsCollector extends BaseMethodCollector {
         }
 
         return toolEntries;
+    }
+
+    private McpSchema.ToolAnnotations evalToolAnnotations(ExecutableElement method, Tool toolAnnotation) {
+        McpSchema.ToolAnnotations toolAnnotations = null;
+        if (hasNonDefaultToolAnnotations(method)) {
+            Tool.Annotations annotations = toolAnnotation.annotations();
+            toolAnnotations = new McpSchema.ToolAnnotations(
+                    toNullIfEmpty(annotations.title()),
+                    annotations.readOnlyHint(),
+                    annotations.destructiveHint(),
+                    annotations.idempotentHint(),
+                    annotations.openWorldHint(),
+                    null
+            );
+        }
+        return toolAnnotations;
+    }
+
+    private boolean hasNonDefaultToolAnnotations(ExecutableElement method) {
+        return AnnMirrorUtils.findAnnotationMirror(method, Tool.class)
+                .map(annMirror -> AnnMirrorUtils.hasProperty(annMirror, "annotations"))
+                .orElse(false);
     }
 
     private boolean isValidMethod(Element element) {

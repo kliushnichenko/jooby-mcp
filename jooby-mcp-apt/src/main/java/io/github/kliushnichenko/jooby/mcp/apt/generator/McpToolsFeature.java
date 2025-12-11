@@ -10,6 +10,7 @@ import io.github.kliushnichenko.jsonschema.generator.JsonSchemaGenerator;
 import io.github.kliushnichenko.jsonschema.model.JsonSchemaObj;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
 
 import javax.lang.model.element.Modifier;
 import java.util.HashMap;
@@ -74,6 +75,7 @@ class McpToolsFeature extends McpFeature {
                 outputSchema = schemaGenerator.generate(tool.outputType());
             }
             CodeBlock requiredArgs = buildRequiredArguments(jsonSchemaObj.getRequired());
+            CodeBlock toolAnnotations = buildToolAnnotations(tool.annotations());
 
             CodeBlock.Builder newToolBlock = CodeBlock.builder()
                     .add("tools.put($S, $T.builder().name($S)",
@@ -87,6 +89,7 @@ class McpToolsFeature extends McpFeature {
             addIfNotNull(inputSchema, newToolBlock, ".inputSchema($S)");
             addIfNotNull(outputSchema, newToolBlock, ".outputSchema($S)");
             addIfNotNull(requiredArgs, newToolBlock, ".requiredArguments($L)");
+            addIfNotNull(toolAnnotations, newToolBlock, ".annotations($L)");
 
             newToolBlock.add(".build());");
             methodBuilder.addCode(newToolBlock.build()).addCode("\n");
@@ -94,6 +97,22 @@ class McpToolsFeature extends McpFeature {
         methodBuilder.addCode("\n");
 
         populateInvokersMap(methodBuilder, descriptor);
+    }
+
+    private CodeBlock buildToolAnnotations(McpSchema.ToolAnnotations annotations) {
+        if (annotations == null) {
+            return null;
+        }
+
+        return CodeBlock.builder()
+                .add("new $L($S, $L, $L, $L, $L, null)",
+                        ClassName.get(McpSchema.ToolAnnotations.class),
+                        annotations.title(),
+                        annotations.readOnlyHint(),
+                        annotations.destructiveHint(),
+                        annotations.idempotentHint(),
+                        annotations.openWorldHint()
+                ).build();
     }
 
     private void populateInvokersMap(MethodSpec.Builder methodBuilder, McpServerDescriptor descriptor) {

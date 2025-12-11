@@ -1,5 +1,6 @@
 package io.github.kliushnichenko.jooby.mcp.apt.tools;
 
+import io.modelcontextprotocol.spec.McpSchema;
 import org.jspecify.annotations.Nullable;
 
 import javax.lang.model.element.ExecutableElement;
@@ -17,6 +18,7 @@ public record ToolEntry(String toolName,
                         String toolTitle,
                         String toolDescription,
                         @Nullable TypeMirror outputType,
+                        McpSchema.ToolAnnotations annotations,
                         String serverKey,
                         TypeElement serviceClass,
                         ExecutableElement method) {

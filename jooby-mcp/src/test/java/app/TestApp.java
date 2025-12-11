@@ -15,6 +15,7 @@ public class TestApp extends Jooby {
 
         getServices().put(Prompts.class, new Prompts());
         getServices().put(ToolsOutputSchemaTestCases.class, new ToolsOutputSchemaTestCases());
+        getServices().put(ToolsAnnotationsTestCases.class, new ToolsAnnotationsTestCases());
 
         install(new McpModule(new DefaultMcpServer()));
     }
