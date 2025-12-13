@@ -51,11 +51,12 @@ public class McpPromptsFeature extends McpFeature {
             CodeBlock promptArguments = buildPromptArgs(prompt.promptArgs());
 
             builder.addStatement(
-                    "prompts.put($S, new $T($S, $S, $L))",
-                    prompt.promptName(),
+                    "prompts.put($S, new $T($S, $S, $S, $L))",
+                    prompt.name(),
                     ClassName.get(McpSchema.Prompt.class),
-                    prompt.promptName(),
-                    prompt.promptDescription(),
+                    prompt.name(),
+                    prompt.title(),
+                    prompt.description(),
                     promptArguments);
         }
         builder.addCode("\n");
@@ -63,7 +64,7 @@ public class McpPromptsFeature extends McpFeature {
         // fill prompt invokers map
         for (PromptEntry entry : descriptor.prompts()) {
             CodeBlock methodCall = buildMethodInvocation(entry.method(), entry.serviceClass(), PromptArg.class);
-            var mapEntry = CodeBlock.of("$S, $L", entry.promptName(), methodCall);
+            var mapEntry = CodeBlock.of("$S, $L", entry.name(), methodCall);
             builder.addCode(CodeBlock.of("promptInvokers.put($L);\n", mapEntry));
         }
     }

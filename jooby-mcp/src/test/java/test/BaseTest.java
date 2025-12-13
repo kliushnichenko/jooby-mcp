@@ -36,4 +36,11 @@ public abstract class BaseTest {
                 .findFirst()
                 .orElseThrow();
     }
+
+    protected McpSchema.Prompt findPrompt(String name) {
+        return mcpClient.listPrompts().prompts().stream()
+                .filter(prompt -> prompt.name().equals(name))
+                .findFirst()
+                .orElseThrow();
+    }
 }

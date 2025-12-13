@@ -37,6 +37,11 @@ public @interface Prompt {
     String name() default "";
 
     /**
+     * A human-readable name for this prompt.
+     */
+    String title() default "";
+
+    /**
      * A human-readable description of what the prompt does.
      * <p>
      * This description will be provided to MCP clients and can be used by AI models

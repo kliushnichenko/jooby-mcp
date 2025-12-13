@@ -11,7 +11,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PromptsTest extends BaseTest {
 
     @Test
-    void list_prompt_messages() {
+    void test_prompt_with_all_params_specified() {
+        McpSchema.Prompt prompt = findPrompt("prompt_with_all_params_specified");
+
+        var expectedPrompt = new McpSchema.Prompt(
+                "prompt_with_all_params_specified",
+                "Summarization Prompt",
+                "A prompt to summarize text.",
+                List.of()
+        );
+
+        assertThat(prompt)
+                .usingRecursiveComparison()
+                .isEqualTo(expectedPrompt);
+    }
+
+    @Test
+    void list_prompt_messages_return_type() {
         var request = new McpSchema.GetPromptRequest("list_prompt_messages", Map.of());
         var result = mcpClient.getPrompt(request);
 

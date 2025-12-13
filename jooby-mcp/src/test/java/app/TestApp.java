@@ -13,7 +13,7 @@ public class TestApp extends Jooby {
     {
         install(new JacksonModule(objectMapper));
 
-        getServices().put(Prompts.class, new Prompts());
+        getServices().put(PromptsTestCases.class, new PromptsTestCases());
         getServices().put(ToolsOutputSchemaTestCases.class, new ToolsOutputSchemaTestCases());
         getServices().put(ToolsAnnotationsTestCases.class, new ToolsAnnotationsTestCases());
 
