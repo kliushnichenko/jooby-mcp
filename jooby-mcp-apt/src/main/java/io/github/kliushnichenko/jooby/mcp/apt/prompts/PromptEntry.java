@@ -7,8 +7,9 @@ import java.util.List;
 /**
  * @author kliushnichenko
  */
-public record PromptEntry(String promptName,
-                          String promptDescription,
+public record PromptEntry(String name,
+                          String title,
+                          String description,
                           List<Arg> promptArgs,
                           String serverKey,
                           TypeElement serviceClass,

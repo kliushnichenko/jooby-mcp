@@ -141,7 +141,7 @@ public class McpProcessor extends AbstractProcessor {
         resources = resourcesCollector.collectResources(roundEnv);
         resourceTemplates = resourceTemplatesCollector.collectResourceTemplates(roundEnv);
 
-        List<String> promptRefs = prompts.stream().map(PromptEntry::promptName).toList();
+        List<String> promptRefs = prompts.stream().map(PromptEntry::name).toList();
         completions = completionsCollector.collectCompletions(roundEnv, promptRefs, resourceTemplates);
     }
 

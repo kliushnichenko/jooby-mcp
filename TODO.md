@@ -1,8 +1,8 @@
 - support java module system
 - json-lib agnostic
 - tests
-- - tools Annotations
 - stateless streamable transport
+- 
 - Utilities
 - - Sampling example
 - - Progress example

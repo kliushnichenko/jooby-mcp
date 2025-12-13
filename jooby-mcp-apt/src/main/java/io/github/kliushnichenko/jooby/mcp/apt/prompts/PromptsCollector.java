@@ -49,6 +49,7 @@ public class PromptsCollector extends BaseMethodCollector {
 
         return new PromptEntry(
                 extractPromptName(method, promptAnnotation),
+                promptAnnotation.title(),
                 promptAnnotation.description(),
                 collectPromptArgs(method),
                 extractServerKey(method, serviceClass),
