@@ -29,7 +29,7 @@ public class JoobyTestSingleton implements Extension {
 
         System.setProperty("application.env", config.env());
         Server srv = Server.loadServer(config.serverOptions());
-        Jooby app = Jooby.createApp(ExecutionMode.DEFAULT, reflectionProvider(config.app()));
+        Jooby app = Jooby.createApp(srv, ExecutionMode.DEFAULT, reflectionProvider(config.app()));
         srv.start(app);
         extension.app = app;
     }

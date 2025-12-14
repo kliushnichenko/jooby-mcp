@@ -14,7 +14,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -100,7 +99,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
         LOG.debug("Handling GET request for session: {}", sessionId);
 
         try {
-            ctx.setResponseType(TEXT_EVENT_STREAM, StandardCharsets.UTF_8);
+            ctx.setResponseType(TEXT_EVENT_STREAM);
             return ctx.upgrade(sse -> {
                 sse.onClose(() -> LOG.debug("SSE connection closed by client for session: {}", sessionId));
 
@@ -222,7 +221,7 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
                         .block();
                 return StatusCode.ACCEPTED;
             } else if (message instanceof McpSchema.JSONRPCRequest jsonrpcRequest) {
-                ctx.setResponseType(TEXT_EVENT_STREAM, StandardCharsets.UTF_8);
+                ctx.setResponseType(TEXT_EVENT_STREAM);
 
                 String finalSessionId = sessionId;
                 return ctx.upgrade(sse -> {

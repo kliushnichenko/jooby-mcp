@@ -45,7 +45,7 @@ import static io.github.kliushnichenko.jooby.mcp.apt.McpProcessor.OPTION_TARGET_
         "io.github.kliushnichenko.jooby.mcp.annotation.CompleteResourceTemplate"
 })
 @SupportedOptions({OPTION_DEFAULT_SERVER_KEY, OPTION_TARGET_PACKAGE})
-@SupportedSourceVersion(SourceVersion.RELEASE_17)
+@SupportedSourceVersion(SourceVersion.RELEASE_21)
 public class McpProcessor extends AbstractProcessor {
 
     private static final Pattern SERVER_KEY_PATTERN = Pattern.compile("^[A-Za-z][A-Za-z0-9]*$");

@@ -37,10 +37,10 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>17</maven.compiler.release>
-        <revision>1.8.0-SNAPSHOT</revision>
+        <maven.compiler.release>21</maven.compiler.release>
+        <revision>2.0.0-SNAPSHOT</revision>
 
-        <jooby.version>3.11.5</jooby.version>
+        <jooby.version>4.0.12</jooby.version>
         <jackson.version>2.19.2</jackson.version>
         <mcp.sdk.version>0.17.0</mcp.sdk.version>
         <lombok.version>1.18.42</lombok.version>
@@ -168,7 +168,7 @@
                     <version>3.28.0</version>
                     <configuration>
                         <linkXRef>false</linkXRef>
-                        <targetJdk>17</targetJdk>
+                        <targetJdk>21</targetJdk>
                         <failOnViolation>true</failOnViolation>
                         <printFailingErrors>true</printFailingErrors>
                         <rulesets>
