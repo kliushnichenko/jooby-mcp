@@ -33,6 +33,10 @@ public class ToolsCollector extends BaseMethodCollector {
             McpSchema.CallToolResult.class.getCanonicalName(),
             McpSchema.Content.class.getCanonicalName(),
             McpSchema.TextContent.class.getCanonicalName(),
+            McpSchema.ImageContent.class.getCanonicalName(),
+            McpSchema.AudioContent.class.getCanonicalName(),
+            McpSchema.EmbeddedResource.class.getCanonicalName(),
+            McpSchema.ResourceLink.class.getCanonicalName(),
             String.class.getCanonicalName()
     );
 

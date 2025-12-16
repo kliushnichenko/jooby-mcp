@@ -1,5 +1,6 @@
 package io.github.kliushnichenko.jooby.mcp.example;
 
+import io.github.kliushnichenko.jooby.mcp.annotation.OutputSchema;
 import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
 import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -38,6 +39,7 @@ public class ToolsExample {
     }
 
     @Tool(name = "get_client_info", description = "Returns the information about the client initiated the request")
+    @OutputSchema.Suppressed
     public McpSchema.Implementation getClientInfo(McpSyncServerExchange exchange) {
         return exchange.getClientInfo();
     }
