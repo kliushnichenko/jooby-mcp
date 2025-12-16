@@ -38,7 +38,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
-        <revision>1.8.0-SNAPSHOT</revision>
+        <revision>1.8.1-SNAPSHOT</revision>
 
         <jooby.version>3.11.5</jooby.version>
         <jackson.version>2.19.2</jackson.version>
@@ -111,7 +111,7 @@
             <dependency>
                 <groupId>io.github.kliushnichenko</groupId>
                 <artifactId>jsonschema-generator-apt</artifactId>
-                <version>0.5.1</version>
+                <version>0.5.2</version>
             </dependency>
 
             <dependency>

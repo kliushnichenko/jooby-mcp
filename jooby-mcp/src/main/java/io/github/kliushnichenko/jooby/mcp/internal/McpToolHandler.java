@@ -39,14 +39,15 @@ public class McpToolHandler {
             verifyRequiredArguments(request.arguments(), toolSpec.getRequiredArguments());
 
             Object result = server.invokeTool(toolName, request.arguments(), exchange);
-            return toCallToolResult(result);
+            return toCallToolResult(toolSpec, result);
         } catch (Exception ex) {
             LOG.error("Error invoking tool '{}':", toolName, ex);
             return buildTextResult(ex.getMessage(), true);
         }
     }
 
-    private McpSchema.CallToolResult toCallToolResult(Object result) throws IOException {
+    private McpSchema.CallToolResult toCallToolResult(ToolSpec spec, Object result) throws IOException {
+        var hasOutputSchema = spec.getOutputSchema() != null;
         if (result == null) {
             return buildTextResult("null", false);
         } else if (result instanceof McpSchema.CallToolResult callToolResult) {
@@ -56,8 +57,15 @@ public class McpToolHandler {
         } else if (result instanceof McpSchema.Content content) {
             return McpSchema.CallToolResult.builder().content(List.of(content)).isError(false).build();
         } else {
-            var resultStr = mcpJsonMapper.writeValueAsString(result);
-            return buildTextResult(resultStr, false);
+            if (hasOutputSchema) {
+                return McpSchema.CallToolResult.builder()
+                        .structuredContent(result)
+                        .isError(false)
+                        .build();
+            } else {
+                var resultStr = mcpJsonMapper.writeValueAsString(result);
+                return buildTextResult(resultStr, false);
+            }
         }
     }
 
