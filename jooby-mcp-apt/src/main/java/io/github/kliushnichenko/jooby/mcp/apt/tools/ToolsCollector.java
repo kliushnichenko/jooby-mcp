@@ -37,6 +37,11 @@ public class ToolsCollector extends BaseMethodCollector {
             McpSchema.AudioContent.class.getCanonicalName(),
             McpSchema.EmbeddedResource.class.getCanonicalName(),
             McpSchema.ResourceLink.class.getCanonicalName(),
+            "com.fasterxml.jackson.databind.JsonNode",
+            "com.fasterxml.jackson.databind.node.ObjectNode",
+            "com.fasterxml.jackson.databind.node.ArrayNode",
+            "com.fasterxml.jackson.databind.node.ValueNode",
+            Object.class.getCanonicalName(),
             String.class.getCanonicalName()
     );
 
