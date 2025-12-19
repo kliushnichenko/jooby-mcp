@@ -179,6 +179,18 @@ public McpSchema.CallToolResult findPet(String petId) {
 
 **Tip**: You can use `@OutputSchema.Suppressed` to skip output schema generation from return type.
 
+### How to enrich json schema?
+
+Whether the schema is generated from method arguments or return type, you can enrich it using OpenAPI annotations. At the moment, generator will respect `description` and `required` attributes from `@Schema` annotation. Also, if `@JsonProperty` is present on a field, its `value` will be used as the property name in the generated schema.
+
+```java
+import io.swagger.v3.oas.annotations.media.Schema;  
+class User {
+    @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, description = "The user's middle name")
+    @JsonProperty("middle-name")
+    private String middleName;
+}
+```
 
 ### Resource Example
 
