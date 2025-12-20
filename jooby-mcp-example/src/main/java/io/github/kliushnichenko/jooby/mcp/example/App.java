@@ -2,6 +2,7 @@ package io.github.kliushnichenko.jooby.mcp.example;
 
 import io.github.kliushnichenko.jooby.mcp.McpModule;
 
+import io.github.kliushnichenko.mcp.inspector.McpInspectorModule;
 import io.jooby.Jooby;
 import io.jooby.avaje.inject.AvajeInjectModule;
 import io.jooby.handler.AccessLogHandler;
@@ -17,6 +18,7 @@ public class App extends Jooby {
         install(new JacksonModule());
         install(AvajeInjectModule.of());
         install(new McpModule(new ExampleMcpServer(), new WeatherMcpServer()));
+        install(new McpInspectorModule("/"));
     }
 
     public static void main(String[] args) {

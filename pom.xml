@@ -52,6 +52,7 @@
         <module>jooby-mcp-common</module>
         <module>jooby-mcp-apt</module>
         <module>jooby-mcp</module>
+        <module>jooby-mcp-inspector</module>
         <module>jooby-mcp-example</module>
     </modules>
 

@@ -13,19 +13,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WeatherServer {
 
-    private WeatherService weatherService;
+    private final WeatherService weatherService;
 
     @Tool(name = "get_weather")
     public String getWeather(double latitude, double longitude) {
         return weatherService.getWeather(latitude, longitude);
-    }
-
-    public static class WeatherService {
-
-        public String getWeather(double latitude, double longitude) {
-            // Simulate fetching weather data for the given location
-            // In a real application, this would involve calling a weather API
-            return "The weather in Numenor is sunny with a temperature of 25°C.";
-        }
     }
 }

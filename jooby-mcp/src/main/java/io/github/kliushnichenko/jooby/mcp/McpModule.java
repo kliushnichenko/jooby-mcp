@@ -142,18 +142,23 @@ public class McpModule implements Extension {
             );
 
             McpSyncServer mcpServer = runner.run();
-            addToJoobyRegistry(app, joobyMcpServer, mcpServer);
+            addToJoobyRegistry(app, joobyMcpServer.getServerKey(), mcpServer, serverConfig);
             app.onStop(mcpServer::close);
         }
     }
 
-    private void addToJoobyRegistry(Jooby app, JoobyMcpServer joobyMcpServer, McpSyncServer mcpServer) {
+    private void addToJoobyRegistry(Jooby app,
+                                    String mcpServerKey,
+                                    McpSyncServer mcpServer,
+                                    McpServerConfig serverConfig) {
+        var registry = app.getServices();
         if (hasSingleMcpServer()) {
-            app.getServices().put(McpSyncServer.class, mcpServer);
+            registry.put(McpSyncServer.class, mcpServer);
         } else {
-            var serviceKey = ServiceKey.key(McpSyncServer.class, joobyMcpServer.getServerKey());
-            app.getServices().put(serviceKey, mcpServer);
+            var serviceKey = ServiceKey.key(McpSyncServer.class, mcpServerKey);
+            registry.put(serviceKey, mcpServer);
         }
+        registry.listOf(McpServerConfig.class).add(serverConfig);
     }
 
     private boolean hasSingleMcpServer() {
