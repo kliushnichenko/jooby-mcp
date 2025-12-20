@@ -29,6 +29,7 @@ Features:
 - [X] Required input arguments validation in tools
 - [X] Build time method signature and return type validation
 - [X] Elicitation, Sampling, Progress support via exchange object 
+- [X] MCP Inspector integration module
 
 Table of Contents:
 
@@ -40,10 +41,8 @@ Table of Contents:
 - [Exchange Object](#exchange-object)
 - [Multiple Servers Support](#multiple-servers-support)
 - [Customizing Default Server Name and Package](#customizing-default-server-name-and-package)
-- [Supported return types in Tools](#supported-return-types-in-tools)
-- [Supported return types in Prompts](#supported-return-types-in-prompts)
-- [Supported return types in Resources and Resource Templates](#supported-return-types-in-resources-and-resource-templates)
-- [Supported return types in Prompt Completions](#supported-return-types-in-prompt-completions)
+- [MCP Inspector Module](#mcp-inspector-module)
+- [Appendix: Supported Return Types](#appendix-supported-return-types)
 
 ## Quick Start
 
@@ -385,7 +384,39 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
    }
    ```
 
-#### Supported return types in Tools
+### MCP Inspector Module
+
+You can use the `McpInspectorModule` to spin up [mcp-inspector-ui](https://github.com/modelcontextprotocol/inspector) right on jooby server
+and speed up your development process. Mind, that it works in `Direct` connection mode only, 
+aimed solely to test your MCP server during development and requires `McpModule` to be installed.
+To enable it, just install the module alongside `McpModule`:
+
+```java
+{
+    install(new McpInspectorModule());
+}
+```
+
+By default, inspector will be available at `/mcp-inspector` path. You can customize it over constructor argument:
+
+```java
+{
+    install(new McpInspectorModule("/custom-inspector-path"));
+}
+```
+
+Dependency:
+```xml
+ <dependency>
+    <groupId>io.github.kliushnichenko</groupId>
+    <artifactId>jooby-mcp-inspector</artifactId>
+    <version>${jooby.mcp.version}</version>
+</dependency>
+```
+
+### Appendix: Supported Return Types
+
+##### Supported return types in Tools
 
 - `String`
 - `McpSchema.CallToolResult`
@@ -393,7 +424,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 - `McpSchema.TextContent`
 - POJO (will be serialized to JSON)
 
-#### Supported return types in Prompts
+##### Supported return types in Prompts
 
 - `McpSchema.GetPromptResult`
 - `McpSchema.PromptMessage`
@@ -402,7 +433,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 - `String`
 - POJO (`toString()` method will be invoked to get the string representation)
 
-#### Supported return types in Resources and Resource Templates
+##### Supported return types in Resources and Resource Templates
 
 - `McpSchema.ReadResourceResult`
 - `McpSchema.ResourceContents`
@@ -411,7 +442,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 - `McpSchema.BlobResourceContents`
 - POJO (will be serialized to JSON)
 
-#### Supported return types in Completions
+##### Supported return types in Completions
 
 - `McpSchema.CompleteResult`
 - `McpSchema.CompleteResult.CompleteCompletion`

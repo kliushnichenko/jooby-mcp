@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>io.github.kliushnichenko</groupId>
+        <artifactId>jooby-mcp-project</artifactId>
+        <version>${revision}</version>
+    </parent>
+
+    <artifactId>jooby-mcp-inspector</artifactId>
+
+    <name>jooby-mcp-inspector</name>
+    <description>Jooby module that provides a web-based MCP inspector</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.jooby</groupId>
+            <artifactId>jooby</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.kliushnichenko</groupId>
+            <artifactId>jooby-mcp</artifactId>
+            <version>${revision}</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

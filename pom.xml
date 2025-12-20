@@ -38,7 +38,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
-        <revision>1.8.3</revision>
+        <revision>1.9.0</revision>
 
         <jooby.version>3.11.5</jooby.version>
         <jackson.version>2.19.2</jackson.version>
@@ -52,6 +52,7 @@
         <module>jooby-mcp-common</module>
         <module>jooby-mcp-apt</module>
         <module>jooby-mcp</module>
+        <module>jooby-mcp-inspector</module>
         <module>jooby-mcp-example</module>
     </modules>
 
