@@ -1,14 +1,53 @@
 package io.github.kliushnichenko.mcp.inspector;
 
-import com.typesafe.config.Config;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
-import io.jooby.*;
+import io.jooby.Extension;
+import io.jooby.Jooby;
+import io.jooby.MediaType;
+import io.jooby.Reified;
 import io.jooby.exception.RegistryException;
 import io.jooby.exception.StartupException;
 
 import java.util.List;
 
+/**
+ * MCP Inspector module for Jooby.
+ *
+ * <p>
+ * The MCP Inspector module provides a web-based interface for inspecting and interacting with
+ * local MCP server running on the same app. It serves a frontend application that allows users to
+ * connect to MCP servers, view their capabilities, and test various protocol features.
+ * </p>
+ *
+ * <h2>Usage</h2>
+ *
+ * <p>
+ * Add the module to your application:
+ * </p>
+ *
+ * <pre>{@code
+ * {
+ *   install(new McpInspectorModule());
+ * }
+ * }</pre>
+ *
+ * <h2>Configuration</h2>
+ *
+ * <p>
+ * The module requires at least one MCP server to be configured in your Jooby application.
+ * </p>
+ *
+ * <h2>Features</h2>
+ *
+ * <ul>
+ *   <li>Serves a web-based MCP Inspector UI</li>
+ *   <li>Automatically configures the inspector to connect to the local MCP server with respect to transport and endpoint</li>
+ *   <li>Supports only direct connection and enables it automatically when the page loads</li>
+ * </ul>
+ *
+ * @author kliushnichenko
+ */
 public class McpInspectorModule implements Extension {
 
     private static final String DIST = "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/inspector-client@0.18.0/dist";
@@ -34,6 +73,7 @@ public class McpInspectorModule implements Extension {
     private static final String DEFAULT_ENDPOINT = "/mcp-inspector";
 
     private final String inspectorEndpoint;
+    private McpServerConfig mcpSrvConfig;
 
     public McpInspectorModule(String inspectorEndpoint) {
         this.inspectorEndpoint = inspectorEndpoint;
@@ -45,20 +85,21 @@ public class McpInspectorModule implements Extension {
 
     @Override
     public void install(@NonNull Jooby app) {
-        McpServerConfig mcpSrvConfig = resolveMcpServerConfig(app);
-
-        var port = resolvePort(app.getConfig());
-        var configJson = buildConfigJson(mcpSrvConfig, port);
+        this.mcpSrvConfig = resolveMcpServerConfig(app);
 
         app.get(inspectorEndpoint, ctx -> {
             if (ctx.query("MCP_PROXY_PORT").isMissing()) {
-                return ctx.sendRedirect(inspectorEndpoint + "?MCP_PROXY_PORT=" + port);
+                return ctx.sendRedirect(inspectorEndpoint + "?MCP_PROXY_PORT=" + ctx.getPort());
             } else {
                 return ctx.setResponseType(MediaType.html).render(indexHtml);
             }
         });
 
-        app.get("/config", ctx -> ctx.setResponseType(MediaType.json).render(configJson));
+        app.get("/config", ctx -> {
+            var location = ctx.getScheme() + "://" + ctx.getHostAndPort();
+            var configJson = buildConfigJson(mcpSrvConfig, location);
+            return ctx.setResponseType(MediaType.json).render(configJson);
+        });
     }
 
     private static McpServerConfig resolveMcpServerConfig(Jooby app) {
@@ -72,7 +113,7 @@ public class McpInspectorModule implements Extension {
         return srvConfigs.get(0);
     }
 
-    private String buildConfigJson(McpServerConfig config, int port) {
+    private String buildConfigJson(McpServerConfig config, String location) {
         var endpoint = McpServerConfig.Transport.STREAMABLE_HTTP == config.getTransport()
                 ? config.getMcpEndpoint()
                 : config.getSseEndpoint();
@@ -84,17 +125,9 @@ public class McpInspectorModule implements Extension {
                   "defaultCommand": "",
                   "defaultArgs": "",
                   "defaultTransport": "%s",
-                  "defaultServerUrl": "http://localhost:%d%s"
+                  "defaultServerUrl": "%s%s"
                 }
-                """.formatted(config.getTransport().getValue(), port, endpoint);
-    }
-
-    private int resolvePort(Config config) {
-        if (config.hasPath("server.port")) {
-            return config.getInt("server.port");
-        } else {
-            return ServerOptions.SERVER_PORT;
-        }
+                """.formatted(config.getTransport().getValue(), location, endpoint);
     }
 
     @Override

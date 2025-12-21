@@ -388,7 +388,7 @@ Mind, that `mcp.default.server.key` should match the configuration section in `a
 
 You can use the `McpInspectorModule` to spin up [mcp-inspector-ui](https://github.com/modelcontextprotocol/inspector) right on jooby server
 and speed up your development process. Mind, that it works in `Direct` connection mode only, 
-aimed solely to test your MCP server during development and requires `McpModule` to be installed.
+aimed solely to test your local MCP server during development and requires `McpModule` to be installed.
 To enable it, just install the module alongside `McpModule`:
 
 ```java
