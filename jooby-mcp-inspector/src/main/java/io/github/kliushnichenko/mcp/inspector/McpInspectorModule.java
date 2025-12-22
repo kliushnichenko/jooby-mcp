@@ -114,9 +114,7 @@ public class McpInspectorModule implements Extension {
     }
 
     private String buildConfigJson(McpServerConfig config, String location) {
-        var endpoint = McpServerConfig.Transport.STREAMABLE_HTTP == config.getTransport()
-                ? config.getMcpEndpoint()
-                : config.getSseEndpoint();
+        var endpoint = resolveEndpoint(config);
 
         return """
                 {
@@ -128,6 +126,15 @@ public class McpInspectorModule implements Extension {
                   "defaultServerUrl": "%s%s"
                 }
                 """.formatted(config.getTransport().getValue(), location, endpoint);
+    }
+
+    private String resolveEndpoint(McpServerConfig config) {
+        if (McpServerConfig.Transport.STREAMABLE_HTTP == config.getTransport() ||
+            McpServerConfig.Transport.STATELESS_STREAMABLE_HTTP == config.getTransport()) {
+            return config.getMcpEndpoint();
+        } else {
+            return config.getSseEndpoint();
+        }
     }
 
     @Override
