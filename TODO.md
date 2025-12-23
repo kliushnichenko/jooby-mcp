@@ -8,11 +8,9 @@
 - - Logging example
 - - Roots example
 
-- stateless streamable transport & server
-- inject TransportContext instead of Exchange Object
+- inject TransportContext
 - support async server?
 
 Inspector:
-- handle failing `.well-known/` endpoint
 - W/A for MCP_PROXY_FULL_ADDRESS cached in localstorage
 - `/config` customize endpoint if possible 

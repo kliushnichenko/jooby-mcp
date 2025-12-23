@@ -73,6 +73,10 @@ public class McpServerConfig {
         return srvConfig;
     }
 
+    public boolean isSseTransport() {
+        return this.transport == Transport.SSE;
+    }
+
     private static String resolveRequiredParam(Config config, String configPath) {
         if (!config.hasPath(configPath)) {
             throw new StartupException("Missing required config path: " + configPath);
