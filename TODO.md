@@ -1,7 +1,6 @@
 - support java module system
 - json-lib agnostic
 - tests
-- stateless streamable transport
 - 
 - Utilities
 - - Sampling example
@@ -9,4 +8,9 @@
 - - Logging example
 - - Roots example
 
+- inject TransportContext
 - support async server?
+
+Inspector:
+- W/A for MCP_PROXY_FULL_ADDRESS cached in localstorage
+- `/config` customize endpoint if possible 

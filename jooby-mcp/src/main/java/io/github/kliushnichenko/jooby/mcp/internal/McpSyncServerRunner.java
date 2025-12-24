@@ -4,6 +4,7 @@ import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.github.kliushnichenko.jooby.mcp.transport.JoobySseTransportProvider;
 import io.github.kliushnichenko.jooby.mcp.transport.JoobyStreamableServerTransportProvider;
 import io.jooby.Jooby;
+import io.jooby.ServiceKey;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
@@ -20,44 +21,20 @@ import java.util.Map;
 /**
  * @author kliushnichenko
  */
-public class McpServerRunner {
+public class McpSyncServerRunner extends BaseMcpServerRunner<McpSyncServer> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(McpServerRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(McpSyncServerRunner.class);
 
-    private final Jooby app;
-    private final JoobyMcpServer joobyMcpServer;
-    private final McpServerConfig serverConfig;
-    private final McpToolHandler toolHandler;
-    private final McpResourceHandler resourceHandler;
-    private final McpResourceTemplateHandler resourceTemplateHandler;
-    private final McpJsonMapper mcpJsonMapper;
-
-    public McpServerRunner(Jooby app,
-                           JoobyMcpServer joobyMcpServer,
-                           McpServerConfig serverConfig,
-                           McpJsonMapper mcpJsonMapper) {
-        this.app = app;
-        this.joobyMcpServer = joobyMcpServer;
-        this.serverConfig = serverConfig;
-        this.mcpJsonMapper = mcpJsonMapper;
-        this.toolHandler = new McpToolHandler(mcpJsonMapper);
-        this.resourceHandler = new McpResourceHandler(mcpJsonMapper);
-        this.resourceTemplateHandler = new McpResourceTemplateHandler(mcpJsonMapper);
+    public McpSyncServerRunner(Jooby app,
+                               JoobyMcpServer joobyMcpServer,
+                               McpServerConfig serverConfig,
+                               McpJsonMapper mcpJsonMapper,
+                               boolean isSingleServer) {
+        super(app, joobyMcpServer, serverConfig, mcpJsonMapper, isSingleServer);
     }
 
-    public McpSyncServer run() {
-        McpSyncServer mcpServer = initMcpServer();
-
-        initTools(mcpServer);
-        initPrompts(mcpServer);
-        initResources(mcpServer);
-        initResourceTemplates(mcpServer);
-
-        logMcpStart(mcpServer);
-        return mcpServer;
-    }
-
-    private McpSyncServer initMcpServer() {
+    @Override
+    protected McpSyncServer initMcpServer() {
         List<McpServerFeatures.SyncCompletionSpecification> completions = initCompletions();
 
         if (McpServerConfig.Transport.SSE == serverConfig.getTransport()) {
@@ -97,27 +74,13 @@ public class McpServerRunner {
         return completions;
     }
 
-    private void initTools(McpSyncServer mcpServer) {
+    @Override
+    protected void initTools(McpSyncServer mcpServer) {
         for (Map.Entry<String, ToolSpec> entry : joobyMcpServer.getTools().entrySet()) {
             ToolSpec toolSpec = entry.getValue();
-            McpSchema.Tool.Builder toolBuilder = McpSchema.Tool.builder()
-                    .name(toolSpec.getName())
-                    .title(toolSpec.getTitle())
-                    .description(toolSpec.getDescription())
-                    .inputSchema(mcpJsonMapper, toolSpec.getInputSchema());
-
-            if (toolSpec.getOutputSchema() != null) {
-                toolBuilder.outputSchema(mcpJsonMapper, toolSpec.getOutputSchema());
-            }
-
-            if (toolSpec.getAnnotations() != null) {
-                toolBuilder.annotations(toolSpec.getAnnotations());
-            }
-
-            McpSchema.Tool tool = toolBuilder.build();
 
             var syncToolSpec = new McpServerFeatures.SyncToolSpecification.Builder()
-                    .tool(tool)
+                    .tool(buildTool(toolSpec))
                     .callHandler((exchange, request) -> toolHandler.handle(request, joobyMcpServer, exchange))
                     .build();
 
@@ -125,7 +88,8 @@ public class McpServerRunner {
         }
     }
 
-    private void initPrompts(McpSyncServer mcpServer) {
+    @Override
+    protected void initPrompts(McpSyncServer mcpServer) {
         for (Map.Entry<String, McpSchema.Prompt> entry : joobyMcpServer.getPrompts().entrySet()) {
             mcpServer.addPrompt(
                     new McpServerFeatures.SyncPromptSpecification(
@@ -136,7 +100,8 @@ public class McpServerRunner {
         }
     }
 
-    private void initResources(McpSyncServer mcpServer) {
+    @Override
+    protected void initResources(McpSyncServer mcpServer) {
         for (McpSchema.Resource resource : joobyMcpServer.getResources()) {
             mcpServer.addResource(
                     new McpServerFeatures.SyncResourceSpecification(
@@ -147,7 +112,8 @@ public class McpServerRunner {
         }
     }
 
-    private void initResourceTemplates(McpSyncServer mcpServer) {
+    @Override
+    protected void initResourceTemplates(McpSyncServer mcpServer) {
         for (McpSchema.ResourceTemplate template : joobyMcpServer.getResourceTemplates()) {
             var syncTemplateSpec = new McpServerFeatures.SyncResourceTemplateSpecification(
                     template,
@@ -157,32 +123,26 @@ public class McpServerRunner {
         }
     }
 
-    @SuppressWarnings("PMD.NPathComplexity")
-    private McpSchema.ServerCapabilities computeCapabilities() {
-        var builder = McpSchema.ServerCapabilities.builder();
-
-        if (!joobyMcpServer.getTools().isEmpty()) {
-            builder.tools(true);
+    @Override
+    protected void addToJoobyRegistry(McpSyncServer mcpServer) {
+        var registry = app.getServices();
+        if (isSingleServer) {
+            registry.put(McpSyncServer.class, mcpServer);
+        } else {
+            var serviceKey = ServiceKey.key(McpSyncServer.class, joobyMcpServer.getServerKey());
+            registry.put(serviceKey, mcpServer);
         }
-
-        if (!joobyMcpServer.getPrompts().isEmpty()) {
-            builder.prompts(true);
-        }
-
-        if (!joobyMcpServer.getCompletions().isEmpty()) {
-            builder.completions();
-        }
-
-        if (!joobyMcpServer.getResources().isEmpty()) {
-            builder.resources(true, true);
-        }
-
-        return builder.build();
     }
 
-    private void logMcpStart(McpSyncServer mcpServer) {
+    @Override
+    protected void close(McpSyncServer mcpServer) {
+        mcpServer.close();
+    }
+
+    @Override
+    protected void logMcpStart(McpSyncServer mcpServer) {
         LOG.info("""
-                                                
+                        
                         MCP server started with:
                             name: {}
                             version: {}
