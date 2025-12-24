@@ -11,6 +11,9 @@ import io.jooby.exception.StartupException;
 
 import java.util.List;
 
+import static io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig.Transport.SSE;
+import static io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig.Transport.STREAMABLE_HTTP;
+
 /**
  * MCP Inspector module for Jooby.
  *
@@ -47,6 +50,7 @@ import java.util.List;
  * </ul>
  *
  * @author kliushnichenko
+ * @since 1.9.0
  */
 public class McpInspectorModule implements Extension {
 
@@ -114,10 +118,8 @@ public class McpInspectorModule implements Extension {
     }
 
     private String buildConfigJson(McpServerConfig config, String location) {
-        var endpoint = McpServerConfig.Transport.STREAMABLE_HTTP == config.getTransport()
-                ? config.getMcpEndpoint()
-                : config.getSseEndpoint();
-
+        var endpoint = resolveEndpoint(config);
+        var transport = config.isSseTransport() ? SSE : STREAMABLE_HTTP;
         return """
                 {
                   "defaultEnvironment": {
@@ -127,7 +129,15 @@ public class McpInspectorModule implements Extension {
                   "defaultTransport": "%s",
                   "defaultServerUrl": "%s%s"
                 }
-                """.formatted(config.getTransport().getValue(), location, endpoint);
+                """.formatted(transport.getValue(), location, endpoint);
+    }
+
+    private String resolveEndpoint(McpServerConfig config) {
+        if (config.isSseTransport()) {
+            return config.getSseEndpoint();
+        } else {
+            return config.getMcpEndpoint();
+        }
     }
 
     @Override

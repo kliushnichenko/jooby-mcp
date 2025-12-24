@@ -32,8 +32,8 @@ public class McpServerConfig {
     @Getter
     public enum Transport {
         SSE("sse"),
-        STREAMABLE_HTTP("streamable-http");
-//        STATELESS_STREAMABLE_HTTP("stateless-streamable-http");
+        STREAMABLE_HTTP("streamable-http"),
+        STATELESS_STREAMABLE_HTTP("stateless-streamable-http");
 
         private final String value;
 
@@ -71,6 +71,10 @@ public class McpServerConfig {
         srvConfig.setKeepAliveInterval(getIntProp("keepAliveInterval", null, config));
 
         return srvConfig;
+    }
+
+    public boolean isSseTransport() {
+        return this.transport == Transport.SSE;
     }
 
     private static String resolveRequiredParam(Config config, String configPath) {

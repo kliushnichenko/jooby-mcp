@@ -18,7 +18,7 @@ Compatibility:
 
 Features:
 
-- [X] SSE and Streamable-HTTP transport
+- [X] SSE, Streamable-HTTP and Stateless Streamable-HTTP transport
 - [X] Multiple servers support
 - [X] Tools
 - [X] Prompts
@@ -94,14 +94,24 @@ Table of Contents:
       keepAliveInterval: 45            # Optional (default: N/A), in seconds
     }
     ```
-   `keepAliveInterval` - enables sending periodic keep-alive messages to the client.  
+
+   Full config for `Stateless Streamable HTTP` transport:
+   ```
+    mcp.default {
+      name: "my-awesome-mcp-server"    
+      version: "0.1.0"                 
+      transport: "stateless-streamable-http"    
+      mcpEndpoint: "/mcp/stateless-streamable"   # Optional (default: /mcp)
+    }
+    ```
+
+   *`keepAliveInterval` - enables sending periodic keep-alive messages to the client.  
    Disabled by default to avoid excessive network overhead. Set to a positive integer value (in seconds) to enable.
 
 4. Implement your features (tools, prompts, resources, etc.), see examples below or in
    the [example-project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example)
 
-5. Install the module. After compilation, you can observe generated `DefaultMcpServer` class. Now register its instance
-   in the module:
+5. Install the module. After compilation, you can observe generated `DefaultMcpServer` class. Now register its instance in the module:
    ```java
    {
       install(new JacksonModule());                    // a JSON encode/decoder is required for JSONRPC
@@ -218,8 +228,7 @@ public class ResourceExamples {
 }
 ```
 
-Find more examples in
-the [project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example/ResourceExamples.java)
+Find more examples in the [example-project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example/ResourceExamples.java)
 
 ### Resource Template Example
 

@@ -3,19 +3,21 @@ package io.github.kliushnichenko.jooby.mcp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.typesafe.config.Config;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import io.github.kliushnichenko.jooby.mcp.internal.BaseMcpServerRunner;
 import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
-import io.github.kliushnichenko.jooby.mcp.internal.McpServerRunner;
+import io.github.kliushnichenko.jooby.mcp.internal.McpSyncServerRunner;
+import io.github.kliushnichenko.jooby.mcp.internal.McpStatelessServerRunner;
 import io.jooby.Extension;
 import io.jooby.Jooby;
-import io.jooby.ServiceKey;
 import io.jooby.exception.StartupException;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
-import io.modelcontextprotocol.server.McpSyncServer;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig.Transport.STATELESS_STREAMABLE_HTTP;
 
 /**
  * MCP (Model Context Protocol) module for Jooby.
@@ -134,31 +136,33 @@ public class McpModule implements Extension {
             McpServerConfig serverConfig = resolveServerConfig(config, joobyMcpServer.getServerKey());
             joobyMcpServer.init(app, mcpJsonMapper);
 
-            var runner = new McpServerRunner(
-                    app,
-                    joobyMcpServer,
-                    serverConfig,
-                    mcpJsonMapper
-            );
-
-            McpSyncServer mcpServer = runner.run();
-            addToJoobyRegistry(app, joobyMcpServer.getServerKey(), mcpServer, serverConfig);
-            app.onStop(mcpServer::close);
+            var runner = buildMcpServerRunner(app, joobyMcpServer, serverConfig);
+            runner.run();
+            app.getServices().listOf(McpServerConfig.class).add(serverConfig);
         }
     }
 
-    private void addToJoobyRegistry(Jooby app,
-                                    String mcpServerKey,
-                                    McpSyncServer mcpServer,
-                                    McpServerConfig serverConfig) {
-        var registry = app.getServices();
-        if (hasSingleMcpServer()) {
-            registry.put(McpSyncServer.class, mcpServer);
+    private BaseMcpServerRunner<?> buildMcpServerRunner(Jooby app,
+                                                        JoobyMcpServer joobyMcpServer,
+                                                        McpServerConfig serverConfig) {
+        var isSingleServer = hasSingleMcpServer();
+        if (STATELESS_STREAMABLE_HTTP == serverConfig.getTransport()) {
+            return new McpStatelessServerRunner(
+                    app,
+                    joobyMcpServer,
+                    serverConfig,
+                    mcpJsonMapper,
+                    isSingleServer
+            );
         } else {
-            var serviceKey = ServiceKey.key(McpSyncServer.class, mcpServerKey);
-            registry.put(serviceKey, mcpServer);
+            return new McpSyncServerRunner(
+                    app,
+                    joobyMcpServer,
+                    serverConfig,
+                    mcpJsonMapper,
+                    isSingleServer
+            );
         }
-        registry.listOf(McpServerConfig.class).add(serverConfig);
     }
 
     private boolean hasSingleMcpServer() {
