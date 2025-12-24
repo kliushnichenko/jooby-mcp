@@ -46,7 +46,6 @@ public class McpStatelessServerRunner extends BaseMcpServerRunner<McpStatelessSy
                 .capabilities(computeCapabilities())
                 .completions(completions)
                 .build();
-
     }
 
     private List<McpStatelessServerFeatures.SyncCompletionSpecification> initCompletions() {
