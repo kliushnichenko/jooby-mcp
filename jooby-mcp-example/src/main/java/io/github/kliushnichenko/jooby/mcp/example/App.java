@@ -18,7 +18,7 @@ public class App extends Jooby {
         install(new JacksonModule());
         install(AvajeInjectModule.of());
         install(new McpModule(new ExampleMcpServer(), new WeatherMcpServer()));
-        install(new McpInspectorModule("/"));
+        install(new McpInspectorModule().path("/"));
     }
 
     public static void main(String[] args) {
