@@ -2,10 +2,7 @@ package io.github.kliushnichenko.mcp.inspector;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig;
-import io.jooby.Extension;
-import io.jooby.Jooby;
-import io.jooby.MediaType;
-import io.jooby.Reified;
+import io.jooby.*;
 import io.jooby.exception.RegistryException;
 import io.jooby.exception.StartupException;
 
@@ -56,7 +53,7 @@ public class McpInspectorModule implements Extension {
 
     private static final String DIST = "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/inspector-client@0.18.0/dist";
 
-    private static final String indexHtml = """
+    private static final String INDEX_HTML_TEMPLATE = """
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -66,44 +63,81 @@ public class McpInspectorModule implements Extension {
                 <title>MCP Inspector</title>
                 <script type="module" crossorigin src="%s/assets/index-Dw52pmVD.js"></script>
                 <link rel="stylesheet" crossorigin href="%s/assets/index-DoQUGvvr.css">
-                <script>localStorage.setItem("lastConnectionType", "direct");</script>
+                <script>
+                localStorage.setItem("lastConnectionType", "direct");
+                </script>
             </head>
             <body>
                 <div id="root" class="w-full"></div>
             </body>
+            %s
             </html>
-            """.formatted(DIST, DIST, DIST);
+            """;
+
+    private static final String AUTO_CONNECT_SCRIPT = """
+            <script>
+            const observer = new MutationObserver(() => {
+              const btn = [...document.querySelectorAll('button')]
+                .find(el => el.textContent.trim() === 'Connect');
+              if (btn) {
+                btn.click();
+                observer.disconnect();
+                console.log('Auto-connecting to MCP server...');
+              }
+            });
+            
+            observer.observe(document.body, { childList: true, subtree: true });
+            </script>
+            """;
 
     private static final String DEFAULT_ENDPOINT = "/mcp-inspector";
 
-    private final String inspectorEndpoint;
+    private String inspectorEndpoint = DEFAULT_ENDPOINT;
+    private boolean autoConnect = true;
     private McpServerConfig mcpSrvConfig;
+    private String indexHtml;
 
-    public McpInspectorModule(String inspectorEndpoint) {
+    public McpInspectorModule path(@NonNull String inspectorEndpoint) {
         this.inspectorEndpoint = inspectorEndpoint;
+        return this;
     }
 
-    public McpInspectorModule() {
-        this.inspectorEndpoint = DEFAULT_ENDPOINT;
+    public McpInspectorModule autoConnect(boolean autoConnect) {
+        this.autoConnect = autoConnect;
+        return this;
     }
 
     @Override
     public void install(@NonNull Jooby app) {
+        this.indexHtml = buildIndexHtml();
         this.mcpSrvConfig = resolveMcpServerConfig(app);
 
         app.get(inspectorEndpoint, ctx -> {
             if (ctx.query("MCP_PROXY_PORT").isMissing()) {
                 return ctx.sendRedirect(inspectorEndpoint + "?MCP_PROXY_PORT=" + ctx.getPort());
             } else {
-                return ctx.setResponseType(MediaType.html).render(indexHtml);
+                return ctx.setResponseType(MediaType.html).render(this.indexHtml);
             }
         });
 
         app.get("/config", ctx -> {
-            var location = ctx.getScheme() + "://" + ctx.getHostAndPort();
+            var location = resolveLocation(ctx);
             var configJson = buildConfigJson(mcpSrvConfig, location);
             return ctx.setResponseType(MediaType.json).render(configJson);
         });
+    }
+
+    private String buildIndexHtml() {
+        var script = this.autoConnect ? AUTO_CONNECT_SCRIPT : "";
+        return INDEX_HTML_TEMPLATE.formatted(DIST, DIST, DIST, script);
+    }
+
+    private String resolveLocation(Context ctx) {
+        if (ctx.getPort() == 80) {
+            return ctx.getScheme() + "://" + ctx.getHost();
+        } else {
+            return ctx.getScheme() + "://" + ctx.getHostAndPort();
+        }
     }
 
     private static McpServerConfig resolveMcpServerConfig(Jooby app) {

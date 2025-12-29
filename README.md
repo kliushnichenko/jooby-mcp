@@ -406,12 +406,16 @@ To enable it, just install the module alongside `McpModule`:
 }
 ```
 
-By default, inspector will be available at `/mcp-inspector` path. You can customize it over constructor argument:
+By default, inspector will be available at `/mcp-inspector` path. And it will try to auto-connect to MCP server upon loading.    
+You can customize both options over corresponding mutators:
 
 ```java
 {
-    install(new McpInspectorModule("/custom-inspector-path"));
-}
+    install(new McpInspectorModule()
+                .path("/custom-inspector-path")
+                .autoConnect(false);
+    );
+}:
 ```
 
 Dependency:
