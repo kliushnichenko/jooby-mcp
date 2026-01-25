@@ -60,12 +60,13 @@ class McpResourceHandler {
     private static McpSchema.ReadResourceResult handleListReturnType(
             Object result,
             String uri,
-            McpJsonMapper mcpJsonMapper, List<?> contents
+            McpJsonMapper mcpJsonMapper,
+            List<?> contents
     ) throws IOException {
         if (contents.isEmpty()) {
             return new McpSchema.ReadResourceResult(List.of());
         } else {
-            var item = contents.iterator().next();
+            var item = contents.getFirst();
             if (item instanceof McpSchema.ResourceContents) {
                 //noinspection unchecked
                 return new McpSchema.ReadResourceResult((List<McpSchema.ResourceContents>) contents);

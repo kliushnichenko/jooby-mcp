@@ -53,7 +53,7 @@ class McpCompletionHandler {
                         new McpSchema.CompleteResult.CompleteCompletion(List.of(), 0, false)
                 );
             } else {
-                var item = values.iterator().next();
+                var item = values.getFirst();
                 if (item instanceof String) {
                     //noinspection unchecked
                     return new McpSchema.CompleteResult(

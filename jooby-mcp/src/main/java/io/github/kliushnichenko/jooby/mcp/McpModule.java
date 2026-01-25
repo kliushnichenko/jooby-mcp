@@ -177,20 +177,6 @@ public class McpModule implements Extension {
         return McpServerConfig.fromConfig(config.getConfig(path));
     }
 
-    /**
-     * Use a custom Jackson ObjectMapper for JSON serialization/deserialization.
-     * <p>
-     * Deprecated since 1.4.0, use {@link #mcpJsonMapper(McpJsonMapper)} instead.
-     *
-     * @param mapper the custom ObjectMapper
-     * @return the current McpModule instance
-     */
-    @Deprecated(since = "1.4.0", forRemoval = true)
-    public McpModule objectMapper(ObjectMapper mapper) {
-        this.mcpJsonMapper = new JacksonMcpJsonMapper(mapper);
-        return this;
-    }
-
     public McpModule mcpJsonMapper(McpJsonMapper mcpJsonMapper) {
         this.mcpJsonMapper = mcpJsonMapper;
         return this;

@@ -70,7 +70,7 @@ class McpPromptHandler {
         if (items.isEmpty()) {
             return new McpSchema.GetPromptResult(null, List.of());
         } else {
-            var item = items.iterator().next();
+            var item = items.getFirst();
             if (item instanceof McpSchema.PromptMessage) {
                 return new McpSchema.GetPromptResult(null, result);
             } else {
