@@ -15,6 +15,7 @@ Compatibility:
 | Jooby Version | Jooby MCP Version |
 |---------------|-------------------|
 | 3.x           | 1.x               |
+| 4.x           | 2.x               |
 
 Features:
 
