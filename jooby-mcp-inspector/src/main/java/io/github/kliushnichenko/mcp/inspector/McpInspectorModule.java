@@ -32,6 +32,17 @@ import static io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig.Transp
  * }
  * }</pre>
  *
+ * All available configurations example:
+ * <pre>{@code
+ * {
+ *   install(new McpInspectorModule()
+ *      .path("/inspector")               // Optional, default is /mcp-inspector
+ *      .autoConnect(false)               // Optional, default is true
+ *      .defaultServer("my-mcp-server")   // Optional, default is the first configured MCP server
+ *   );
+ * }
+ * }</pre>
+ *
  * <h2>Configuration</h2>
  *
  * <p>
@@ -51,7 +62,7 @@ import static io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig.Transp
  */
 public class McpInspectorModule implements Extension {
 
-    private static final String DIST = "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/inspector-client@0.18.0/dist";
+    private static final String DIST = "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/inspector-client@0.19.0/dist";
 
     private static final String INDEX_HTML_TEMPLATE = """
             <!DOCTYPE html>
@@ -61,11 +72,9 @@ public class McpInspectorModule implements Extension {
                 <link rel="icon" type="image/svg+xml" href="%s/mcp.svg">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>MCP Inspector</title>
-                <script type="module" crossorigin src="%s/assets/index-Dw52pmVD.js"></script>
-                <link rel="stylesheet" crossorigin href="%s/assets/index-DoQUGvvr.css">
-                <script>
-                localStorage.setItem("lastConnectionType", "direct");
-                </script>
+                <script type="module" src="/mcp-inspector/static/initScript-3HVc23AL.js"></script>
+                <script type="module" crossorigin src="%s/assets/index-3HVc23AL.js"></script>
+                <link rel="stylesheet" crossorigin href="%s/assets/index-6PUMPh30.css">
             </head>
             <body>
                 <div id="root" class="w-full"></div>
@@ -75,25 +84,13 @@ public class McpInspectorModule implements Extension {
             """;
 
     private static final String AUTO_CONNECT_SCRIPT = """
-            <script>
-            const observer = new MutationObserver(() => {
-              const btn = [...document.querySelectorAll('button')]
-                .find(el => el.textContent.trim() === 'Connect');
-              if (btn) {
-                btn.click();
-                observer.disconnect();
-                console.log('Auto-connecting to MCP server...');
-              }
-            });
-            
-            observer.observe(document.body, { childList: true, subtree: true });
-            </script>
-            """;
+            <script src="/mcp-inspector/static/autoConnectScript-3HVc23AL.js"></script>""";
 
     private static final String DEFAULT_ENDPOINT = "/mcp-inspector";
 
     private String inspectorEndpoint = DEFAULT_ENDPOINT;
     private boolean autoConnect = true;
+    private String defaultServer;
     private McpServerConfig mcpSrvConfig;
     private String indexHtml;
 
@@ -107,20 +104,21 @@ public class McpInspectorModule implements Extension {
         return this;
     }
 
+    public McpInspectorModule defaultServer(@NonNull String mcpServerName) {
+        this.defaultServer = mcpServerName;
+        return this;
+    }
+
     @Override
     public void install(@NonNull Jooby app) {
         this.indexHtml = buildIndexHtml();
         this.mcpSrvConfig = resolveMcpServerConfig(app);
 
-        app.get(inspectorEndpoint, ctx -> {
-            if (ctx.query("MCP_PROXY_PORT").isMissing()) {
-                return ctx.sendRedirect(inspectorEndpoint + "?MCP_PROXY_PORT=" + ctx.getPort());
-            } else {
-                return ctx.setResponseType(MediaType.html).render(this.indexHtml);
-            }
-        });
+        app.assets("/mcp-inspector/static/*", "/mcpInspector/assets/");
 
-        app.get("/config", ctx -> {
+        app.get(inspectorEndpoint, ctx -> ctx.setResponseType(MediaType.html).render(this.indexHtml));
+
+        app.get("/mcp-inspector/config", ctx -> {
             var location = resolveLocation(ctx);
             var configJson = buildConfigJson(mcpSrvConfig, location);
             return ctx.setResponseType(MediaType.json).render(configJson);
@@ -140,12 +138,19 @@ public class McpInspectorModule implements Extension {
         }
     }
 
-    private static McpServerConfig resolveMcpServerConfig(Jooby app) {
+    private McpServerConfig resolveMcpServerConfig(Jooby app) {
         List<McpServerConfig> srvConfigs;
         try {
             srvConfigs = app.getServices().get(Reified.list(McpServerConfig.class));
         } catch (RegistryException ex) {
             throw new StartupException("MCP Inspector module requires at least one MCP server to be configured.");
+        }
+
+        if (defaultServer != null) {
+            return srvConfigs.stream()
+                    .filter(config -> config.getName().equals(defaultServer))
+                    .findFirst()
+                    .orElseThrow(() -> new StartupException("MCP server named '%s' not found".formatted(defaultServer)));
         }
 
         return srvConfigs.get(0);
