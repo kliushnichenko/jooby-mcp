@@ -1,7 +1,6 @@
 package io.github.kliushnichenko.jooby.mcp.example;
 
 import io.github.kliushnichenko.jooby.mcp.McpModule;
-
 import io.github.kliushnichenko.mcp.inspector.McpInspectorModule;
 import io.jooby.Jooby;
 import io.jooby.avaje.inject.AvajeInjectModule;
