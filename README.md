@@ -1,4 +1,4 @@
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg)](https://search.maven.org/artifact/io.github.kliushnichenko/jooby-mcp)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg)](https://central.sonatype.com/search?q=jooby-mcp)
 [![Javadoc](https://javadoc.io/badge/io.github.kliushnichenko/jooby-mcp/jooby-mcp.svg)](https://javadoc.io/doc/io.github.kliushnichenko/jooby-mcp/latest)
 [![Github](https://github.com/kliushnichenko/jooby-mcp/actions/workflows/maven.yml/badge.svg)](https://github.com/kliushnichenko/jooby-mcp/actions)
 
@@ -415,7 +415,17 @@ You can customize both options over corresponding mutators:
                 .path("/custom-inspector-path")
                 .autoConnect(false);
     );
-}:
+}
+```
+
+If  you have more than one MCP server registered, you can specify which one to connect to by default:
+
+```java
+{
+    install(new McpInspectorModule()
+                .defaultMcpServer("weather-mcp-server")  // server name from application.conf settings
+    );
+}
 ```
 
 Dependency:
