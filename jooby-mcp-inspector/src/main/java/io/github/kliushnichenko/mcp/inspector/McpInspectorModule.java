@@ -87,6 +87,7 @@ public class McpInspectorModule implements Extension {
             <script src="/mcp-inspector/static/autoConnectScript-3HVc23AL.js"></script>""";
 
     private static final String DEFAULT_ENDPOINT = "/mcp-inspector";
+    public static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
 
     private String inspectorEndpoint = DEFAULT_ENDPOINT;
     private boolean autoConnect = true;
@@ -131,10 +132,19 @@ public class McpInspectorModule implements Extension {
     }
 
     private String resolveLocation(Context ctx) {
+        var scheme = resolveSchema(ctx);
         if (ctx.getPort() == 80) {
-            return ctx.getScheme() + "://" + ctx.getHost();
+            return scheme + "://" + ctx.getHost();
         } else {
-            return ctx.getScheme() + "://" + ctx.getHostAndPort();
+            return scheme + "://" + ctx.getHostAndPort();
+        }
+    }
+
+    private String resolveSchema(Context ctx) {
+        if (ctx.header(X_FORWARDED_PROTO).isPresent()) {
+            return ctx.header(X_FORWARDED_PROTO).value();
+        } else {
+            return ctx.getScheme();
         }
     }
 
