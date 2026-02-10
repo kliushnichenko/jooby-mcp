@@ -49,7 +49,7 @@ public class McpSyncServerRunner extends BaseMcpServerRunner<McpSyncServer> {
                     app,
                     mcpJsonMapper,
                     serverConfig,
-                    request -> McpTransportContext.EMPTY
+                    CTX_EXTRACTOR
             );
 
             return McpServer.sync(transportProvider)

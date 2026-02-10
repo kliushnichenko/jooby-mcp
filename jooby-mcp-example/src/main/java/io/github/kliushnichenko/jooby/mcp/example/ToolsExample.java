@@ -3,6 +3,7 @@ package io.github.kliushnichenko.jooby.mcp.example;
 import io.github.kliushnichenko.jooby.mcp.annotation.OutputSchema;
 import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
 import io.github.kliushnichenko.jooby.mcp.annotation.ToolArg;
+import io.jooby.Context;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Singleton;
@@ -34,7 +35,7 @@ public class ToolsExample {
     }
 
     @Tool(name = "pi_sign_image", description = "Returns an image of the Pi")
-    public McpSchema.ImageContent getPiSIgnImage() {
+    public McpSchema.ImageContent getPiSignImage() {
         return new McpSchema.ImageContent(null, PI_SIGN_IMAGE, "image/png");
     }
 
