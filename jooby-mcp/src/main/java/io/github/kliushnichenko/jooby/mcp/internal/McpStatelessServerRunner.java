@@ -4,7 +4,6 @@ import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
 import io.github.kliushnichenko.jooby.mcp.transport.JoobyStatelessServerTransport;
 import io.jooby.Jooby;
 import io.jooby.ServiceKey;
-import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpStatelessServerFeatures;
@@ -40,7 +39,7 @@ public class McpStatelessServerRunner extends BaseMcpServerRunner<McpStatelessSy
                 app,
                 mcpJsonMapper,
                 serverConfig,
-                request -> McpTransportContext.EMPTY);
+                CTX_EXTRACTOR);
         return McpServer.sync(transportProvider)
                 .serverInfo(serverConfig.getName(), serverConfig.getVersion())
                 .capabilities(computeCapabilities())

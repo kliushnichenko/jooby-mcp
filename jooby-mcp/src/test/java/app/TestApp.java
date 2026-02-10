@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.kliushnichenko.jooby.mcp.McpModule;
 import io.jooby.Jooby;
 import io.jooby.jackson.JacksonModule;
+import test.SchemaAnnotationTest;
 
 
 public class TestApp extends Jooby {
@@ -17,6 +18,7 @@ public class TestApp extends Jooby {
         getServices().put(ToolsOutputSchemaTestCases.class, new ToolsOutputSchemaTestCases());
         getServices().put(ToolsAnnotationsTestCases.class, new ToolsAnnotationsTestCases());
         getServices().put(ToolsStructuredContentTestCases.class, new ToolsStructuredContentTestCases());
+        getServices().put(SchemaAnnotationTestCases.class, new SchemaAnnotationTestCases());
 
         install(new McpModule(new DefaultMcpServer()));
     }

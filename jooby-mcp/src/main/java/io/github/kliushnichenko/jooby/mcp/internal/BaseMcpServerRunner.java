@@ -1,11 +1,24 @@
 package io.github.kliushnichenko.jooby.mcp.internal;
 
 import io.github.kliushnichenko.jooby.mcp.JoobyMcpServer;
+import io.jooby.Context;
 import io.jooby.Jooby;
+import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;
+import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import io.modelcontextprotocol.spec.McpSchema;
 
+import java.util.Map;
+import java.util.function.Function;
+
 public abstract class BaseMcpServerRunner<S> {
+
+    protected static final McpTransportContextExtractor<Context> CTX_EXTRACTOR = ctx -> {
+        var transportContext = Map.<String, Object>of(
+                "HEADERS", ctx.headerMap()
+        );
+        return McpTransportContext.create(transportContext);
+    };
 
     protected final Jooby app;
     protected final JoobyMcpServer joobyMcpServer;
