@@ -185,7 +185,9 @@ public class McpProcessor extends AbstractProcessor {
         Set<String> servers = new HashSet<>();
         for (Element element : serverElements) {
             McpServer annotation = element.getAnnotation(McpServer.class);
-            servers.add(annotation.value());
+            if (!annotation.value().isEmpty()) {
+                servers.add(annotation.value());
+            }
         }
         serverKeys.addAll(servers);
     }

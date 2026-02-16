@@ -51,7 +51,7 @@ public class McpServerGenerator {
      * @throws IOException if an I/O error occurs
      */
     private String generateMcpServer(McpServerDescriptor serverDescriptor) throws IOException {
-        String className = capitalize(serverDescriptor.serverKey()) + MCP_SERVER_CLASS_NAME;
+        String className = normalizeClassName(serverDescriptor.serverKey()) + MCP_SERVER_CLASS_NAME;
 
         TypeSpec.Builder mcpServerBuilder = TypeSpec.classBuilder(className)
                 .addModifiers(Modifier.PUBLIC)
@@ -156,8 +156,23 @@ public class McpServerGenerator {
         }
     }
 
-    private String capitalize(String str) {
-        var lowerCase = str.toLowerCase();
-        return Character.toUpperCase(lowerCase.charAt(0)) + lowerCase.substring(1);
+    private String normalizeClassName(String input) {
+        StringBuilder result = new StringBuilder();
+        boolean capitalizeNext = true;
+
+        for (char c : input.toCharArray()) {
+            if (Character.isLetterOrDigit(c)) {
+                if (capitalizeNext) {
+                    result.append(Character.toUpperCase(c));
+                    capitalizeNext = false;
+                } else {
+                    result.append(Character.toLowerCase(c));
+                }
+            } else {
+                capitalizeNext = true;
+            }
+        }
+
+        return result.toString();
     }
 }
