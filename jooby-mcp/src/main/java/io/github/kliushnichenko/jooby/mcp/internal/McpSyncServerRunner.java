@@ -5,7 +5,6 @@ import io.github.kliushnichenko.jooby.mcp.transport.JoobySseTransportProvider;
 import io.github.kliushnichenko.jooby.mcp.transport.JoobyStreamableServerTransportProvider;
 import io.jooby.Jooby;
 import io.jooby.ServiceKey;
-import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpServerFeatures;
