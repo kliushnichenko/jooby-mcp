@@ -9,7 +9,6 @@ import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import io.modelcontextprotocol.spec.McpSchema;
 
 import java.util.Map;
-import java.util.function.Function;
 
 public abstract class BaseMcpServerRunner<S> {
 

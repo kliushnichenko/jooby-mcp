@@ -19,7 +19,7 @@
 
     <properties>
         <application.class>io.github.kliushnichenko.jooby.mcp.example.App</application.class>
-        <avaje.inject.version>11.4</avaje.inject.version>
+        <avaje.inject.version>12.4</avaje.inject.version>
     </properties>
 
     <dependencies>
@@ -111,7 +111,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>3.6.1</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <transformers>
