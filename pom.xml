@@ -41,7 +41,8 @@
         <revision>2.0.3-SNAPSHOT</revision>
 
         <jooby.version>4.0.15</jooby.version>
-        <jackson.version>2.21.0</jackson.version>
+        <jackson2.version>2.21.0</jackson2.version>
+        <jackson.annotations.version>2.21</jackson.annotations.version>
         <mcp.sdk.version>0.17.2</mcp.sdk.version>
         <lombok.version>1.18.42</lombok.version>
         <junit.version>6.0.3</junit.version>
@@ -118,13 +119,13 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
+                <version>${jackson2.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>${jackson.version}</version>
+                <version>${jackson.annotations.version}</version>
             </dependency>
 
             <dependency>
