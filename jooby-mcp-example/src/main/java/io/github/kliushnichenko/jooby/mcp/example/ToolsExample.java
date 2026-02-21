@@ -42,6 +42,12 @@ public class ToolsExample {
     @Tool(name = "get_client_info", description = "Returns the information about the client initiated the request")
     @OutputSchema.Suppressed
     public McpSchema.Implementation getClientInfo(McpSyncServerExchange exchange) {
+
+        try {
+            Thread.sleep(15_000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         return exchange.getClientInfo();
     }
 }

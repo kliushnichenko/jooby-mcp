@@ -38,12 +38,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <revision>2.0.4-SNAPSHOT</revision>
+        <revision>2.1.0</revision>
 
         <jooby.version>4.0.15</jooby.version>
         <jackson2.version>2.21.0</jackson2.version>
         <jackson.annotations.version>2.21</jackson.annotations.version>
-        <mcp.sdk.version>0.17.2</mcp.sdk.version>
+        <mcp.sdk.version>0.18.1</mcp.sdk.version>
         <lombok.version>1.18.42</lombok.version>
         <junit.version>6.0.3</junit.version>
         <pmd.version>7.16.0</pmd.version>

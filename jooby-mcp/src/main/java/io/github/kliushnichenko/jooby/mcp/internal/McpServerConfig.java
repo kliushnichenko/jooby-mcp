@@ -23,6 +23,7 @@ public class McpServerConfig {
     private String mcpEndpoint = DEFAULT_MCP_ENDPOINT;
     private boolean disallowDelete;
     private Integer keepAliveInterval;
+    private String instructions;
 
     public McpServerConfig(String name, String version) {
         this.name = name;
@@ -67,6 +68,7 @@ public class McpServerConfig {
         srvConfig.setSseEndpoint(getStrProp("sseEndpoint", DEFAULT_SSE_ENDPOINT, config));
         srvConfig.setMessageEndpoint(getStrProp("messageEndpoint", DEFAULT_MESSAGE_ENDPOINT, config));
         srvConfig.setMcpEndpoint(getStrProp("mcpEndpoint", DEFAULT_MCP_ENDPOINT, config));
+        srvConfig.setInstructions(getStrProp("instructions", null, config));
         srvConfig.setDisallowDelete(getBoolProp("disallowDelete", false, config));
         srvConfig.setKeepAliveInterval(getIntProp("keepAliveInterval", null, config));
 

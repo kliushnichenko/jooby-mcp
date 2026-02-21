@@ -44,6 +44,7 @@ public class McpStatelessServerRunner extends BaseMcpServerRunner<McpStatelessSy
                 .serverInfo(serverConfig.getName(), serverConfig.getVersion())
                 .capabilities(computeCapabilities())
                 .completions(completions)
+                .instructions(serverConfig.getInstructions())
                 .build();
     }
 

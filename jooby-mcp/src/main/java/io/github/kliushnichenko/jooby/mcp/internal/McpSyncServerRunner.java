@@ -42,6 +42,7 @@ public class McpSyncServerRunner extends BaseMcpServerRunner<McpSyncServer> {
                     .serverInfo(serverConfig.getName(), serverConfig.getVersion())
                     .capabilities(computeCapabilities())
                     .completions(completions)
+                    .instructions(serverConfig.getInstructions())
                     .build();
         } else if (McpServerConfig.Transport.STREAMABLE_HTTP == serverConfig.getTransport()) {
             var transportProvider = new JoobyStreamableServerTransportProvider(
@@ -55,6 +56,7 @@ public class McpSyncServerRunner extends BaseMcpServerRunner<McpSyncServer> {
                     .serverInfo(serverConfig.getName(), serverConfig.getVersion())
                     .capabilities(computeCapabilities())
                     .completions(completions)
+                    .instructions(serverConfig.getInstructions())
                     .build();
         } else {
             throw new IllegalStateException("Unsupported transport: " + serverConfig.getTransport());
