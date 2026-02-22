@@ -62,7 +62,7 @@ import static io.github.kliushnichenko.jooby.mcp.internal.McpServerConfig.Transp
  */
 public class McpInspectorModule implements Extension {
 
-    private static final String DIST = "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/inspector-client@0.19.0/dist";
+    private static final String DIST = "https://cdn.jsdelivr.net/npm/@modelcontextprotocol/inspector-client@0.20.0/dist";
 
     private static final String INDEX_HTML_TEMPLATE = """
             <!DOCTYPE html>
@@ -72,9 +72,9 @@ public class McpInspectorModule implements Extension {
                 <link rel="icon" type="image/svg+xml" href="%s/mcp.svg">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>MCP Inspector</title>
-                <script type="module" src="/mcp-inspector/static/initScript-3HVc23AL.js"></script>
-                <script type="module" crossorigin src="%s/assets/index-3HVc23AL.js"></script>
-                <link rel="stylesheet" crossorigin href="%s/assets/index-6PUMPh30.css">
+                <script type="module" src="/mcp-inspector/static/initScript-B8iPFz0O.js"></script>
+                <script type="module" crossorigin src="%s/assets/index-B8iPFz0O.js"></script>
+                <link rel="stylesheet" crossorigin href="%s/assets/index-DdtP67NK.css">
             </head>
             <body>
                 <div id="root" class="w-full"></div>
@@ -84,7 +84,7 @@ public class McpInspectorModule implements Extension {
             """;
 
     private static final String AUTO_CONNECT_SCRIPT = """
-            <script src="/mcp-inspector/static/autoConnectScript-3HVc23AL.js"></script>""";
+            <script src="/mcp-inspector/static/autoConnectScript-B8iPFz0O.js"></script>""";
 
     private static final String DEFAULT_ENDPOINT = "/mcp-inspector";
     public static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
