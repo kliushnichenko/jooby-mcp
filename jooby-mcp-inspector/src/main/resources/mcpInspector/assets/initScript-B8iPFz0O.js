@@ -31,6 +31,13 @@ const DEFAULT_INSPECTOR_CONFIG = {
         description: "Session token for authenticating with the MCP Proxy Server (displayed in proxy console on startup)",
         value: "",
         is_session_item: true
+    },
+    MCP_TASK_TTL: {
+        label: "Task TTL",
+        description:
+            "Default Time-to-Live (TTL) in milliseconds for newly created tasks",
+        value: 60000,
+        is_session_item: false
     }
 };
 

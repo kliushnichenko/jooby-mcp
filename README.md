@@ -93,6 +93,7 @@ Table of Contents:
       mcpEndpoint: "/mcp/streamable"   # Optional (default: /mcp), applicable only to Streamable HTTP transport
       disallowDelete: true             # Optional (default: false)
       keepAliveInterval: 45            # Optional (default: N/A), in seconds
+      instructions: "..."              # Optional 
     }
     ```
 
@@ -108,6 +109,8 @@ Table of Contents:
 
    *`keepAliveInterval` - enables sending periodic keep-alive messages to the client.  
    Disabled by default to avoid excessive network overhead. Set to a positive integer value (in seconds) to enable.
+   
+   *`instructions` - Sets the server instructions that will be shared with clients during connection initialization. These instructions provide guidance to the client on how to interact with this server.
 
 4. Implement your features (tools, prompts, resources, etc.), see examples below or in
    the [example-project](https://github.com/kliushnichenko/jooby-mcp/blob/1.x/jooby-mcp-example/src/main/java/io/github/kliushnichenko/mcp/example)

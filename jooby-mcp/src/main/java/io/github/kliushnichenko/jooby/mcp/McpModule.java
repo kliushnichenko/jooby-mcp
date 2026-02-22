@@ -11,7 +11,7 @@ import io.jooby.Extension;
 import io.jooby.Jooby;
 import io.jooby.exception.StartupException;
 import io.modelcontextprotocol.json.McpJsonMapper;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
+import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapper;
 
 import java.util.ArrayList;
 import java.util.Collections;

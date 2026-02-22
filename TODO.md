@@ -10,7 +10,5 @@
 
 - inject TransportContext
 - support async server?
-
-Inspector:
-- W/A for MCP_PROXY_FULL_ADDRESS cached in localstorage
-- `/config` customize endpoint if possible 
+- validators integration
+- export mcp.json manifest

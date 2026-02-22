@@ -5,6 +5,7 @@ import io.github.kliushnichenko.jooby.mcp.annotation.Tool;
 import io.github.kliushnichenko.jooby.mcp.apt.AnnMirrorUtils;
 import io.github.kliushnichenko.jooby.mcp.apt.BaseMethodCollector;
 import io.modelcontextprotocol.spec.McpSchema;
+import io.modelcontextprotocol.util.ToolNameValidator;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
@@ -62,6 +63,9 @@ public class ToolsCollector extends BaseMethodCollector {
                 Tool toolAnnotation = method.getAnnotation(Tool.class);
                 TypeMirror outputType = evalOutputType(method);
                 McpSchema.ToolAnnotations toolAnnotations = evalToolAnnotations(method, toolAnnotation);
+
+                var toolName = extractToolName(method, toolAnnotation);
+                ToolNameValidator.validate(toolName, true);
 
                 toolEntries.add(new ToolEntry(
                         extractToolName(method, toolAnnotation),
