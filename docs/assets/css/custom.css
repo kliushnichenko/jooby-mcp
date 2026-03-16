@@ -1,0 +1,43 @@
+/* Custom CSS for the docs site. Hextra loads this file automatically. */
+
+/*
+ * Syntax highlight theme (Chroma)
+ * Hextra does not expose a config param for the highlight style; you override via CSS.
+ *
+ * To use a different style (e.g. monokai, nord, solarized-dark):
+ *   1. Run: hugo gen chromastyles --style=STYLE > chroma-STYLE.css
+ *   2. Save that file here (e.g. assets/css/chroma-monokai.css)
+ *   3. Uncomment and adapt the import below, or paste the generated rules here.
+ *
+ * Style names: github, monokai, nord, solarized-dark, solarized-light, dracula, etc.
+ * Gallery: https://xyproto.github.io/splash/docs/all.html
+ */
+/* Chroma (syntax highlight): light mode */
+@import "/css/chroma-github.css";
+/* Dark mode: Tokyo Night Moon */
+@import "/css/chroma-tokyonight-moon.css";
+
+/* Wider layout: page (sidebar+content), content column, and navbar. Defaults: 80rem. */
+:root {
+  --hextra-max-page-width: 96rem;    /* whole row (sidebar + content) */
+  --hextra-max-content-width: 80rem; /* main text/code column */
+  --hextra-max-navbar-width: 96rem; /* align navbar with page width */
+}
+/* Force widths in case variables are overridden by load order */
+.hextra-max-page-width {
+  max-width: 96rem;
+}
+.hextra-max-navbar-width {
+  max-width: 96rem;
+}
+#content.hextra-max-content-width,
+main.hextra-max-content-width {
+  max-width: 80rem;
+}
+
+/* Code block font-size: override Hextra’s default (.9em). Target the same wrappers Hextra uses. */
+.highlight pre,
+.hextra-code-block,
+.hextra-code-block pre {
+  font-size: 0.875rem; /* 14px; change to e.g. 0.8125rem (13px) or 1rem (16px) as needed */
+}

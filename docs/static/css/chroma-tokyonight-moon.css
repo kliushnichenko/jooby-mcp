@@ -1,0 +1,73 @@
+/* Tokyo Night Moon – dark mode only (scoped under .dark). Use .highlight for specificity. */
+
+.dark .highlight .bg { color:#c8d3f5; background-color:#222436; }
+.dark .highlight .chroma { color:#c8d3f5; background-color:#222436; -webkit-text-size-adjust:none; }
+.dark .highlight .chroma .err { color:#c53b53 }
+.dark .highlight .chroma .lnlinks { outline:none; text-decoration:none; color:inherit }
+.dark .highlight .chroma .lntd { vertical-align:top; padding:0; margin:0; border:0; }
+.dark .highlight .chroma .lntable { border-spacing:0; padding:0; margin:0; border:0; }
+.dark .highlight .chroma .hl { background-color:#444a73 }
+.dark .highlight .chroma .lnt { white-space:pre; -webkit-user-select:none; user-select:none; margin-right:0.4em; padding:0 0.4em 0 0.4em; color:#828bb8 }
+.dark .highlight .chroma .ln { white-space:pre; -webkit-user-select:none; user-select:none; margin-right:0.4em; padding:0 0.4em 0 0.4em; color:#828bb8 }
+.dark .highlight .chroma .line { display:flex; }
+.dark .highlight .chroma .k { color:#c099ff }
+.dark .highlight .chroma .kc { color:#ffc777 }
+.dark .highlight .chroma .kd { color:#c099ff }
+.dark .highlight .chroma .kn { color:#86e1fc }
+.dark .highlight .chroma .kp { color:#c099ff }
+.dark .highlight .chroma .kr { color:#c099ff }
+.dark .highlight .chroma .kt { color:#4fd6be }
+.dark .highlight .chroma .na { color:#82aaff }
+.dark .highlight .chroma .nc { color:#ff966c }
+.dark .highlight .chroma .no { color:#ff966c }
+.dark .highlight .chroma .nd { color:#82aaff; font-weight:bold }
+.dark .highlight .chroma .ni { color:#86e1fc }
+.dark .highlight .chroma .ne { color:#ffc777 }
+.dark .highlight .chroma .nl { color:#c3e88d }
+.dark .highlight .chroma .nn { color:#ffc777 }
+.dark .highlight .chroma .py { color:#ffc777 }
+.dark .highlight .chroma .nt { color:#c099ff }
+.dark .highlight .chroma .nb { color:#c3e88d }
+.dark .highlight .chroma .bp { color:#c3e88d }
+.dark .highlight .chroma .nf { color:#82aaff }
+.dark .highlight .chroma .fm { color:#82aaff }
+.dark .highlight .chroma .s { color:#c3e88d }
+.dark .highlight .chroma .sa { color:#c099ff }
+.dark .highlight .chroma .sb { color:#c3e88d }
+.dark .highlight .chroma .sc { color:#c3e88d }
+.dark .highlight .chroma .dl { color:#82aaff }
+.dark .highlight .chroma .sd { color:#444a73 }
+.dark .highlight .chroma .s2 { color:#c3e88d }
+.dark .highlight .chroma .se { color:#82aaff }
+.dark .highlight .chroma .sh { color:#444a73 }
+.dark .highlight .chroma .si { color:#c3e88d }
+.dark .highlight .chroma .sx { color:#c3e88d }
+.dark .highlight .chroma .sr { color:#86e1fc }
+.dark .highlight .chroma .s1 { color:#c3e88d }
+.dark .highlight .chroma .ss { color:#c3e88d }
+.dark .highlight .chroma .m { color:#ffc777 }
+.dark .highlight .chroma .mb { color:#ffc777 }
+.dark .highlight .chroma .mf { color:#ffc777 }
+.dark .highlight .chroma .mh { color:#ffc777 }
+.dark .highlight .chroma .mi { color:#ffc777 }
+.dark .highlight .chroma .il { color:#ffc777 }
+.dark .highlight .chroma .mo { color:#ffc777 }
+.dark .highlight .chroma .o { color:#c3e88d; font-weight:bold }
+.dark .highlight .chroma .ow { color:#c3e88d; font-weight:bold }
+.dark .highlight .chroma .p { color:#c8d3f5; }
+.dark .highlight .chroma .c { color:#444a73; font-style:italic }
+.dark .highlight .chroma .ch { color:#444a73; font-style:italic }
+.dark .highlight .chroma .cm { color:#444a73; font-style:italic }
+.dark .highlight .chroma .c1 { color:#444a73; font-style:italic }
+.dark .highlight .chroma .cs { color:#444a73; font-style:italic }
+.dark .highlight .chroma .cp { color:#444a73; font-style:italic }
+.dark .highlight .chroma .cpf { color:#444a73; font-weight:bold; font-style:italic }
+.dark .highlight .chroma .gd { color:#c53b53; background-color:#1b1d2b }
+.dark .highlight .chroma .ge { font-style:italic }
+.dark .highlight .chroma .gr { color:#c53b53 }
+.dark .highlight .chroma .gh { color:#ffc777; font-weight:bold }
+.dark .highlight .chroma .gi { color:#c3e88d; background-color:#1b1d2b }
+.dark .highlight .chroma .gs { font-weight:bold }
+.dark .highlight .chroma .gu { color:#ffc777; font-weight:bold }
+.dark .highlight .chroma .gt { color:#c53b53 }
+.dark .highlight .chroma .gl { text-decoration:underline }
