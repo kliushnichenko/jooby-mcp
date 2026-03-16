@@ -6,10 +6,10 @@ weight: 1
 ---
 
 <p style="display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; margin-bottom: 1rem;">
-  <a about="_blank" href="https://central.sonatype.com/search?q=jooby-mcp"><img src="https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg" alt="Maven Central" loading="lazy" decoding="async"></a>
-  <a about="_blank" href="https://mvnrepository.com/artifact/io.github.kliushnichenko/jooby-mcp"><img src="https://badges.mvnrepository.com/badge/io.github.kliushnichenko/jooby-mcp/badge.svg?label=MvnRepository&color=green" alt="MvnRepository" loading="lazy" decoding="async"></a>
+  <a target="_blank" href="https://central.sonatype.com/search?q=jooby-mcp"><img src="https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg" alt="Maven Central" loading="lazy" decoding="async"></a>
+  <a target="_blank" href="https://mvnrepository.com/artifact/io.github.kliushnichenko/jooby-mcp"><img src="https://badges.mvnrepository.com/badge/io.github.kliushnichenko/jooby-mcp/badge.svg?label=MvnRepository&color=green" alt="MvnRepository" loading="lazy" decoding="async"></a>
   <a><img src="https://badge.mcpx.dev" alt="MCP" loading="lazy" decoding="async"></a>
-  <a about="_blank" href="https://javadoc.io/doc/io.github.kliushnichenko/jooby-mcp/latest"><img src="https://javadoc.io/badge/io.github.kliushnichenko/jooby-mcp/jooby-mcp.svg" alt="Javadoc" loading="lazy" decoding="async"></a>
+  <a target="_blank" href="https://javadoc.io/doc/io.github.kliushnichenko/jooby-mcp/latest"><img src="https://javadoc.io/badge/io.github.kliushnichenko/jooby-mcp/jooby-mcp.svg" alt="Javadoc" loading="lazy" decoding="async"></a>
 </p>
 
 ## What is jooby-mcp?

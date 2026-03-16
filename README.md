@@ -11,7 +11,7 @@ processor, so no runtime reflection is required.
 
 ⭐ **If you find this project useful, consider giving it a star. It helps others discover it**
 
-🚀 Quickstart, guides, and API reference available in the [docs](https://kliushnichenko.github.io/jooby-mcp/)
+🚀 Quickstart, guides, and API reference available in the <a target="_blank" href="https://kliushnichenko.github.io/jooby-mcp/">docs</a>
 
 ### Features
 
