@@ -1,0 +1,18 @@
+{{- /* JSON-LD SoftwareApplication for search engines (home page only) */ -}}
+{{- if .IsHome }}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "jooby-mcp",
+  "applicationCategory": "DeveloperApplication",
+  "description": "{{ .Site.Params.description | default "Integrate MCP Java SDK with Jooby. Annotation-based tools, prompts, and resources with build-time discovery." | safeJS }}",
+  "url": "{{ .Permalink }}",
+  "operatingSystem": "JVM",
+  "offers": {
+    "@type": "Offer",
+    "url": "https://central.sonatype.com/artifact/io.github.kliushnichenko/jooby-mcp"
+  }
+}
+</script>
+{{- end }}

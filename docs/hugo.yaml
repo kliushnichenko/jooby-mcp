@@ -1,0 +1,62 @@
+baseURL: "https://kliushnichenko.github.io/jooby-mcp"
+languageCode: "en-us"
+title: "∞ jooby-mcp"
+
+module:
+  hugoVersion:
+    min: "0.146.0"
+  imports:
+    - path: "github.com/imfing/hextra"
+
+markup:
+  highlight:
+    noClasses: false
+  goldmark:
+    renderer:
+      unsafe: true
+
+menu:
+  main:
+    - name: "Documentation"
+      pageRef: "/"
+      weight: 10
+    - name: "GitHub"
+      url: "https://github.com/kliushnichenko/jooby-mcp"
+      weight: 15
+    - name: "Search"
+      weight: 20
+      params:
+        type: "search"
+
+# Analytics: ID is set via env HUGO_SERVICES_GOOGLEANALYTICS_ID in CI (use secret GA_MEASUREMENT_ID)
+services:
+  googleAnalytics:
+    ID: ""
+
+params:
+  description: "Jooby MCP - Integrate Java MCP SDK with Jooby framework. Annotation-based MCP tools, prompts, and resources for Jooby apps."
+  # Default image for Open Graph / social sharing (optional: add a 1200×630 image for better previews)
+  images:
+    - "images/mcp_logo.svg"
+  defaultTheme: "auto"
+  navbar:
+    displayTitle: true
+    displayLogo: true
+    logo:
+      path: images/mcp_logo.svg
+      dark: images/dark_mcp_logo.svg
+      link: /
+      width: 40
+      height: 20
+  footer:
+    enable: false
+  search:
+    enable: true
+  editURL:
+    enable: true
+    base: "https://github.com/kliushnichenko/jooby-mcp/edit/main/docs"
+  # Code block copy button (Hextra)
+  highlight:
+    copy:
+      enable: true
+      display: "hover"   # "hover" or "always"
