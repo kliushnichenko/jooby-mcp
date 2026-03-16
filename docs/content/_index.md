@@ -6,24 +6,23 @@ weight: 1
 ---
 
 <p style="display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; margin-bottom: 1rem;">
-  <a href="https://central.sonatype.com/search?q=jooby-mcp"><img src="https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg" alt="Maven Central" loading="lazy" decoding="async"></a>
-  <a href="https://mvnrepository.com/artifact/io.github.kliushnichenko/jooby-mcp"><img src="https://badges.mvnrepository.com/badge/io.github.kliushnichenko/jooby-mcp/badge.svg?label=MvnRepository&color=green" alt="MvnRepository" loading="lazy" decoding="async"></a>
+  <a about="_blank" href="https://central.sonatype.com/search?q=jooby-mcp"><img src="https://img.shields.io/maven-central/v/io.github.kliushnichenko/jooby-mcp.svg" alt="Maven Central" loading="lazy" decoding="async"></a>
+  <a about="_blank" href="https://mvnrepository.com/artifact/io.github.kliushnichenko/jooby-mcp"><img src="https://badges.mvnrepository.com/badge/io.github.kliushnichenko/jooby-mcp/badge.svg?label=MvnRepository&color=green" alt="MvnRepository" loading="lazy" decoding="async"></a>
   <a><img src="https://badge.mcpx.dev" alt="MCP" loading="lazy" decoding="async"></a>
-  <a href="https://javadoc.io/doc/io.github.kliushnichenko/jooby-mcp/latest"><img src="https://javadoc.io/badge/io.github.kliushnichenko/jooby-mcp/jooby-mcp.svg" alt="MvnRepository" loading="lazy" decoding="async"></a>
+  <a about="_blank" href="https://javadoc.io/doc/io.github.kliushnichenko/jooby-mcp/latest"><img src="https://javadoc.io/badge/io.github.kliushnichenko/jooby-mcp/jooby-mcp.svg" alt="Javadoc" loading="lazy" decoding="async"></a>
 </p>
 
 ## What is jooby-mcp?
 
 **jooby-mcp** integrates the [Model Context Protocol (MCP) Java SDK](https://github.com/modelcontextprotocol/java-sdk)
-with the [Jooby](https://github.com/jooby-project/jooby) framework. It lets you expose **tools**, **prompts**, and *
-*resources** to MCP clients using declarative, annotation-based APIs—with discovery at **build time** via an annotation
+with the [Jooby](https://github.com/jooby-project/jooby) framework. It lets you expose **tools**, **prompts**, and **resources** to MCP clients using declarative, annotation-based APIs with discovery at **build time** via an annotation
 processor, so no runtime reflection is required.
 
 ## Prerequisites
 
 - A [Jooby](https://jooby.io) application (3.x or 4.x).
 - Basic familiarity with MCP
-  concepts ([tools](https://spec.modelcontextprotocol.io/specification/2025-05-26/basic/tools/), [prompts](https://spec.modelcontextprotocol.io/specification/2025-05-26/basic/prompts/), [resources](https://spec.modelcontextprotocol.io/specification/2025-05-26/basic/resources/))
+  concepts ([tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools), [prompts](https://modelcontextprotocol.io/specification/2025-11-25/server/prompts), [resources](https://modelcontextprotocol.io/specification/2025-11-25/server/resources))
   is helpful but not required.
 
 ## Version compatibility

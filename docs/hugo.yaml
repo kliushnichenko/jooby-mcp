@@ -45,7 +45,7 @@ params:
     logo:
       path: images/mcp_logo.svg
       dark: images/dark_mcp_logo.svg
-      link: /
+      link: /jooby-mcp/
       width: 40
       height: 20
   footer:
