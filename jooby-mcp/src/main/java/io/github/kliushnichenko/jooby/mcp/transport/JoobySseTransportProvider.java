@@ -78,6 +78,18 @@ public class JoobySseTransportProvider implements McpServerTransportProvider {
     }
 
     @Override
+    public Mono<Void> notifyClient(String sessionId, String method, Object params) {
+        return Mono.defer(() -> {
+            McpServerSession session = this.sessions.get(sessionId);
+            if (session == null) {
+                LOG.debug("Session {} not found", sessionId);
+                return Mono.empty();
+            }
+            return session.sendNotification(method, params);
+        });
+    }
+
+    @Override
     public Mono<Void> closeGracefully() {
         return Flux.fromIterable(sessions.values())
                 .doFirst(() -> {

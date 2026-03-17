@@ -297,6 +297,18 @@ public class JoobyStreamableServerTransportProvider implements McpStreamableServ
     }
 
     @Override
+    public Mono<Void> notifyClient(String sessionId, String method, Object params) {
+        return Mono.defer(() -> {
+            McpStreamableServerSession session = this.sessions.get(sessionId);
+            if (session == null) {
+                LOG.debug("Session {} not found", sessionId);
+                return Mono.empty();
+            }
+            return session.sendNotification(method, params);
+        });
+    }
+
+    @Override
     public Mono<Void> notifyClients(String method, Object params) {
         if (this.sessions.isEmpty()) {
             LOG.debug("No active sessions to broadcast message to");

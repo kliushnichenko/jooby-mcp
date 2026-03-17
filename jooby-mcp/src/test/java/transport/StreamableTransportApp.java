@@ -6,7 +6,7 @@ import io.github.kliushnichenko.jooby.mcp.transport.JoobyStreamableServerTranspo
 import io.jooby.Jooby;
 import io.jooby.jackson.JacksonModule;
 import io.modelcontextprotocol.common.McpTransportContext;
-import io.modelcontextprotocol.json.jackson.JacksonMcpJsonMapper;
+import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -32,12 +32,17 @@ public class StreamableTransportApp extends Jooby {
         McpServerFeatures.SyncToolSpecification toolSpec =
                 McpServerFeatures.SyncToolSpecification.builder()
                         .tool(McpSchema.Tool.builder()
-                                .name("echo_tool")
+                                        .name("echo_tool")
                                         .description("A tool that echoes back the input it receives.")
 //                                .inputSchema(new McpSchema.JsonSchema(""))
-                                .build()
+                                        .build()
                         )
-                        .callHandler((exchange, request) -> new McpSchema.CallToolResult(request.arguments().get("input").toString(), false))
+                        .callHandler((exchange, request) -> {
+                            var input = request.arguments().get("input").toString();
+                            return McpSchema.CallToolResult.builder()
+                                    .addTextContent(input)
+                                    .build();
+                        })
                         .build();
 
         McpServer.sync(transportProvider)
