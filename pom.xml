@@ -40,8 +40,8 @@
         <maven.compiler.release>21</maven.compiler.release>
         <revision>2.1.0</revision>
 
-        <jooby.version>4.0.17</jooby.version>
-        <jackson2.version>2.21.1</jackson2.version>
+        <jooby.version>4.1.0</jooby.version>
+        <jackson2.version>2.21.2</jackson2.version>
         <jackson.annotations.version>2.21</jackson.annotations.version>
         <mcp.sdk.version>1.1.0</mcp.sdk.version>
         <lombok.version>1.18.44</lombok.version>
