@@ -46,7 +46,7 @@
         <mcp.sdk.version>1.1.0</mcp.sdk.version>
         <lombok.version>1.18.44</lombok.version>
         <junit.version>6.0.3</junit.version>
-        <pmd.version>7.16.0</pmd.version>
+        <pmd.version>7.23.0</pmd.version>
     </properties>
 
     <modules>
