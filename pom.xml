@@ -41,10 +41,10 @@
         <revision>2.1.0</revision>
 
         <jooby.version>4.4.0</jooby.version>
-        <jackson2.version>2.21.2</jackson2.version>
+        <jackson2.version>2.21.3</jackson2.version>
         <jackson.annotations.version>2.21</jackson.annotations.version>
-        <mcp.sdk.version>1.1.1</mcp.sdk.version>
-        <lombok.version>1.18.44</lombok.version>
+        <mcp.sdk.version>1.1.2</mcp.sdk.version>
+        <lombok.version>1.18.46</lombok.version>
         <junit.version>6.0.3</junit.version>
         <pmd.version>7.16.0</pmd.version>
     </properties>
